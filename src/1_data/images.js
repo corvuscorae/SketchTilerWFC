@@ -1,3 +1,5 @@
+// For WFC's Image Processor's multiple input feature
+
 const IMAGES_GROUND = [
 	MAP1_GROUND,
 	//MAP2_GROUND,

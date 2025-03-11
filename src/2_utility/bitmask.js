@@ -4,15 +4,12 @@
 */
 
 /** 
- * Represents either
- * an adjacent patterns Bitmask for a pattern (which patterns are adjacent to a pattern in a direction),
- * or a possible patterns Bitmask for a cell (which patterns a cell can be).
+ * Represents either:
+ * 	an adjacent patterns Bitmask for a pattern (which patterns are adjacent to a pattern in a direction),
+ * 	or a possible patterns Bitmask for a cell (which patterns a cell can be).
  */
 export default class Bitmask {
-	/**
-	 * Since a single int can only store up to 32 bits (or patterns),
-	 * use an array of ints to represent one giant int with infinite size.
-	 */
+	/** Since a single int can only store up to 32 bits (or patterns), use an array of ints to represent one giant int with infinite size. */
 	array;
 
 	/** @param {number} numBits is equal to numPatterns */

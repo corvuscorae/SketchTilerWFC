@@ -1,4 +1,13 @@
-/** Gets a batch of pngs generated in scene and sends the base64 png data to server for saving. */
+/*
+	This file probably isn't needed for this project
+	We can remove it later once we know its for sure not needed
+*/
+
+/**
+ * Gets a batch of pngs generated in scene and sends the base64 png data to server for saving.
+ * @param {number} numRuns
+ * @param {Phaser.Scene} scene
+ */
 export async function autoExport(numRuns, scene){
 	console.log("Generating batch...");
 
@@ -34,7 +43,10 @@ export async function autoExport(numRuns, scene){
 	window.game.canvas.height = startHeight;
 }
 
-/** Ensures Phaser fully updates the canvas. */		
+/**
+ * Ensures Phaser fully updates the canvas.
+ * @param {Phaser.Scene} scene
+ */		
 function forceRenderUpdate(scene) {
 	return new Promise(resolve => {
 		scene.time.delayedCall(100, () => {

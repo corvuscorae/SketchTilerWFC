@@ -1,19 +1,16 @@
 import Phaser from "./lib/phaser.module.js";
 import { TinyTownGenerator } from "./src/5_main/tinyTownGenerator.js";
 
-// debug with extreme prejudice
-"use strict"
+"use strict"	// execute JS code in strict mode
 
 let config = {
-	parent: 'phaser-game',
+	parent: "phaserCanvas",
 	type: Phaser.CANVAS,
 	width: 640,
 	height: 400,
 	zoom: 1,
 	autoCenter: true,
-	render: {
-		pixelArt: true	// prevent pixel art from getting blurred when scaled
-	},
+	render: { pixelArt: true },	// scale pixel art without blurring
 	scene: [TinyTownGenerator]
 }
 

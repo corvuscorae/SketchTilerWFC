@@ -78,7 +78,7 @@ export class TinyTownGenerator extends Phaser.Scene {
 		Get average runtime over ${this.numRuns} runs: T <br>
 		Export ${this.numRuns} runs as .png files: E
 		`;
-		document.getElementById("description").innerHTML = controls;
+		document.getElementById("descriptionText").innerHTML = controls;
 	}
 
 	generateMap(){
