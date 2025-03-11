@@ -10,7 +10,6 @@ export class TinyTownGenerator extends Phaser.Scene {
 	N = 2;
 	outputWidth = 24;
 	outputHeight = 15;
-	tileSize = 16;
 
 	maxAttempts = 10;
 	numRuns = 10;	// for this.getAverageRuntime() and autoExport()
