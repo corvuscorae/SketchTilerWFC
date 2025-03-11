@@ -27,7 +27,7 @@ export default class ImageProcessor {
 
 	/**
 	 * Populates this.patterns, this.adjacencies, and this.weights.
-	 * @param {number[][]} images an array of 2D tile ID matrices each representing a layer of a tilemap
+	 * @param {number[][][]} images an array of 2D tile ID matrices each representing a layer of a tilemap
 	 * @param {number} N the width of the resulting square patterns
 	 */
 	process(images, N) {
@@ -43,7 +43,7 @@ export default class ImageProcessor {
 	}
 
 	/**
-	 * @param {number[][]} images an array of 2D tile ID matrices each representing a layer of a tilemap
+	 * @param {number[][][]} images an array of 2D tile ID matrices each representing a layer of a tilemap
 	 * @param {number} N the width of the resulting square patterns
 	 */
 	getPatternsAndWeights(images, N) {

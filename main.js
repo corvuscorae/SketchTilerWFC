@@ -1,7 +1,7 @@
-import Phaser from "./lib/phaser.module.js";
-import { TinyTownGenerator } from "./src/3_phaserScenes/tinyTownGenerator.js";
-
 "use strict"	// execute JS code in strict mode
+
+import Phaser from "./lib/phaser.module.js";
+import { TinyTownGenerator } from "./src/3_phaserScenes/tinyTownGenerator.js"
 
 let config = {
 	parent: "phaserCanvas",

@@ -1,18 +1,15 @@
 import Phaser from "../../lib/phaser.module.js"
-import ImageProcessor from "../3_classes/imageProcessor.js"
-import ConstraintSolver from "../3_classes/constraintSolver.js"
-import { autoExport } from "../1_utility/autoExporter.js";
+import WFC from "../2_wfc/wfc.js";
 
 export class TinyTownGenerator extends Phaser.Scene {
-	ip = new ImageProcessor();
-	cs = new ConstraintSolver();
+	wfc = new WFC();
 	mapIndex = 1;
 	N = 2;
 	outputWidth = 24;
 	outputHeight = 15;
 
 	maxAttempts = 10;
-	numRuns = 10;	// for this.getAverageRuntime() and autoExport()
+	numRuns = 10;	// for this.getAverageRuntime()
 
 	constructor() {
 		super("tinyTownGeneratorScene");
@@ -26,15 +23,14 @@ export class TinyTownGenerator extends Phaser.Scene {
 
 	create()
 	{
-		this.setupControls();
 		this.showInputImage();
+		this.setupControls();
 	}
 
 	showInputImage() {
 		this.multiLayerMap = this.add.tilemap("tinyTownMap", 16, 16, 40, 25);
 		this.tileset = this.multiLayerMap.addTilesetImage("kenney-tiny-town", "tilemap");
 
-		// Use the following for map2+:
 		if (this.mapIndex === 1) {
 			this.groundLayer = this.multiLayerMap.createLayer("Ground-n-Walkways", this.tileset, 0, 0);
 			this.treesLayer = this.multiLayerMap.createLayer("Trees-n-Bushes", this.tileset, 0, 0);
@@ -52,30 +48,20 @@ export class TinyTownGenerator extends Phaser.Scene {
 		this.runWFC_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 		this.clear_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
 		this.timedRuns_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T);
-		this.autoExport_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
 		this.runWFC_Key.on("down", () => this.generateMap());
-		this.timedRuns_Key.on("down", () => this.getAverageRuntime(this.numRuns));
-		this.autoExport_Key.on("down", () => autoExport(this.numRuns, this)); 
 		this.clear_Key.on("down", () => {
-			for (const layer of this.multiLayerMapLayers) {
-				layer.setVisible(true);
-			}
-			if (this.groundMap) {
-				this.groundMap.destroy();
-			}
-			if (this.structuresMap) {
-				this.structuresMap.destroy();
-			}
+			for (const layer of this.multiLayerMapLayers) layer.setVisible(true);
+			if (this.groundMap) this.groundMap.destroy();
+			if (this.structuresMap) this.structuresMap.destroy();
 		});
-
+		this.timedRuns_Key.on("down", () => this.getAverageRuntime(this.numRuns));
 
 		const controls = `
 		<h2>Controls (open console recommended)</h2>
 		Run WFC: R <br>
 		Clear Output: C <br>
 		Get average runtime over ${this.numRuns} runs: T <br>
-		Export ${this.numRuns} runs as .png files: E
 		`;
 		document.getElementById("descriptionText").innerHTML = controls;
 	}
