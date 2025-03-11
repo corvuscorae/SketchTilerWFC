@@ -1,4 +1,4 @@
-import Bitmask from "../2_utility/bitmask.js";
+import Bitmask from "./bitmask.js";
 
 /** Processes images to get their patterns. Doesn't process images as periodic, and doesn't rotate or reflect patterns. */
 export default class ImageProcessor {

@@ -7,7 +7,7 @@ class Node {
 }
 
 /** Utilizes a linked list for O(1) enqueueing/dequeueing. */
-class Queue {
+export default class Queue {
 	front = null;
 	back = null;
 	length = 0;

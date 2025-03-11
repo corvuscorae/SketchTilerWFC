@@ -1,5 +1,5 @@
 import Phaser from "./lib/phaser.module.js";
-import { TinyTownGenerator } from "./src/5_main/tinyTownGenerator.js";
+import { TinyTownGenerator } from "./src/3_main/tinyTownGenerator.js";
 
 "use strict"	// execute JS code in strict mode
 

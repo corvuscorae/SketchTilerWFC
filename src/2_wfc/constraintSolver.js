@@ -1,4 +1,5 @@
-import Bitmask from "../2_utility/bitmask.js";
+import Bitmask from "./bitmask";
+import Queue from "./queue";
 
 export default class ConstraintSolver {
 	/**
