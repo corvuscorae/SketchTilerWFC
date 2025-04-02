@@ -1,7 +1,8 @@
 import Phaser from "../../lib/phaser.module.js"
-import WFC from "../2_wfc/wfc.js";
+//import WFC from "../2_wfc/wfc.js";
 
 export class TinyTownGenerator_Scene extends Phaser.Scene {
+	/*
 	wfc = new WFC();
 	mapIndex = 1;
 	N = 2;
@@ -10,6 +11,7 @@ export class TinyTownGenerator_Scene extends Phaser.Scene {
 
 	maxAttempts = 10;
 	numRuns = 10;	// for this.getAverageRuntime()
+	*/
 
 	constructor() {
 		super("tinyTownGeneratorScene");
@@ -23,8 +25,10 @@ export class TinyTownGenerator_Scene extends Phaser.Scene {
 
 	create()
 	{
-		this.showInputImage();
-		this.setupControls();
+		//this.showInputImage();
+		//this.setupControls();
+
+		console.log("hi");
 	}
 
 	showInputImage() {
