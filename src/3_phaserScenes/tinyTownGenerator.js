@@ -1,7 +1,7 @@
 import Phaser from "../../lib/phaser.module.js"
 import WFC from "../2_wfc/wfc.js";
 
-export class TinyTownGenerator extends Phaser.Scene {
+export class TinyTownGenerator_Scene extends Phaser.Scene {
 	wfc = new WFC();
 	mapIndex = 1;
 	N = 2;
