@@ -1,5 +1,6 @@
 import Phaser from "../../lib/phaser.module.js"
 import processImages from "../2_wfc/2_components/imageProcessor.js";
+import solve from "../2_wfc/2_components/constraintSolver.js";
 
 export default class Test_Scene extends Phaser.Scene {
 
@@ -23,10 +24,14 @@ export default class Test_Scene extends Phaser.Scene {
 			[21, 22, 23, 24, 25]
 		];
 
-		const [patterns, weights, adjacencies] = processImages([image], 2);
+		const [patterns, weights, adjacencies] = processImages(IMAGES_GROUND, 2);
 
 		console.log(patterns);
 		console.log(weights);
 		console.log(adjacencies);
+
+		const map = solve(patterns, weights, adjacencies, 10, 10, 10);
+
+		console.log(map);
 	}
 }
