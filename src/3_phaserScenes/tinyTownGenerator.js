@@ -1,17 +1,17 @@
 import Phaser from "../../lib/phaser.module.js"
-//import WFC from "../2_wfc/wfc.js";
+import WFC from "../2_wfc/wfc.js";
+import { MAPS_GROUND, MAPS_STRUCTURES } from "../2_wfc/1_input/maps.js";
 
-export class TinyTownGenerator_Scene extends Phaser.Scene {
-	/*
-	wfc = new WFC();
+export default class TinyTownGenerator_Scene extends Phaser.Scene {
 	mapIndex = 1;
+
+	wfc = new WFC();
 	N = 2;
 	outputWidth = 24;
 	outputHeight = 15;
-
 	maxAttempts = 10;
+
 	numRuns = 10;	// for this.getAverageRuntime()
-	*/
 
 	constructor() {
 		super("tinyTownGeneratorScene");
@@ -25,10 +25,8 @@ export class TinyTownGenerator_Scene extends Phaser.Scene {
 
 	create()
 	{
-		//this.showInputImage();
-		//this.setupControls();
-
-		console.log("hi");
+		this.showInputImage();
+		this.setupControls();
 	}
 
 	showInputImage() {
@@ -71,28 +69,15 @@ export class TinyTownGenerator_Scene extends Phaser.Scene {
 	}
 
 	generateMap(){
-		let patterns;
-		let weights;
-		let adjacencies;
-		let generationWasSuccessful;
-
 		console.log("Processing ground");
-		this.ip.process(IMAGES_GROUND, this.N);
-		patterns = this.ip.patterns;
-		weights = this.ip.weights
-		adjacencies = this.ip.adjacencies;
-		generationWasSuccessful = this.cs.solve(patterns, weights, adjacencies, this.outputWidth, this.outputHeight, this.maxAttempts);
-		if (!generationWasSuccessful) return;
-		const groundImage = this.cs.output;
+		this.wfc.process(MAPS_GROUND, this.N);
+		const groundImage = this.wfc.generate(this.outputWidth, this.outputHeight, this.maxAttempts);
+		if (!groundImage) return;
 
 		console.log("Structures");
-		this.ip.process(IMAGES_STRUCTURES, this.N);
-		patterns = this.ip.patterns;
-		weights = this.ip.weights
-		adjacencies = this.ip.adjacencies;
-		generationWasSuccessful = this.cs.solve(patterns, weights, adjacencies, this.outputWidth, this.outputHeight, this.maxAttempts);
-		if (!generationWasSuccessful) return;
-		const structuresImage = this.cs.output;
+		this.wfc.process(MAPS_STRUCTURES, this.N);
+		const structuresImage = this.wfc.generate(this.outputWidth, this.outputHeight, this.maxAttempts);
+		if (!structuresImage) return;
 
 		this.showImages(groundImage, structuresImage);
 	}
