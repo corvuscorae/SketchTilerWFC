@@ -1,6 +1,6 @@
 import Phaser from "../../lib/phaser.module.js"
-import processImages from "../2_wfc/2_components/imageProcessor.js";
-import solve from "../2_wfc/2_components/constraintSolver.js";
+import WFC from "../2_wfc/wfc.js";
+import { MAPS_GROUND, MAPS_STRUCTURES } from "../2_wfc/1_input/maps.js";
 
 export default class Test_Scene extends Phaser.Scene {
 
@@ -24,14 +24,10 @@ export default class Test_Scene extends Phaser.Scene {
 			[21, 22, 23, 24, 25]
 		];
 
-		const [patterns, weights, adjacencies] = processImages(IMAGES_GROUND, 2);
-
-		console.log(patterns);
-		console.log(weights);
-		console.log(adjacencies);
-
-		const map = solve(patterns, weights, adjacencies, 10, 10, 10);
-
+		const wfc = new WFC();
+		
+		wfc.process(MAPS_GROUND, 2);
+		const map = wfc.generate(10, 10, 10);
 		console.log(map);
 	}
 }

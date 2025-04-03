@@ -8,7 +8,7 @@ import Bitmask from "./bitmask.js";
  * @param {number} N the width of the resulting square patterns
  * @returns {[number[][][], number[], Bitmask[][]]} patterns, weights, adjacencies
  */
-export default function processImages(images, N) {
+export default function process(images, N) {
 	const [patterns, weights] = getPatternsAndWeights(images, N);
 	const adjacencies = getAdjacencies(patterns);
 	return [patterns, weights, adjacencies];
