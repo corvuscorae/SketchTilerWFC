@@ -1,6 +1,6 @@
 import Phaser from "../../lib/phaser.module.js"
 import WFC from "../2_wfc/wfc.js";
-import { MAPS_GROUND, MAPS_STRUCTURES } from "../2_wfc/1_input/maps.js";
+import { MAPS_GROUND, MAPS_STRUCTURES } from "../2_wfc/maps.js";
 
 export default class TinyTownGenerator_Scene extends Phaser.Scene {
 	mapIndex = 1;
