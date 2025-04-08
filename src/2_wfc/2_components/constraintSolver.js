@@ -2,6 +2,12 @@ import DIRECTIONS from "./directions.js";
 import Bitmask from "./bitmask.js";
 import Queue from "./queue.js";
 
+export default class ConstraintSolver {
+	#waveMatrix;
+
+	
+}
+
 /**
  * Attempts to create an output image based on the patterns, weights, and adjacencies from input images.
  * @param {number[][][]} patterns
@@ -11,7 +17,7 @@ import Queue from "./queue.js";
  * @param {number} height of output
  * @returns {number[][] | null} an image as a 2D matrix of tile IDs if successful, or null if not
  */
-export default function solve(patterns, weights, adjacencies, width, height, maxAttempts) {
+function solve(patterns, weights, adjacencies, width, height, maxAttempts) {
 	console.log("starting");
 
 	let waveMatrix = createWaveMatrix(patterns.length, width, height);
