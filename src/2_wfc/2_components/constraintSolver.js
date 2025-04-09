@@ -253,26 +253,3 @@ function waveMatrixToImage(waveMatrix, patterns) {
 
 	return image;
 }
-
-const totalDurations = new Map();
-const numCalls = new Map();
-
-/**
- * A function wrapper that records how long a function takes to run in ms.
- * @param {Function} targetFunction the function being timed/wrapped
- * @param {any[]} args an array storing the arguments that will be passed to the target function
- * @returns {any} what targetFunction returns
- */
-function time(targetFunction, args) {
-	const start = performance.now();
-	const result = targetFunction(...args);	// it's okay if the function doesn't have parameters because you can still do this in JS
-	const duration = performance.now() - start;
-
-	if (totalDurations.has(targetFunction.name)) totalDurations.set(targetFunction.name, totalDurations.get(targetFunction.name) + duration);
-	else totalDurations.set(targetFunction.name, duration);
-
-	if (numCalls.has(targetFunction.name)) numCalls.set(targetFunction.name, numCalls.get(targetFunction.name) + 1);
-	else numCalls.set(targetFunction.name, 1);
-
-	return result;
-}
