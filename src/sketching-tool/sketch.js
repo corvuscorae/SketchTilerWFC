@@ -1,7 +1,7 @@
-import "./style.css";
+//import "./style.css";
 
 const APP_NAME = "Sketch Co-Collaborate";
-const app = document.querySelector<HTMLDivElement>("#app")!;
+const app = document.querySelector("#app");
 
 document.title = APP_NAME;
 
@@ -10,7 +10,7 @@ header.innerHTML = APP_NAME;
 app.append(header);
 
 const canvas = document.createElement("canvas");
-const context = canvas.getContext("2d")!;
+const context = canvas.getContext("2d");
 app.append(canvas);
 canvas.width = 1280;
 canvas.height = 720;
@@ -24,23 +24,24 @@ buttonContainer.classList.add("button-container"); // Add a class for CSS stylin
 app.append(buttonContainer);
 
 
-interface Displayable {
-  display(ctx: CanvasRenderingContext2D): void;
-}
+//interface Displayable {
+//  display(ctx: CanvasRenderingContext2D): void;
+//}
+//
+//interface Point {
+//  x: number;
+//  y: number;
+//}
 
-interface Point {
-  x: number;
-  y: number;
-}
+//type Line = { points: Array<Point>; thickness: number; hue: number, structure: string };
 
-type Line = { points: Array<Point>; thickness: number; hue: number, structure: string };
+const lineThickness = 5;
+let workingLine = { points: [], thickness: lineThickness, hue: 0, structure: "House" };
 
-const lineThickness: number = 5;
-let workingLine: Line = { points: [], thickness: lineThickness, hue: 0, structure: "House" };
-
-class LineDisplayble implements Displayable {
-  constructor(readonly line: Line) {}
-  display(ctx: CanvasRenderingContext2D): void {
+class LineDisplayble {
+  constructor(line) { this.line = line; }
+  
+  display(ctx) {
     ctx.lineWidth = this.line.thickness;
     ctx.beginPath();
     ctx.moveTo(this.line.points[0].x, this.line.points[0].y); //get to line start
@@ -53,8 +54,8 @@ class LineDisplayble implements Displayable {
   }
 }
 
-let displayList: Array<Displayable> = [];
-let redoDisplayList: Array<Displayable> = [];
+let displayList = []; 
+let redoDisplayList = [];
 
 const changeDraw = new Event("drawing-changed"); //When changeDraw is dispatched, the drawing area will be repainted.
 
@@ -65,34 +66,36 @@ canvas.addEventListener("drawing-changed", () => {
   }
 });
 
-interface Sticker {
-  x: number;
-  y: number;
-  emoji: string;
-}
+//interface Sticker {
+//  x: number;
+//  y: number;
+//  emoji: string;
+//}
 
-class stickerDisplayable implements Displayable {
-  constructor(readonly sticker: Sticker | null) {}
-  display(ctx: CanvasRenderingContext2D): void {
+class stickerDisplayable {
+  constructor(sticker) { this.sticker = sticker; }
+  
+  display(ctx) {
     if (this.sticker != null) {
       ctx.fillText(this.sticker.emoji, this.sticker.x, this.sticker.y);
     }
   }
 }
 
-let currentSticker: stickerDisplayable = new stickerDisplayable(null)!;
+let currentSticker = new stickerDisplayable(null);
 
-interface Mouse {
-  x: number;
-  y: number;
-  hue: number;
-  active: boolean;
-  sticker: Sticker | null;
-}
+//interface Mouse {
+//  x: number;
+//  y: number;
+//  hue: number;
+//  active: boolean;
+//  sticker: Sticker | null;
+//}
 
-class mouseDisplayable implements Displayable {
-  constructor(readonly mouse: Mouse) {}
-  display(ctx: CanvasRenderingContext2D): void {
+class mouseDisplayable {
+  constructor(mouse) { this.mouse = mouse; }
+  
+  display(ctx) {
     if (!this.mouse.active) {
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -114,7 +117,7 @@ class mouseDisplayable implements Displayable {
   }
 }
 
-let mouseObject: mouseDisplayable = new mouseDisplayable({
+let mouseObject = new mouseDisplayable({
   x: 0,
   y: 0,
   hue: 0,
@@ -296,7 +299,7 @@ buttonContainer.append(exportButton);
 
 exportButton.onclick = () => {
   const exportCanvas = document.createElement("canvas");
-  const exportContext = exportCanvas.getContext("2d")!;
+  const exportContext = exportCanvas.getContext("2d");
   exportCanvas.width = 1920;
   exportCanvas.height = 1080;
   exportContext.scale(1.5, 1.5);
@@ -313,9 +316,9 @@ exportButton.onclick = () => {
   downloadLink.click();
 };
 
-function makeColorButton(name: string, hue: number): void {
+function makeColorButton(name, hue) {
   const hueButton = document.createElement("button");
-  hueButton.innerHTML = name;
+  hueButton.innerHTML = name; 
 
   buttonContainer.append(hueButton);
 
@@ -332,14 +335,14 @@ makeColorButton("🌲Forest🌲", 131);
 makeColorButton("🌐Path🌐", 268);
 
 // Helper function to calculate the perpendicular distance from a point to a line
-function perpendicularDistance(point: Point, start: Point, end: Point): number {
+function perpendicularDistance(point, start, end) {
   const numerator = Math.abs((end.y - start.y) * point.x - (end.x - start.x) * point.y + end.x * start.y - end.y * start.x);
   const denominator = Math.sqrt(Math.pow(end.y - start.y, 2) + Math.pow(end.x - start.x, 2));
   return numerator / denominator;
 }
 
 // Ramer-Douglas-Peucker algorithm to simplify lines
-function ramerDouglasPeucker(points: Point[], tolerance: number): Point[] {
+function ramerDouglasPeucker(points, tolerance) {
   // Find the point with the maximum perpendicular distance
   let dmax = 0;
   let index = 0;
