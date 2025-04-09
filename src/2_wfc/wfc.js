@@ -1,7 +1,7 @@
 import process from "./2_components/imageProcessor.js";
 import solve from "./2_components/constraintSolver.js";
 
-export default class WFC {
+export default class WFCModel {
 	#patterns;
 	#weights;
 	#adjacencies;
@@ -12,7 +12,7 @@ export default class WFC {
 	 * @param {number[][][]} images an array of 2D tile ID matrices each representing a layer of a tilemap
 	 * @param {number} N the width of the resulting square patterns
 	 */
-	process(images, N) {
+	learn(images, N) {
 		[this.#patterns, this.#weights, this.#adjacencies] = process(images, N);
 	}
 
