@@ -1,9 +1,9 @@
 "use strict"	// execute JS code in strict mode
 
 import Phaser from "./lib/phaser.module.js";
-import { TinyTownGenerator } from "./src/3_phaserScenes/tinyTownGenerator.js"
+import TinyTownGenerator_Scene from "./src/3_phaserScenes/tinyTownGenerator.js";
 
-let config = {
+const config = {
 	parent: "phaserCanvas",
 	type: Phaser.CANVAS,
 	width: 640,
@@ -11,7 +11,7 @@ let config = {
 	zoom: 1,
 	autoCenter: true,
 	render: { pixelArt: true },	// scale pixel art without blurring
-	scene: [TinyTownGenerator]
+	scene: [TinyTownGenerator_Scene]
 }
 
 window.game = new Phaser.Game(config);
