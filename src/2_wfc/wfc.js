@@ -1,4 +1,4 @@
-import process from "./2_components/imageProcessor.js";
+import process from "./2_components/imageLearner.js";
 import solve from "./2_components/constraintSolver.js";
 
 export default class WFCModel {
