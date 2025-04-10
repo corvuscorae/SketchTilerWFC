@@ -1,6 +1,6 @@
 "use strict"	// execute JS code in strict mode
 
-import Phaser from "./lib/phaser.module.js";
+import Phaser from "./lib/phaserModule.js";
 import WFCTesting from "./src/3_phaserScenes/wfcTesting.js";
 
 const config = {

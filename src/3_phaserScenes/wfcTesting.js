@@ -1,4 +1,4 @@
-import Phaser from "../../lib/phaser.module.js"
+import Phaser from "../../lib/phaserModule.js"
 import WFCModel from "../2_wfc/wfcModel.js";
 import { MAPS_GROUND, MAPS_STRUCTURES } from "../2_wfc/maps.js";
 
