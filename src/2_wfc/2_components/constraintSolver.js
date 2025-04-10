@@ -1,24 +1,25 @@
-import DIRECTIONS from "./directions.js";
-import Bitmask from "./bitmask.js";
-import Queue from "./queue.js";
-import PerformanceProfiler from "../../1_utility/performanceProfiler.js";
+import DIRECTIONS from "./directions";
+import Bitmask from "./bitmask";
+import Queue from "./queue";
+import PerformanceProfilers from "../../1_utility/performanceProfiler";
 
 export default class ConstraintSolver {
 	#waveMatrix;
 
 	/**
-	 * Attempts to create an output image based on the patterns, weights, and adjacencies from input images.
+	 * Attempts to solve a wave matrix based on learned data.
 	 * @param {number[][][]} patterns
 	 * @param {number[]} weights 
 	 * @param {Bitmask[][]} adjacencies
 	 * @param {number} width of output
 	 * @param {number} height of output
-	 * @returns {number[][] | null} an image as a 2D matrix of tile IDs if successful, or null if not
+	 * @param {bool} time whether to time the duration of this function or not
+	 * @returns {Bitmask[][] | null} the solved wave matrix if successful, or null if not
 	 */
-	solve(patterns, weights, adjacencies, width, height, maxAttempts) {
+	solve(patterns, weights, adjacencies, width, height, maxAttempts, time) {
 		console.log("starting");
 
-		let waveMatrix = createWaveMatrix(patterns.length, width, height);
+		let waveMatrix = this.createWaveMatrix(patterns.length, width, height);
 		let numAttempts = 1;
 
 		/*
@@ -229,26 +230,5 @@ export default class ConstraintSolver {
 		}
 
 		return Math.log(sumOfWeights) - sumOfWeightLogWeights/sumOfWeights;
-	}
-
-	/**
-	 * Build a 2D image matrix using the top left tile of each cell's pattern.
-	 * @param {Bitmask[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
-	 * @param {number[][][]} patterns 
-	 * @returns {number[][]}
-	 */
-	waveMatrixToImage(waveMatrix, patterns) {
-		const image = [];
-		for (let y = 0; y < waveMatrix.length; y++) image[y] = [];
-
-		for (let y = 0; y < waveMatrix.length; y++) {
-		for (let x = 0; x < waveMatrix[0].length; x++) {
-			const possiblePatterns_Array = waveMatrix[y][x].toArray();
-			const i = possiblePatterns_Array[0];	// should be guaranteed to only have 1 possible pattern
-			const tileID = patterns[i][0][0];
-			image[y][x] = tileID;
-		}}
-
-		return image;
 	}
 }

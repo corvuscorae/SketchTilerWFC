@@ -1,6 +1,10 @@
 import DIRECTIONS from "./directions.js";
 import Bitmask from "./bitmask.js";
 
+export default class ImageLearner {
+
+}
+
 /**
  * Gets the patterns from the images and those patterns' weights and adjacencies.
  * Doesn't process images as periodic, and doesn't rotate or reflect patterns.
@@ -8,7 +12,7 @@ import Bitmask from "./bitmask.js";
  * @param {number} N the width of the resulting square patterns
  * @returns {[number[][][], number[], Bitmask[][]]} patterns, weights, adjacencies
  */
-export default function process(images, N) {
+function learn(images, N) {
 	const [patterns, weights] = getPatternsAndWeights(images, N);
 	const adjacencies = getAdjacencies(patterns);
 	return [patterns, weights, adjacencies];
