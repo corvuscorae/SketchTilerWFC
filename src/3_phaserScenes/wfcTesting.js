@@ -25,11 +25,8 @@ export default class WFCTesting_Scene extends Phaser.Scene {
 
 	create()
 	{
-		//this.showInputImage();
-		//this.setupControls();
-
-		this.model.learn(MAPS_GROUND, 2, false);
-		this.model.debug();
+		this.showInputImage();
+		this.setupControls();
 	}
 
 	showInputImage() {
@@ -73,7 +70,9 @@ export default class WFCTesting_Scene extends Phaser.Scene {
 
 	generateMap(){
 		console.log("Processing ground");
-		this.model.process(MAPS_GROUND, this.N);
+		this.model.learn(MAPS_GROUND, this.N, true);
+		this.model.debug();
+		return;
 		const groundImage = this.model.generate(this.outputWidth, this.outputHeight, this.maxAttempts);
 		if (!groundImage) return;
 

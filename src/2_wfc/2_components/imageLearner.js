@@ -1,10 +1,13 @@
 import DIRECTIONS from "./directions.js";
 import Bitmask from "./bitmask.js";
+import PerformanceProfiler from "./performanceProfiler.js";
 
 export default class ImageLearner {
 	patterns;
 	weights;
 	adjacencies;
+
+	#profiler = new PerformanceProfiler();
 
 	/**
 	 * Returns the patterns learned from the images and those patterns' weights and adjacencies.
@@ -18,8 +21,14 @@ export default class ImageLearner {
 		this.patterns = [];
 		this.weights = [];
 		this.adjacencies = [];
-		this.#getPatternsAndWeights(images, N);
-		this.#getAdjacencies();
+
+		if (time) this.#profiler.time(() => this.#getPatternsAndWeights(images, N), this.#getPatternsAndWeights.name);
+		else this.#getPatternsAndWeights(images, N);
+
+		if (time) this.#profiler.time(() => this.#getAdjacencies(), this.#getAdjacencies.name);
+		else this.#getAdjacencies();
+
+		if (time) this.#profiler.logData();
 	}
 
 	/**
