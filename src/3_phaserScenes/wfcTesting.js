@@ -2,19 +2,19 @@ import Phaser from "../../lib/phaser.module.js"
 import WFCModel from "../2_wfc/wfcModel.js";
 import { MAPS_GROUND, MAPS_STRUCTURES } from "../2_wfc/maps.js";
 
-export default class WFCTesting_Scene extends Phaser.Scene {
-	mapIndex = 1;
+export default class WFCTesting extends Phaser.Scene {
+	mapIndex = 1;	// which map to display
 
 	model = new WFCModel();
 	N = 2;
-	outputWidth = 24;
-	outputHeight = 15;
+	width = 24;
+	height = 15;
 	maxAttempts = 10;
 
 	numRuns = 10;	// for this.getAverageRuntime()
 
 	constructor() {
-		super("tinyTownGeneratorScene");
+		super("wfcTestingScene");
 	}
 
 	preload() {
@@ -71,12 +71,12 @@ export default class WFCTesting_Scene extends Phaser.Scene {
 	generateMap(){
 		console.log("Ground");
 		this.model.learn(MAPS_GROUND, this.N, true);
-		const groundImage = this.model.generate(this.outputWidth, this.outputHeight, this.maxAttempts, true, true);
+		const groundImage = this.model.generate(this.width, this.height, this.maxAttempts, true, true);
 		if (!groundImage) return;
 
 		console.log("Structures");
 		this.model.learn(MAPS_STRUCTURES, this.N, true);
-		const structuresImage = this.model.generate(this.outputWidth, this.outputHeight, this.maxAttempts, true, true);
+		const structuresImage = this.model.generate(this.width, this.height, this.maxAttempts, true, true);
 		if (!structuresImage) return;
 
 		this.showImages(groundImage, structuresImage);
@@ -87,12 +87,8 @@ export default class WFCTesting_Scene extends Phaser.Scene {
 	 * @param {number[][]} structuresImage 
 	 */
 	showImages(groundImage, structuresImage) {
-		if (this.groundMap) {
-			this.groundMap.destroy();
-		}
-		if (this.structuresMap) {
-			this.structuresMap.destroy();
-		}
+		if (this.groundMap) this.groundMap.destroy();
+		if (this.structuresMap) this.structuresMap.destroy();
 
 		this.groundMap = this.make.tilemap({
 			data: groundImage,
@@ -108,22 +104,20 @@ export default class WFCTesting_Scene extends Phaser.Scene {
 		this.groundMap.createLayer(0, this.tileset, 0, 0);
 		this.structuresMap.createLayer(0, this.tileset, 0, 0);
 
-		for (const layer of this.multiLayerMapLayers) {
-			layer.setVisible(false);
-		}
+		for (const layer of this.multiLayerMapLayers) layer.setVisible(false);
 	}	
 
 	getAverageRuntime(numRuns){
 		let timeStart = performance.now();
 		let timeTotal = 0;
-		for(let i = 1; i <= numRuns; i++){
+		for(let i = 0; i < numRuns; i++){
 			this.generateMap();
 
 			let timeEnd = performance.now();
 			let timeElapsed = timeEnd - timeStart;
 			timeTotal += timeElapsed;
 
-			console.log(`Generation #${i} took ${timeElapsed.toFixed(2)} ms`)
+			console.log(`Generation #${i+1} took ${timeElapsed.toFixed(2)} ms`)
 
 			timeStart = performance.now();
 		}

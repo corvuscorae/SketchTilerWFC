@@ -1,7 +1,7 @@
 "use strict"	// execute JS code in strict mode
 
 import Phaser from "./lib/phaser.module.js";
-import WFCTesting_Scene from "./src/3_phaserScenes/wfcTesting.js";
+import WFCTesting from "./src/3_phaserScenes/wfcTesting.js";
 
 const config = {
 	parent: "phaserCanvas",
@@ -11,7 +11,7 @@ const config = {
 	zoom: 1,
 	autoCenter: true,
 	render: { pixelArt: true },	// scale pixel art without blurring
-	scene: [WFCTesting_Scene]
+	scene: [WFCTesting]
 }
 
 window.game = new Phaser.Game(config);
