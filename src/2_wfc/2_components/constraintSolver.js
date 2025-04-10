@@ -1,9 +1,10 @@
 import DIRECTIONS from "./directions";
 import Bitmask from "./bitmask";
 import Queue from "./queue";
-import PerformanceProfilers from "../../1_utility/performanceProfiler";
+import PerformanceProfiler from "../../1_utility/performanceProfiler";
 
 export default class ConstraintSolver {
+	#profiler = new PerformanceProfiler();
 	#waveMatrix;
 
 	/**

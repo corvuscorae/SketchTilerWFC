@@ -14,7 +14,7 @@ export default class PerformanceProfiler {
 	 * @param {any[]} args an array storing the arguments for the function
 	 * @returns {any} whatever the function returns
 	 */
-	timeFunction(func, args) {
+	time(func, args) {
 		const start = performance.now();
 		const result = func(...args);
 		const duration = performance.now() - start;
