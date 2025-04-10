@@ -23,11 +23,12 @@ export default class WFCModel {
 	 * @param {number} width of output
 	 * @param {number} height of output
 	 * @param {number} maxAttempts
+	 * @param {bool} logProgress whether to log the progress of this function or not
 	 * @param {bool} time whether to time the performance of this function or not
 	 * @returns {number[][] | null} an image as a 2D matrix of tile IDs if successful, or null if not
 	 */
-	generate(width, height, maxAttempts, time) {
+	generate(width, height, maxAttempts, logProgress, time) {
 		if (!this.#learned) throw new Error("WFC must learn before generating");
-		return this.#solver.solve(this.#learner.patterns, this.#learner.weights, this.#learner.adjacencies, width, height, maxAttempts, time);
+		return this.#solver.solve(this.#learner.patterns, this.#learner.weights, this.#learner.adjacencies, width, height, maxAttempts, logProgress, time);
 	}
 }

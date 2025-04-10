@@ -16,11 +16,12 @@ export default class ConstraintSolver {
 	 * @param {number} width of output
 	 * @param {number} height of output
 	 * @param {number} maxAttempts
+	 * @param {bool} logProgress whether to log the progress of this function or not
 	 * @param {bool} time whether to time the duration of this function or not
 	 * @returns {bool} whether the attempt was successful or not
 	 */
-	solve(patterns, weights, adjacencies, width, height, maxAttempts, time) {
-		console.log("starting");
+	solve(patterns, weights, adjacencies, width, height, maxAttempts, logProgress, time) {
+		if (logProgress) console.log("starting");
 
 		let waveMatrix;
 		if (time) waveMatrix = this.#profiler.time(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
@@ -41,12 +42,12 @@ export default class ConstraintSolver {
 			if (time) this.#profiler.time(() => this.observe(waveMatrix, y, x, weights), this.observe.name);
 			else this.observe(waveMatrix, y, x, weights);
 
-			console.log("propagating...");
+			if (logProgress) console.log("propagating...");
 			let contradictionCreated;
 			if (time) contradictionCreated = this.#profiler.time(() => this.propagate(waveMatrix, y, x, adjacencies), this.propagate.name);
 			else contradictionCreated = this.propagate(waveMatrix, y, x, adjacencies);
 			if (contradictionCreated) {
-				console.log("restarting");
+				if (logProgress) console.log("restarting");
 				if (time) waveMatrix = this.#profiler.time(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
 				else waveMatrix = this.createWaveMatrix(patterns.length, width, height);
 				y = Math.floor(Math.random() * height);	// random in range [0, outputHeight-1]
@@ -58,14 +59,14 @@ export default class ConstraintSolver {
 			if (time) [y, x] = this.#profiler.time(() => this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights), this.getLeastEntropyUnsolvedCellPosition.name);
 			else [y, x] = this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights);
 			if (y === -1 && x === -1) {
-				console.log("solved! in " + numAttempts + " attempt(s)");
+				if (logProgress) console.log("solved! took " + numAttempts + " attempt(s)");
 				if (time) this.#profiler.logData();
 				return this.waveMatrixToImage(waveMatrix, patterns);
 				break;
 			}
 		}
 
-		console.log("max attempts reached");
+		if (logProgress) console.log("max attempts reached");
 		return false;
 	}
 
