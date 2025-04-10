@@ -22,7 +22,10 @@ export default class ConstraintSolver {
 	solve(patterns, weights, adjacencies, width, height, maxAttempts, time) {
 		console.log("starting");
 
-		let waveMatrix = this.createWaveMatrix(patterns.length, width, height);
+		let waveMatrix;
+		if (time) waveMatrix = this.#profiler.time(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
+		else waveMatrix = this.createWaveMatrix(patterns.length, width, height);
+
 		let numAttempts = 1;
 
 		/*
@@ -35,22 +38,28 @@ export default class ConstraintSolver {
 		let x = Math.floor(Math.random() * width);	// random in range [0, outputWidth-1]
 
 		while (numAttempts <= maxAttempts) {	// use <= so maxAttempts can be 1
-			this.observe(waveMatrix, y, x, weights);
+			if (time) this.#profiler.time(() => this.observe(waveMatrix, y, x, weights), this.observe.name);
+			else this.observe(waveMatrix, y, x, weights);
 
 			console.log("propagating...");
-			const contradictionCreated = this.propagate(waveMatrix, y, x, adjacencies);
+			let contradictionCreated;
+			if (time) contradictionCreated = this.#profiler.time(() => this.propagate(waveMatrix, y, x, adjacencies), this.propagate.name);
+			else contradictionCreated = this.propagate(waveMatrix, y, x, adjacencies);
 			if (contradictionCreated) {
 				console.log("restarting");
-				waveMatrix = this.createWaveMatrix(patterns.length, width, height);
+				if (time) waveMatrix = this.#profiler.time(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
+				else waveMatrix = this.createWaveMatrix(patterns.length, width, height);
 				y = Math.floor(Math.random() * height);	// random in range [0, outputHeight-1]
 				x = Math.floor(Math.random() * width);	// random in range [0, outputWidth-1]
 				numAttempts++;
 				continue;
 			}
 
-			[y, x] = this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights);
+			if (time) [y, x] = this.#profiler.time(() => this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights), this.getLeastEntropyUnsolvedCellPosition.name);
+			else [y, x] = this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights);
 			if (y === -1 && x === -1) {
 				console.log("solved! in " + numAttempts + " attempt(s)");
+				if (time) this.#profiler.logData();
 				return this.waveMatrixToImage(waveMatrix, patterns);
 				break;
 			}

@@ -42,8 +42,8 @@ export default class PerformanceProfiler {
 
 		for (const [funcName, perfData] of this.#data) {
 			message += `${funcName}():\n`;
-			message += `\tAverage Duration: ${perfData.totalDuration / perfData.numCalls} ms\n`
 			message += `\tTotal Duration: ${perfData.totalDuration} ms\n`;
+			message += `\tAverage Duration: ${(perfData.totalDuration / perfData.numCalls).toFixed(3)} ms\n`
 			message += `\tNum Calls: ${perfData.numCalls}\n`;
 		}
 
