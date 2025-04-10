@@ -7,6 +7,15 @@ export default class ImageLearner {
 	weights;
 	adjacencies;
 
+	/*
+	patterns = array of pattern objects
+	pattern object = {
+		tiles: number[][],
+		weight: number
+		adjacencies: Bitmask[][]
+	}
+	*/
+
 	#profiler = new PerformanceProfiler();
 
 	/**

@@ -1,21 +1,23 @@
-import DIRECTIONS from "./directions";
-import Bitmask from "./bitmask";
-import Queue from "./queue";
-import PerformanceProfiler from "../../1_utility/performanceProfiler";
+import DIRECTIONS from "./directions.js";
+import Bitmask from "./bitmask.js";
+import Queue from "./queue.js";
+import PerformanceProfiler from "./performanceProfiler.js";
 
 export default class ConstraintSolver {
+	waveMatrix;
+
 	#profiler = new PerformanceProfiler();
-	#waveMatrix;
 
 	/**
 	 * Attempts to solve a wave matrix based on learned data.
 	 * @param {number[][][]} patterns
-	 * @param {number[]} weights 
+	 * @param {number[]} weights
 	 * @param {Bitmask[][]} adjacencies
 	 * @param {number} width of output
 	 * @param {number} height of output
+	 * @param {number} maxAttempts
 	 * @param {bool} time whether to time the duration of this function or not
-	 * @returns {Bitmask[][] | null} the solved wave matrix if successful, or null if not
+	 * @returns {bool} whether the attempt was successful or not
 	 */
 	solve(patterns, weights, adjacencies, width, height, maxAttempts, time) {
 		console.log("starting");
@@ -33,23 +35,23 @@ export default class ConstraintSolver {
 		let x = Math.floor(Math.random() * width);	// random in range [0, outputWidth-1]
 
 		while (numAttempts <= maxAttempts) {	// use <= so maxAttempts can be 1
-			observe(waveMatrix, y, x, weights);
+			this.observe(waveMatrix, y, x, weights);
 
 			console.log("propagating...");
-			const contradictionCreated = propagate(waveMatrix, y, x, adjacencies);
+			const contradictionCreated = this.propagate(waveMatrix, y, x, adjacencies);
 			if (contradictionCreated) {
 				console.log("restarting");
-				waveMatrix = createWaveMatrix(patterns.length, width, height);
+				waveMatrix = this.createWaveMatrix(patterns.length, width, height);
 				y = Math.floor(Math.random() * height);	// random in range [0, outputHeight-1]
 				x = Math.floor(Math.random() * width);	// random in range [0, outputWidth-1]
 				numAttempts++;
 				continue;
 			}
 
-			[y, x] = getLeastEntropyUnsolvedCellPosition(waveMatrix, weights);
+			[y, x] = this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights);
 			if (y === -1 && x === -1) {
 				console.log("solved! in " + numAttempts + " attempt(s)");
-				return waveMatrixToImage(waveMatrix, patterns);
+				return this.waveMatrixToImage(waveMatrix, patterns);
 				break;
 			}
 		}
@@ -195,7 +197,7 @@ export default class ConstraintSolver {
 
 		for (let y = 0; y < waveMatrix.length; y++) {
 		for (let x = 0; x < waveMatrix[0].length; x++) {
-			const entropy = getShannonEntropy(waveMatrix[y][x], weights);
+			const entropy = this.getShannonEntropy(waveMatrix[y][x], weights);
 			if (entropy < leastEntropy && entropy > 0) {
 				leastEntropy = entropy;
 				leastEntropyCellPositions = [[y, x]];
@@ -231,5 +233,26 @@ export default class ConstraintSolver {
 		}
 
 		return Math.log(sumOfWeights) - sumOfWeightLogWeights/sumOfWeights;
+	}
+
+	/**
+	 * Build a 2D image matrix using the top left tile of each cell's pattern.
+	 * @param {Bitmask[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
+	 * @param {number[][][]} patterns 
+	 * @returns {number[][]}
+	 */
+	waveMatrixToImage(waveMatrix, patterns) {
+		const image = [];
+		for (let y = 0; y < waveMatrix.length; y++) image[y] = [];
+
+		for (let y = 0; y < waveMatrix.length; y++) {
+		for (let x = 0; x < waveMatrix[0].length; x++) {
+			const possiblePatterns_Array = waveMatrix[y][x].toArray();
+			const i = possiblePatterns_Array[0];	// should be guaranteed to only have 1 possible pattern
+			const tileID = patterns[i][0][0];
+			image[y][x] = tileID;
+		}}
+
+		return image;
 	}
 }

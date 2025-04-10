@@ -72,12 +72,12 @@ export default class WFCTesting_Scene extends Phaser.Scene {
 		console.log("Processing ground");
 		this.model.learn(MAPS_GROUND, this.N, true);
 		this.model.debug();
-		return;
 		const groundImage = this.model.generate(this.outputWidth, this.outputHeight, this.maxAttempts);
 		if (!groundImage) return;
 
 		console.log("Structures");
-		this.model.process(MAPS_STRUCTURES, this.N);
+		this.model.learn(MAPS_STRUCTURES, this.N);
+		this.model.debug();
 		const structuresImage = this.model.generate(this.outputWidth, this.outputHeight, this.maxAttempts);
 		if (!structuresImage) return;
 

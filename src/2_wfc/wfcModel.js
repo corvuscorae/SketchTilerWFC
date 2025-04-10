@@ -1,7 +1,9 @@
 import ImageLearner from "./2_components/imageLearner.js";
+import ConstraintSolver from "./2_components/constraintSolver.js";
 
 export default class WFCModel {
 	#learner = new ImageLearner();
+	#solver = new ConstraintSolver();
 	#learned = false;
 
 	/**
@@ -25,7 +27,7 @@ export default class WFCModel {
 	 */
 	generate(width, height, maxAttempts) {
 		if (!this.#learned) throw new Error("WFC must learn before generating");
-		//return solve(this.#patterns, this.#weights, this.#adjacencies, width, height, maxAttempts);
+		return this.#solver.solve(this.#learner.patterns, this.#learner.weights, this.#learner.adjacencies, width, height, maxAttempts);
 	}
 
 	debug() {
