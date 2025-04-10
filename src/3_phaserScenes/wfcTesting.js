@@ -1,11 +1,11 @@
 import Phaser from "../../lib/phaser.module.js"
-import WFC from "../2_wfc/wfc.js";
+import WFCModel from "../2_wfc/wfcModel.js";
 import { MAPS_GROUND, MAPS_STRUCTURES } from "../2_wfc/maps.js";
 
-export default class TinyTownGenerator_Scene extends Phaser.Scene {
+export default class WFCTesting_Scene extends Phaser.Scene {
 	mapIndex = 1;
 
-	wfc = new WFC();
+	model = new WFCModel();
 	N = 2;
 	outputWidth = 24;
 	outputHeight = 15;
@@ -25,8 +25,11 @@ export default class TinyTownGenerator_Scene extends Phaser.Scene {
 
 	create()
 	{
-		this.showInputImage();
-		this.setupControls();
+		//this.showInputImage();
+		//this.setupControls();
+
+		this.model.learn(MAPS_GROUND, 2, false);
+		this.model.debug();
 	}
 
 	showInputImage() {
@@ -70,13 +73,13 @@ export default class TinyTownGenerator_Scene extends Phaser.Scene {
 
 	generateMap(){
 		console.log("Processing ground");
-		this.wfc.process(MAPS_GROUND, this.N);
-		const groundImage = this.wfc.generate(this.outputWidth, this.outputHeight, this.maxAttempts);
+		this.model.process(MAPS_GROUND, this.N);
+		const groundImage = this.model.generate(this.outputWidth, this.outputHeight, this.maxAttempts);
 		if (!groundImage) return;
 
 		console.log("Structures");
-		this.wfc.process(MAPS_STRUCTURES, this.N);
-		const structuresImage = this.wfc.generate(this.outputWidth, this.outputHeight, this.maxAttempts);
+		this.model.process(MAPS_STRUCTURES, this.N);
+		const structuresImage = this.model.generate(this.outputWidth, this.outputHeight, this.maxAttempts);
 		if (!structuresImage) return;
 
 		this.showImages(groundImage, structuresImage);
