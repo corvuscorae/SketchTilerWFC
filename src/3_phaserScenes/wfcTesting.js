@@ -3,15 +3,18 @@ import WFCModel from "../2_wfc/wfcModel.js";
 import { MAPS_GROUND, MAPS_STRUCTURES } from "../2_wfc/maps.js";
 
 export default class WFCTesting extends Phaser.Scene {
-	mapIndex = 1;	// which map to display
+	displayedMapID = 3;	// check assets folder to see all maps
 
 	model = new WFCModel();
 	N = 2;
 	width = 24;
 	height = 15;
 	maxAttempts = 10;
+	logProgress = true;
+	profileLearning = true;
+	profileSolving = true;
 
-	numRuns = 10;	// for this.getAverageRuntime()
+	numRuns = 10;	// for this.getAverageGenerationDuration()
 
 	constructor() {
 		super("wfcTestingScene");
@@ -20,11 +23,10 @@ export default class WFCTesting extends Phaser.Scene {
 	preload() {
 		this.load.setPath("./assets/");
 		this.load.image("tilemap", "tinyTown_Tilemap_Packed.png");
-		this.load.tilemapTiledJSON("tinyTownMap", `map${this.mapIndex}.tmj`);
+		this.load.tilemapTiledJSON("tinyTownMap", `map${this.displayedMapID}.tmj`);
 	}
 
-	create()
-	{
+	create() {
 		this.showInputImage();
 		this.setupControls();
 	}
@@ -33,7 +35,7 @@ export default class WFCTesting extends Phaser.Scene {
 		this.multiLayerMap = this.add.tilemap("tinyTownMap", 16, 16, 40, 25);
 		this.tileset = this.multiLayerMap.addTilesetImage("kenney-tiny-town", "tilemap");
 
-		if (this.mapIndex === 1) {
+		if (this.displayedMapID === 1) {
 			this.groundLayer = this.multiLayerMap.createLayer("Ground-n-Walkways", this.tileset, 0, 0);
 			this.treesLayer = this.multiLayerMap.createLayer("Trees-n-Bushes", this.tileset, 0, 0);
 			this.housesLayer = this.multiLayerMap.createLayer("Houses-n-Fences", this.tileset, 0, 0);
@@ -47,9 +49,9 @@ export default class WFCTesting extends Phaser.Scene {
 	}
 
 	setupControls() {
-		this.runWFC_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+		this.runWFC_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G);
 		this.clear_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
-		this.timedRuns_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T);
+		this.timedRuns_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
 		this.runWFC_Key.on("down", () => this.generateMap());
 		this.clear_Key.on("down", () => {
@@ -57,36 +59,36 @@ export default class WFCTesting extends Phaser.Scene {
 			if (this.groundMap) this.groundMap.destroy();
 			if (this.structuresMap) this.structuresMap.destroy();
 		});
-		this.timedRuns_Key.on("down", () => this.getAverageRuntime(this.numRuns));
+		this.timedRuns_Key.on("down", () => this.getAverageGenerationDuration(this.numRuns));
 
-		const controls = `
-		<h2>Controls (open console recommended)</h2>
-		Run WFC: R <br>
-		Clear Output: C <br>
-		Get average runtime over ${this.numRuns} runs: T <br>
+		document.getElementById("descriptionText").innerHTML = `
+			<h2>Controls</h2>
+			(Opening the console is recommended) <br><br>
+			Generate: G <br>
+			Clear generation: C <br>
+			Get average generation duration over ${this.numRuns} runs: A
 		`;
-		document.getElementById("descriptionText").innerHTML = controls;
 	}
 
 	generateMap(){
-		console.log("Ground");
-		this.model.learn(MAPS_GROUND, this.N, true);
-		const groundImage = this.model.generate(this.width, this.height, this.maxAttempts, true, true);
+		console.log("Using model for ground");
+		this.model.learn(MAPS_GROUND, this.N, this.profileLearning);
+		const groundImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
 		if (!groundImage) return;
 
-		console.log("Structures");
-		this.model.learn(MAPS_STRUCTURES, this.N, true);
-		const structuresImage = this.model.generate(this.width, this.height, this.maxAttempts, true, true);
+		console.log("Using model for structures");
+		this.model.learn(MAPS_STRUCTURES, this.N, this.profileLearning);
+		const structuresImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
 		if (!structuresImage) return;
 
-		this.showImages(groundImage, structuresImage);
+		this.displayMap(groundImage, structuresImage);
 	}
 
 	/**
 	 * @param {number[][]} groundImage 
 	 * @param {number[][]} structuresImage 
 	 */
-	showImages(groundImage, structuresImage) {
+	displayMap(groundImage, structuresImage) {
 		if (this.groundMap) this.groundMap.destroy();
 		if (this.structuresMap) this.structuresMap.destroy();
 
@@ -107,20 +109,15 @@ export default class WFCTesting extends Phaser.Scene {
 		for (const layer of this.multiLayerMapLayers) layer.setVisible(false);
 	}	
 
-	getAverageRuntime(numRuns){
-		let timeStart = performance.now();
-		let timeTotal = 0;
-		for(let i = 0; i < numRuns; i++){
+	getAverageGenerationDuration(numRuns) {
+		let totalDuration = 0;
+		for (let i = 1; i <= numRuns; i++) {	// we want i to start at one for console logging
+			const start = performance.now();
 			this.generateMap();
-
-			let timeEnd = performance.now();
-			let timeElapsed = timeEnd - timeStart;
-			timeTotal += timeElapsed;
-
-			console.log(`Generation #${i+1} took ${timeElapsed.toFixed(2)} ms`)
-
-			timeStart = performance.now();
+			let duration = performance.now() - start;
+			totalDuration += duration;
+			console.log(`Generation #${i} took ${duration.toFixed(2)} ms`)
 		}
-		console.log(`Generating ${numRuns} maps took ${timeTotal.toFixed(2)} ms total for an average time of ${(timeTotal / numRuns).toFixed(2)} ms`)
+		console.log(`Generating ${numRuns} times took ${totalDuration} ms, with an average duration of ${(totalDuration / numRuns).toFixed(2)} ms`)
 	}
 }

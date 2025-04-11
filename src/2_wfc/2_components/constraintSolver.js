@@ -17,14 +17,14 @@ export default class ConstraintSolver {
 	 * @param {number} height of output
 	 * @param {number} maxAttempts
 	 * @param {bool} logProgress whether to log the progress of this function or not
-	 * @param {bool} time whether to time the duration of this function or not
+	 * @param {bool} profile whether to profile the duration of this function or not
 	 * @returns {bool} whether the attempt was successful or not
 	 */
-	solve(patterns, weights, adjacencies, width, height, maxAttempts, logProgress, time) {
+	solve(patterns, weights, adjacencies, width, height, maxAttempts, logProgress, profile) {
 		if (logProgress) console.log("starting");
 
 		let waveMatrix;
-		if (time) waveMatrix = this.#profiler.time(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
+		if (profile) waveMatrix = this.#profiler.profile(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
 		else waveMatrix = this.createWaveMatrix(patterns.length, width, height);
 
 		let numAttempts = 1;
@@ -39,16 +39,16 @@ export default class ConstraintSolver {
 		let x = Math.floor(Math.random() * width);	// random in range [0, outputWidth-1]
 
 		while (numAttempts <= maxAttempts) {	// use <= so maxAttempts can be 1
-			if (time) this.#profiler.time(() => this.observe(waveMatrix, y, x, weights), this.observe.name);
+			if (profile) this.#profiler.profile(() => this.observe(waveMatrix, y, x, weights), this.observe.name);
 			else this.observe(waveMatrix, y, x, weights);
 
 			if (logProgress) console.log("propagating...");
 			let contradictionCreated;
-			if (time) contradictionCreated = this.#profiler.time(() => this.propagate(waveMatrix, y, x, adjacencies), this.propagate.name);
+			if (profile) contradictionCreated = this.#profiler.profile(() => this.propagate(waveMatrix, y, x, adjacencies), this.propagate.name);
 			else contradictionCreated = this.propagate(waveMatrix, y, x, adjacencies);
 			if (contradictionCreated) {
 				if (logProgress) console.log("restarting");
-				if (time) waveMatrix = this.#profiler.time(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
+				if (profile) waveMatrix = this.#profiler.profile(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
 				else waveMatrix = this.createWaveMatrix(patterns.length, width, height);
 				y = Math.floor(Math.random() * height);	// random in range [0, outputHeight-1]
 				x = Math.floor(Math.random() * width);	// random in range [0, outputWidth-1]
@@ -56,11 +56,11 @@ export default class ConstraintSolver {
 				continue;
 			}
 
-			if (time) [y, x] = this.#profiler.time(() => this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights), this.getLeastEntropyUnsolvedCellPosition.name);
+			if (profile) [y, x] = this.#profiler.profile(() => this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights), this.getLeastEntropyUnsolvedCellPosition.name);
 			else [y, x] = this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights);
 			if (y === -1 && x === -1) {
 				if (logProgress) console.log("solved! took " + numAttempts + " attempt(s)");
-				if (time) this.#profiler.logData();
+				if (profile) this.#profiler.logData();
 				return this.waveMatrixToImage(waveMatrix, patterns);
 				break;
 			}

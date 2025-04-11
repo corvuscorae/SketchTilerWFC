@@ -6,8 +6,8 @@ import WFCTesting from "./src/3_phaserScenes/wfcTesting.js";
 const config = {
 	parent: "phaserCanvas",
 	type: Phaser.CANVAS,
-	width: 640,
-	height: 400,
+	width: 640,		// 40 tiles x 16 pixels each
+	height: 400,	// 25 tiles x 16 pixels each
 	zoom: 1,
 	autoCenter: true,
 	render: { pixelArt: true },	// scale pixel art without blurring

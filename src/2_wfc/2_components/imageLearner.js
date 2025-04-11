@@ -23,21 +23,21 @@ export default class ImageLearner {
 	 * Doesn't process images as periodic, and doesn't rotate or reflect patterns.
 	 * @param {number[][][]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
 	 * @param {number} N the width and height of the learned patterns
-	 * @param {bool} time whether to time the performance of this function or not
+	 * @param {bool} profile whether to profile the performance of this function or not
 	 * @returns {[number[][][], number[], Bitmask[][]]} an array containing the patterns, weights, and adjacencies
 	 */
-	learn(images, N, time) {
+	learn(images, N, profile) {
 		this.patterns = [];
 		this.weights = [];
 		this.adjacencies = [];
 
-		if (time) this.#profiler.time(() => this.#getPatternsAndWeights(images, N), this.#getPatternsAndWeights.name);
+		if (profile) this.#profiler.profile(() => this.#getPatternsAndWeights(images, N), this.#getPatternsAndWeights.name);
 		else this.#getPatternsAndWeights(images, N);
 
-		if (time) this.#profiler.time(() => this.#getAdjacencies(), this.#getAdjacencies.name);
+		if (profile) this.#profiler.profile(() => this.#getAdjacencies(), this.#getAdjacencies.name);
 		else this.#getAdjacencies();
 
-		if (time) this.#profiler.logData();
+		if (profile) this.#profiler.logData();
 	}
 
 	/**
