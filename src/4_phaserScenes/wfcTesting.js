@@ -1,6 +1,6 @@
 import Phaser from "../../lib/phaserModule.js"
-import WFCModel from "../2_wfc/wfcModel.js";
-import { MAPS_GROUND, MAPS_STRUCTURES } from "../2_wfc/maps.js";
+import WFCModel from "../3_wfc/wfcModel.js";
+import { MAPS_GROUND, MAPS_STRUCTURES } from "../3_wfc/maps.js";
 
 export default class WFCTesting extends Phaser.Scene {
 	displayedMapID = 3;	// check assets folder to see all maps
