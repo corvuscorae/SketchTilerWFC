@@ -1,3 +1,8 @@
+/*
+	Did a lot of AI consulting (ChatGPT) to write register()
+	The ideas of returning a wrapped function and using Function.apply() is credited to it
+*/
+
 /** Records data on the performances of functions. */
 export default class PerformanceProfiler {
 	/** @type {Map<string, { totalExecutionTime: number, timesCalled: number }>} */

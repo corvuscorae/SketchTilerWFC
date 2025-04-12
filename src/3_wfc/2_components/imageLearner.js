@@ -20,6 +20,7 @@ export default class ImageLearner {
 		this.patterns = [];
 		this.weights = [];
 		this.adjacencies = [];
+		this.profiler.clearData();
 
 		this.profileFunctions(profile)
 		this.getPatternsAndWeights(images, N);
