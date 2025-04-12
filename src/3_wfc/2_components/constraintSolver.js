@@ -22,7 +22,7 @@ export default class ConstraintSolver {
 	 * @returns {bool} whether the attempt was successful or not
 	 */
 	solve(patterns, weights, adjacencies, width, height, maxAttempts, logProgress, profile) {
-		this.#profile = profile;	// need to store the value outside this function so functions here that call other functions know whether to profile (e.g. getLeastEntropyUnsolvedCellPosition())
+		this.#profile = profile;	// need to store outside the scope of this function so functions not directly called by this function can still be profiled
 
 		if (logProgress) console.log("starting");
 

@@ -3,41 +3,42 @@ import Bitmask from "./bitmask.js";
 import PerformanceProfiler from "../../1_utility/performanceProfiler.js";
 
 export default class ImageLearner {
+	// /** @type {{ tiles: number[][], weight: number, adjacencies: Bitmask[][] }[]} */
 	patterns;
 	weights;
 	adjacencies;
 
-	/*
-	patterns = array of pattern objects
-	pattern object = {
-		tiles: number[][],
-		weight: number
-		adjacencies: Bitmask[][]
-	}
-	*/
-
 	#profiler = new PerformanceProfiler();
+	#profile = false;
 
 	/**
-	 * Returns the patterns learned from the images and those patterns' weights and adjacencies.
-	 * Doesn't process images as periodic, and doesn't rotate or reflect patterns.
+	 * Learns the patterns of one or more images. Doesn't process images as periodic, and doesn't rotate or reflect patterns.
 	 * @param {number[][][]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
-	 * @param {number} N the width and height of the learned patterns
+	 * @param {number} N the width and height of patterns
 	 * @param {bool} profile whether to profile the performance of this function or not
-	 * @returns {[number[][][], number[], Bitmask[][]]} an array containing the patterns, weights, and adjacencies
 	 */
-	learn(images, N, profile) {
+	learn(images, N) {
 		this.patterns = [];
 		this.weights = [];
 		this.adjacencies = [];
 
-		if (profile) this.#profiler.profile(() => this.#getPatternsAndWeights(images, N), this.#getPatternsAndWeights.name);
-		else this.#getPatternsAndWeights(images, N);
+		this.#getPatternsAndWeights(images, N);
+		this.#getAdjacencies();
 
-		if (profile) this.#profiler.profile(() => this.#getAdjacencies(), this.#getAdjacencies.name);
-		else this.#getAdjacencies();
+		if (this.#profile) this.#profiler.logData();
+	}
 
-		if (profile) this.#profiler.logData();
+	setProfile(value) {
+		this.#profile = value;
+
+		if (value) {
+			//this.#getPatternsAndWeights = this.#profiler.profile(this.#getPatternsAndWeights);
+			//this.#getAdjacencies = this.#profiler.profile(this.#getAdjacencies);
+		}
+		else {
+			//this.#getPatternsAndWeights = this.#getPatternsAndWeights.original;
+			//this.#getAdjacencies = this.#getAdjacencies.original;
+		}
 	}
 
 	/**

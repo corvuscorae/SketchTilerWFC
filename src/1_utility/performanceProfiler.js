@@ -1,56 +1,67 @@
-/** Records data on the performances of the functions you give it. */
+/** Records data on the performances of functions. */
 export default class PerformanceProfiler {
-
-	#combinedTotalExecutionTime = 0;
-
 	/** @type {Map<string, { totalExecutionTime: number, timesCalled: number }>} */
 	#data = new Map();
 
 	/**
-	 * Executes a function and records its performance data.
-	 * @template T the return type of the function to be executed
-	 * @param {() => T} func use an arrow function to encapsulate the function to be executed (e.g. () => myFunction(args)) so you maintain the "this" context
-	 * @param {string} funcName
-	 * @returns {T} whatever the function returns
+	 * Wraps a function, letting the profiler record its performance data each time it's called. To unwrap, write func = func.original.
+	 * @param {Function} func
+	 * @returns {Function}
 	 */
-	profile(func, funcName) {
-		const start = performance.now();
-		const result = func();
-		const duration = performance.now() - start;
+	profile(func) {
+		if (!func.name) throw new Error("Cannot pass anonymous (nameless) functions to profile()");
+		if (func.original) return func;	// prevent double-wrapping
 
-		this.#combinedTotalExecutionTime += duration;
+		const profiler = this;
 
-		if (this.#data.has(funcName)) {
-			this.#data.get(funcName).totalExecutionTime += duration;
-			this.#data.get(funcName).timesCalled++;
+		/**
+		 * The wrapped version of a function. This version executes like normal but it now additionally lets the profiler record its performance data.
+		 * @template T the return type of func (the function being wrapped)
+		 * @param {...any} args any amount of arguments
+		 * @returns {T} whatever func (the function being wrapped) returns
+		 */
+		function wrapped(...args) {
+			const start = performance.now();
+			const result = func(...args);
+			const duration = performance.now() - start;
+		
+			if (profiler.#data.has(func.name)) {
+				profiler.#data.get(func.name).totalExecutionTime += duration;
+				profiler.#data.get(func.name).timesCalled++;
+			}
+			else {
+				profiler.#data.set(func.name, {
+					totalExecutionTime: duration,
+					timesCalled: 1,
+				});
+			}
+	
+			return result;
 		}
-		else {
-			this.#data.set(funcName, {
-				totalExecutionTime: duration,
-				timesCalled: 1
-			});
-		}
-
-		return result;
+	
+		wrapped.original = func; // for unwrapping
+		return wrapped;
 	}
 
-	/** Console logs the performance data of all functions timed. */
+	/** Console logs the performance data of all functions profiled. */
 	logData() {
-		let message = `Combined Total Duration: ${this.#combinedTotalExecutionTime} ms\n\n`;
+		let message = "";
+		let combinedTotalExecutionTime = 0;
 
 		for (const [funcName, funcData] of this.#data) {
 			message += `${funcName}():\n`;
 			message += `\tTotal Duration: ${funcData.totalExecutionTime} ms\n`;
 			message += `\tAverage Duration: ${(funcData.totalExecutionTime / funcData.timesCalled).toFixed(2)} ms\n`
 			message += `\tNum Calls: ${funcData.timesCalled}\n`;
+			combinedTotalExecutionTime += funcData.totalExecutionTime;
 		}
+		message += `\nCombined Total Duration: ${combinedTotalExecutionTime} ms`;
 
 		console.log(message);
 	}
 
 	/** Clears all tracked performance data. */
 	clearData() {
-		this.#combinedTotalExecutionTime = 0;
 		this.#data.clear();
 	}
 }
