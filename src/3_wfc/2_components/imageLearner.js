@@ -8,8 +8,7 @@ export default class ImageLearner {
 	weights;
 	adjacencies;
 
-	#profiler = new PerformanceProfiler();
-	#profile = false;
+	profiler = new PerformanceProfiler();
 
 	/**
 	 * Learns the patterns of one or more images. Doesn't process images as periodic, and doesn't rotate or reflect patterns.
@@ -17,35 +16,30 @@ export default class ImageLearner {
 	 * @param {number} N the width and height of patterns
 	 * @param {bool} profile whether to profile the performance of this function or not
 	 */
-	learn(images, N) {
+	learn(images, N, profile) {
 		this.patterns = [];
 		this.weights = [];
 		this.adjacencies = [];
 
-		this.#getPatternsAndWeights(images, N);
-		this.#getAdjacencies();
+		this.profileFunctions(profile)
+		this.getPatternsAndWeights(images, N);
+		this.getAdjacencies();
 
-		if (this.#profile) this.#profiler.logData();
+		if (profile) this.profiler.logData();
 	}
 
-	setProfile(value) {
-		this.#profile = value;
-
-		if (value) {
-			//this.#getPatternsAndWeights = this.#profiler.profile(this.#getPatternsAndWeights);
-			//this.#getAdjacencies = this.#profiler.profile(this.#getAdjacencies);
-		}
-		else {
-			//this.#getPatternsAndWeights = this.#getPatternsAndWeights.original;
-			//this.#getAdjacencies = this.#getAdjacencies.original;
-		}
+	profileFunctions(value) {
+		this.getPatternsAndWeights = value ? this.profiler.register(this.getPatternsAndWeights) : this.profiler.unregister(this.getPatternsAndWeights);
+		this.getPattern = value ? this.profiler.register(this.getPattern) : this.profiler.unregister(this.getPattern);
+		this.getAdjacencies = value ? this.profiler.register(this.getAdjacencies) : this.profiler.unregister(this.getAdjacencies);
+		this.isAdjacent = value ? this.profiler.register(this.isAdjacent) : this.profiler.unregister(this.isAdjacent);
 	}
 
 	/**
 	 * @param {number[][][]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
 	 * @param {number} N the width and height of the learned patterns
 	 */
-	#getPatternsAndWeights(images, N) {
+	getPatternsAndWeights(images, N) {
 		/*
 			Because patterns[] must only contain unique ones, we have to get patterns and weights together
 			When we find duplicate patterns, throw them out and increment the original pattern's weight
@@ -58,7 +52,7 @@ export default class ImageLearner {
 			for (let y = 0; y < image.length-N+1; y++) {	// length-N+1 because we're not processing image as periodic
 			for (let x = 0; x < image[0].length-N+1; x++) {	// length-N+1 because we're not processing image as periodic
 
-				const p = this.#getPattern(image, N, y, x);
+				const p = this.getPattern(image, N, y, x);
 				const p_str = p.toString();	// need to convert to string because maps compare arrays using their pointers
 				if (uniquePatterns.has(p_str)) {
 					const i = uniquePatterns.get(p_str);
@@ -80,7 +74,7 @@ export default class ImageLearner {
 	 * @param {number} x the x position of the window that captures the pattern
 	 * @returns {number[][]}
 	 */
-	#getPattern(image, N, y, x) {
+	getPattern(image, N, y, x) {
 		const pattern = [];
 		for (let ny = 0; ny < N; ny++) pattern[ny] = [];
 
@@ -92,7 +86,7 @@ export default class ImageLearner {
 		return pattern;
 	}
 
-	#getAdjacencies() {
+	getAdjacencies() {
 		/*
 			Check each pattern against every other pattern in every direction
 			Because pattern adjacency is commutative (A is adjacent to B means B is adjacent to A)
@@ -114,7 +108,7 @@ export default class ImageLearner {
 		for (let i = 0; i < this.patterns.length; i++) {
 			for (let j = i+1; j < this.patterns.length; j++) {
 				for (let k = 0; k < DIRECTIONS.length; k++) {
-					if (this.#isAdjacent(this.patterns[i], this.patterns[j], DIRECTIONS[k])) {
+					if (this.isAdjacent(this.patterns[i], this.patterns[j], DIRECTIONS[k])) {
 						const o = oppositeDirIndex.get(k);
 						this.adjacencies[i][k].setBit(j);
 						this.adjacencies[j][o].setBit(i);
@@ -131,7 +125,7 @@ export default class ImageLearner {
 	 * @param {number[]} dir direction
 	 * @returns {boolean}
 	 */
-	#isAdjacent(p1, p2, dir) {
+	isAdjacent(p1, p2, dir) {
 		/*
 			Check if the patterns overlap, for example:
 			Suppose dir is UP ([-1, 0])

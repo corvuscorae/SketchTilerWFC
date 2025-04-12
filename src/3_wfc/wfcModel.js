@@ -2,8 +2,8 @@ import ImageLearner from "./2_components/imageLearner.js";
 //import ConstraintSolver from "./2_components/constraintSolver.js";
 
 export default class WFCModel {
-	#learner = new ImageLearner();
-	//#solver = new ConstraintSolver();
+	learner = new ImageLearner();
+	//solver = new ConstraintSolver();
 
 	/**
 	 * Learns the images' patterns and those patterns' weights and adjacencies.
@@ -13,7 +13,7 @@ export default class WFCModel {
 	 * @param {bool} profile whether to profile the performance of this function or not
 	 */
 	learn(images, N, profile) {
-		this.#learner.learn(images, N, profile);
+		this.learner.learn(images, N, profile);
 	}
 
 	/**
@@ -26,6 +26,6 @@ export default class WFCModel {
 	 * @returns {number[][] | null} an image as a 2D matrix of tile IDs if successful, or null if not
 	 */
 	generate(width, height, maxAttempts, logProgress, profile) {
-		//return this.#solver.solve(this.#learner.patterns, this.#learner.weights, this.#learner.adjacencies, width, height, maxAttempts, logProgress, profile);
+		//return this.solver.solve(this.learner.patterns, this.learner.weights, this.learner.adjacencies, width, height, maxAttempts, logProgress, profile);
 	}
 }

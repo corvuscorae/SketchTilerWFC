@@ -1,15 +1,15 @@
 /** Records data on the performances of functions. */
 export default class PerformanceProfiler {
 	/** @type {Map<string, { totalExecutionTime: number, timesCalled: number }>} */
-	#data = new Map();
+	data = new Map();
 
 	/**
-	 * Wraps a function, letting the profiler record its performance data each time it's called. To unwrap, write func = func.original.
+	 * Registers a function to have its performance data recorded each time it's called.
 	 * @param {Function} func
 	 * @returns {Function}
 	 */
-	profile(func) {
-		if (!func.name) throw new Error("Cannot pass anonymous (nameless) functions to profile()");
+	register(func) {
+		if (!func.name) throw new Error("The function cannot be anonymous (nameless)");
 		if (func.original) return func;	// prevent double-wrapping
 
 		const profiler = this;
@@ -22,15 +22,15 @@ export default class PerformanceProfiler {
 		 */
 		function wrapped(...args) {
 			const start = performance.now();
-			const result = func(...args);
+			const result = func.apply(this, args);	// set the this context for func to its caller
 			const duration = performance.now() - start;
 		
-			if (profiler.#data.has(func.name)) {
-				profiler.#data.get(func.name).totalExecutionTime += duration;
-				profiler.#data.get(func.name).timesCalled++;
+			if (profiler.data.has(func.name)) {
+				profiler.data.get(func.name).totalExecutionTime += duration;
+				profiler.data.get(func.name).timesCalled++;
 			}
 			else {
-				profiler.#data.set(func.name, {
+				profiler.data.set(func.name, {
 					totalExecutionTime: duration,
 					timesCalled: 1,
 				});
@@ -43,12 +43,21 @@ export default class PerformanceProfiler {
 		return wrapped;
 	}
 
+	/**
+	 * Unregisters a function from having its performance data recorded each time it's called.
+	 * @param {Function} func
+	 * @returns {Function}
+	 */
+	unregister(func) {
+		return func.original ?? func;
+	}
+
 	/** Console logs the performance data of all functions profiled. */
 	logData() {
 		let message = "";
 		let combinedTotalExecutionTime = 0;
 
-		for (const [funcName, funcData] of this.#data) {
+		for (const [funcName, funcData] of this.data) {
 			message += `${funcName}():\n`;
 			message += `\tTotal Duration: ${funcData.totalExecutionTime} ms\n`;
 			message += `\tAverage Duration: ${(funcData.totalExecutionTime / funcData.timesCalled).toFixed(2)} ms\n`
@@ -62,6 +71,6 @@ export default class PerformanceProfiler {
 
 	/** Clears all tracked performance data. */
 	clearData() {
-		this.#data.clear();
+		this.data.clear();
 	}
 }

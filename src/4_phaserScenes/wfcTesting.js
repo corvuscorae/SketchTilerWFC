@@ -73,9 +73,6 @@ export default class WFCTesting extends Phaser.Scene {
 	generateMap(){
 		console.log("Using model for ground");
 		this.model.learn(MAPS_GROUND, this.N, this.profileLearning);
-		console.log(this.model);
-		return;
-
 		const groundImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
 		if (!groundImage) return;
 
