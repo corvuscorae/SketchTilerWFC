@@ -3,13 +3,13 @@
 	The ideas of returning a wrapped function and using Function.apply() is credited to it
 */
 
-/** Records data on the performances of functions. */
+/** Profiles the performances of functions. */
 export default class PerformanceProfiler {
 	/** @type {Map<string, { totalExecutionTime: number, timesCalled: number }>} */
 	data = new Map();
 
 	/**
-	 * Registers a function to have its performance data recorded each time it's called.
+	 * Registers a function to have its performance data recorded each time it's called. Returns the function back.
 	 * @param {Function} func
 	 * @returns {Function}
 	 */
@@ -20,14 +20,14 @@ export default class PerformanceProfiler {
 		const profiler = this;
 
 		/**
-		 * The wrapped version of a function. This version executes like normal but it now additionally lets the profiler record its performance data.
-		 * @template T the return type of func (the function being wrapped)
+		 * A wrapped version of func() that executes like normal but now additionally lets the profiler record its performance data.
+		 * @template T func()'s return type
 		 * @param {...any} args any amount of arguments
-		 * @returns {T} whatever func (the function being wrapped) returns
+		 * @returns {T} whatever func() returns
 		 */
-		function wrapped(...args) {
+		function func_Registered(...args) {
 			const start = performance.now();
-			const result = func.apply(this, args);	// set the this context for func to its caller
+			const result = func.apply(this, args);	// execute func() with the same this context as its caller
 			const duration = performance.now() - start;
 		
 			if (profiler.data.has(func.name)) {
@@ -44,8 +44,8 @@ export default class PerformanceProfiler {
 			return result;
 		}
 	
-		wrapped.original = func; // for unwrapping
-		return wrapped;
+		func_Registered.unregistered = func; // for unwrapping
+		return func_Registered;
 	}
 
 	/**
@@ -54,7 +54,7 @@ export default class PerformanceProfiler {
 	 * @returns {Function}
 	 */
 	unregister(func) {
-		return func.original ?? func;
+		return func.unregistered ?? func;	// only unwrap if func is wrapped
 	}
 
 	/** Console logs the performance data of all functions profiled. */
