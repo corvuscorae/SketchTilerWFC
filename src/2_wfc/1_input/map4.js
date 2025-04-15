@@ -1,6 +1,6 @@
 /** 
  * Map 3 but with less trees and fixed roofs
- * @type {{ GROUND: InputImage[], STRUCTURES: InputImage[] }}
+ * @type {{ GROUND: TilemapImage[], STRUCTURES: TilemapImage[] }}
  */
 const MAP4 = {
 	GROUND: [

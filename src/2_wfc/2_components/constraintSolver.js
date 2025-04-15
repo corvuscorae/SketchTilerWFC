@@ -4,15 +4,16 @@ import Queue from "./queue.js";
 import PerformanceProfiler from "../../4_utility/performanceProfiler.js";
 
 export default class ConstraintSolver {
+	/** @type {Cell[][]} */
 	waveMatrix;
 
-	profiler = new PerformanceProfiler();
+	performanceProfiler = new PerformanceProfiler();
 
 	/**
-	 * Attempts to solve a wave matrix based on learned data.
-	 * @param {number[][][]} patterns
+	 * Attempts to solve this.waveMatrix based on learned pattern data.
+	 * @param {Pattern[]} patterns
 	 * @param {number[]} weights
-	 * @param {Bitmask[][]} adjacencies
+	 * @param {AdjacentPatternsMap[]} adjacencies
 	 * @param {number} width of output
 	 * @param {number} height of output
 	 * @param {number} maxAttempts
@@ -21,15 +22,12 @@ export default class ConstraintSolver {
 	 * @returns {bool} whether the attempt was successful or not
 	 */
 	solve(patterns, weights, adjacencies, width, height, maxAttempts, logProgress, profile) {
-		this.profiler.clearData();
+		this.performanceProfiler.clearData();
 		this.profileFunctions(profile);
 
 		if (logProgress) console.log("starting");
 
-		let waveMatrix;
-		if (this.profile) waveMatrix = this.profiler.profile(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
-		else waveMatrix = this.createWaveMatrix(patterns.length, width, height);
-
+		let waveMatrix = this.createWaveMatrix(patterns.length, width, height);
 		let numAttempts = 1;
 
 		/*
@@ -42,28 +40,22 @@ export default class ConstraintSolver {
 		let x = Math.floor(Math.random() * width);	// random in range [0, outputWidth-1]
 
 		while (numAttempts <= maxAttempts) {	// use <= so maxAttempts can be 1
-			if (this.profile) this.profiler.profile(() => this.observe(waveMatrix, y, x, weights), this.observe.name);
-			else this.observe(waveMatrix, y, x, weights);
+			this.observe(waveMatrix, y, x, weights);
 
 			if (logProgress) console.log("propagating...");
-			let contradictionCreated;
-			if (this.profile) contradictionCreated = this.profiler.profile(() => this.propagate(waveMatrix, y, x, adjacencies), this.propagate.name);
-			else contradictionCreated = this.propagate(waveMatrix, y, x, adjacencies);
+			let contradictionCreated = this.propagate(waveMatrix, y, x, adjacencies);
 			if (contradictionCreated) {
-				if (logProgress) console.log("restarting");
-				if (this.profile) waveMatrix = this.profiler.profile(() => this.createWaveMatrix(patterns.length, width, height), this.createWaveMatrix.name);
-				else waveMatrix = this.createWaveMatrix(patterns.length, width, height);
+				waveMatrix = this.createWaveMatrix(patterns.length, width, height);
 				y = Math.floor(Math.random() * height);	// random in range [0, outputHeight-1]
 				x = Math.floor(Math.random() * width);	// random in range [0, outputWidth-1]
 				numAttempts++;
 				continue;
 			}
 
-			if (this.profile) [y, x] = this.profiler.profile(() => this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights), this.getLeastEntropyUnsolvedCellPosition.name);
-			else [y, x] = this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights);
+			[y, x] = this.getLeastEntropyUnsolvedCellPosition(waveMatrix, weights);
 			if (y === -1 && x === -1) {
 				if (logProgress) console.log("solved! took " + numAttempts + " attempt(s)");
-				if (profile) this.profiler.logData();
+				if (profile) this.performanceProfiler.logData();
 				return this.waveMatrixToImage(waveMatrix, patterns);
 				break;
 			}
@@ -73,13 +65,27 @@ export default class ConstraintSolver {
 		return false;
 	}
 
+	/**
+	 * Registers/unregisters important member functions to the performance profiler.
+	 * @param {bool} value Whether to profile (register) or not (unregister).
+	 */
 	profileFunctions(value) {
-		this.createWaveMatrix = value ? this.profiler.register(this.createWaveMatrix) : this.profiler.unregister(this.createWaveMatrix);
-		this.observe = value ? this.profiler.register(this.observe) : this.profiler.unregister(this.observe);
-		this.propagate = value ? this.profiler.register(this.propagate) : this.profiler.unregister(this.propagate);
-		this.getLeastEntropyUnsolvedCellPosition = value ? this.profiler.register(this.getLeastEntropyUnsolvedCellPosition) : this.profiler.unregister(this.getLeastEntropyUnsolvedCellPosition);
-		this.getShannonEntropy = value ? this.profiler.register(this.getShannonEntropy) : this.profiler.unregister(this.getShannonEntropy);
-		this.waveMatrixToImage = value ? this.profiler.register(this.waveMatrixToImage) : this.profiler.unregister(this.waveMatrixToImage);
+		if (value) {
+			this.createWaveMatrix = this.performanceProfiler.register(this.createWaveMatrix);
+			this.observe = this.performanceProfiler.register(this.observe);
+			this.propagate = this.performanceProfiler.register(this.propagate);
+			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.register(this.getLeastEntropyUnsolvedCellPosition);
+			this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy);
+			this.waveMatrixToImage = this.performanceProfiler.register(this.waveMatrixToImage);
+		}
+		else {
+			this.createWaveMatrix = this.performanceProfiler.unregister(this.createWaveMatrix);
+			this.observe = this.performanceProfiler.unregister(this.observe);
+			this.propagate = this.performanceProfiler.unregister(this.propagate);
+			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.unregister(this.getLeastEntropyUnsolvedCellPosition);
+			this.getShannonEntropy = this.performanceProfiler.unregister(this.getShannonEntropy);
+			this.waveMatrixToImage = this.performanceProfiler.unregister(this.waveMatrixToImage);
+		}
 	}
 
 	/**
@@ -88,7 +94,7 @@ export default class ConstraintSolver {
 	 * @param {number} numPatterns 
 	 * @param {number} width of output
 	 * @param {number} height of output
-	 * @returns {Bitmask[][]}
+	 * @returns {Cell[][]}
 	 */
 	createWaveMatrix(numPatterns, width, height) {
 		const waveMatrix = [];
@@ -107,7 +113,7 @@ export default class ConstraintSolver {
 
 	/**
 	 * Picks a pattern for a cell to become using weighted random.
-	 * @param {Bitmask[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
+	 * @param {Cell[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
 	 * @param {number} y 
 	 * @param {number} x 
 	 * @param {number[]} weights 
@@ -142,10 +148,10 @@ export default class ConstraintSolver {
 
 	/**
 	 * Adjusts all cells' possible patterns if they need to due to the observation of a cell.
-	 * @param {Bitmask[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
+	 * @param {Cell[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
 	 * @param {number} y 
 	 * @param {number} x
-	 * @param {Bitmask[][]} adjacencies
+	 * @param {AdjacentPatternsMap[]} adjacencies
 	 * @returns {boolean} whether a contradiction was created or not
 	 */
 	propagate(waveMatrix, y, x, adjacencies) {
@@ -204,7 +210,7 @@ export default class ConstraintSolver {
 
 	/**
 	 * Get the position of the cell with the least entropy that's not 0. If all cells are solved, returns [-1, -1].
-	 * @param {Bitmask[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
+	 * @param {Cell[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
 	 * @param {number[]} weights
 	 * @returns {number[]} [y, x] if there's an unsolved cell or [-1, -1] if there aren't any
 	 */
@@ -220,7 +226,7 @@ export default class ConstraintSolver {
 		for (let y = 0; y < waveMatrix.length; y++) {
 		for (let x = 0; x < waveMatrix[0].length; x++) {
 			let entropy;
-			if (this.profile) entropy = this.profiler.profile(() => this.getShannonEntropy(waveMatrix[y][x], weights), this.getShannonEntropy.name);
+			if (this.profile) entropy = this.performanceProfiler.profile(() => this.getShannonEntropy(waveMatrix[y][x], weights), this.getShannonEntropy.name);
 			else entropy = this.getShannonEntropy(waveMatrix[y][x], weights);
 
 			if (entropy < leastEntropy && entropy > 0) {
@@ -239,7 +245,7 @@ export default class ConstraintSolver {
 
 	/**
 	 * Gets the Shannon Entropy of a cell using its possible patterns and those patterns' weights.
-	 * @param {Bitmask} bitmask 
+	 * @param {PossiblePatternsBitmask} bitmask 
 	 * @param {number[]} weights 
 	 * @returns {number}
 	 */
@@ -262,9 +268,9 @@ export default class ConstraintSolver {
 
 	/**
 	 * Build a 2D image matrix using the top left tile of each cell's pattern.
-	 * @param {Bitmask[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
-	 * @param {number[][][]} patterns 
-	 * @returns {number[][]}
+	 * @param {Cell[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
+	 * @param {Pattern[]} patterns 
+	 * @returns {TilemapImage}
 	 */
 	waveMatrixToImage(waveMatrix, patterns) {
 		const image = [];

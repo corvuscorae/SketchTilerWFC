@@ -3,16 +3,20 @@ import Bitmask from "./bitmask.js";
 import PerformanceProfiler from "../../4_utility/performanceProfiler.js";
 
 export default class ImageLearner {
-	// /** @type {{ tiles: number[][], weight: number, adjacencies: Bitmask[][] }[]} */
+	/** @type {Pattern[]} */
 	patterns;
+
+	/** @type {number[]} */
 	weights;
+
+	/** @type {AdjacentPatternsMap[]} */
 	adjacencies;
 
-	profiler = new PerformanceProfiler();
+	performanceProfiler = new PerformanceProfiler();
 
 	/**
 	 * Learns the patterns of one or more images. Doesn't process images as periodic, and doesn't rotate or reflect patterns.
-	 * @param {number[][][]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
+	 * @param {TilemapImage[]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
 	 * @param {number} N the width and height of patterns
 	 * @param {bool} profile whether to profile the performance of this function or not
 	 */
@@ -20,24 +24,37 @@ export default class ImageLearner {
 		this.patterns = [];
 		this.weights = [];
 		this.adjacencies = [];
-		this.profiler.clearData();
+		this.performanceProfiler.clearData();
 
 		this.profileFunctions(profile)
 		this.getPatternsAndWeights(images, N);
 		this.getAdjacencies();
 
-		if (profile) this.profiler.logData();
-	}
-
-	profileFunctions(value) {
-		this.getPatternsAndWeights = value ? this.profiler.register(this.getPatternsAndWeights) : this.profiler.unregister(this.getPatternsAndWeights);
-		this.getPattern = value ? this.profiler.register(this.getPattern) : this.profiler.unregister(this.getPattern);
-		this.getAdjacencies = value ? this.profiler.register(this.getAdjacencies) : this.profiler.unregister(this.getAdjacencies);
-		this.isAdjacent = value ? this.profiler.register(this.isAdjacent) : this.profiler.unregister(this.isAdjacent);
+		if (profile) this.performanceProfiler.logData();
 	}
 
 	/**
-	 * @param {number[][][]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
+	 * Registers/unregisters important member functions to the performance profiler.
+	 * @param {bool} value Whether to profile (register) or not (unregister).
+	 */
+	profileFunctions(value) {
+		if (value) {
+			this.getPatternsAndWeights = this.performanceProfiler.register(this.getPatternsAndWeights);
+			this.getPattern = this.performanceProfiler.register(this.getPattern);
+			this.getAdjacencies = this.performanceProfiler.register(this.getAdjacencies);
+			this.isAdjacent = this.performanceProfiler.register(this.isAdjacent);
+		}
+		else {
+			this.getPatternsAndWeights = this.performanceProfiler.unregister(this.getPatternsAndWeights);
+			this.getPattern = this.performanceProfiler.unregister(this.getPattern);
+			this.getAdjacencies = this.performanceProfiler.unregister(this.getAdjacencies);
+			this.isAdjacent = this.performanceProfiler.unregister(this.isAdjacent);
+		}
+	}
+
+	/**
+	 * Populates this.patterns and this.weights.
+	 * @param {TilemapImage[]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
 	 * @param {number} N the width and height of the learned patterns
 	 */
 	getPatternsAndWeights(images, N) {
@@ -69,11 +86,11 @@ export default class ImageLearner {
 	}
 
 	/**
-	 * @param {number[][]} image an array of 2D tile ID matrices that each represent a layer of a tilemap
+	 * @param {TilemapImage} image an array of 2D tile ID matrices that each represent a layer of a tilemap
 	 * @param {number} N the width and height of the learned patterns
 	 * @param {number} y the y position of the window that captures the pattern
 	 * @param {number} x the x position of the window that captures the pattern
-	 * @returns {number[][]}
+	 * @returns {Pattern}
 	 */
 	getPattern(image, N, y, x) {
 		const pattern = [];
@@ -87,6 +104,7 @@ export default class ImageLearner {
 		return pattern;
 	}
 
+	/** Populates this.adjacencies. */
 	getAdjacencies() {
 		/*
 			Check each pattern against every other pattern in every direction
@@ -121,9 +139,9 @@ export default class ImageLearner {
 
 	/**
 	 * Determines if p1 is to the {dir} of p2. This result also tells you whether p2 is to the {opposite dir} of p1.
-	 * @param {number[][]} p1 pattern 1
-	 * @param {number[][]} p2 pattern 2
-	 * @param {number[]} dir direction
+	 * @param {Pattern} p1
+	 * @param {Pattern} p2
+	 * @param {Direction} dir
 	 * @returns {boolean}
 	 */
 	isAdjacent(p1, p2, dir) {

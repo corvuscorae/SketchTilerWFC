@@ -3,7 +3,7 @@ import MAP2 from "./1_input/map2.js";
 import MAP3 from "./1_input/map3.js";
 import MAP4 from "./1_input/map4.js";
 
-/** @type {{ GROUND: InputImage[], STRUCTURES: InputImage[] }} */
+/** @type {{ GROUND: TilemapImage[], STRUCTURES: TilemapImage[] }} */
 const IMAGES = {
 	GROUND: [
 		MAP1.GROUND,

@@ -1,19 +1,18 @@
-/** A node of a linked list. */
-class Node {
-	constructor(data) {
-		this.data = data;
-		this.next = null;
-	}
-}
-
-/** Utilizes a linked list for O(1) enqueueing/dequeueing. */
+/**
+ * Utilizes a linked list for O(1) enqueueing/dequeueing.
+ * Isn't much faster than an array-based queue in practice due to CPU caching.
+ */
 export default class Queue {
 	front = null;
 	back = null;
 	length = 0;
 
-	enqueue(data) {
-		const node = new Node(data);
+	/**
+	 * Adds an element to the back of the queue.
+	 * @param {any} element
+	 */
+	enqueue(element) {
+		const node = new Node(element);
 
 		if (this.length === 0) {
 			this.front = node;
@@ -27,16 +26,27 @@ export default class Queue {
 		this.length++;
 	}
 
-	/** @returns {any | null} the element at the front of the queue or null if it's is empty */
+	/**
+	 * Returns the element at the front of the queue if there is one, or null if there isn't. 
+	 * @returns {any | null}
+	 */
 	dequeue() {
 		if (this.length === 0) return null;
 
-		const data = this.front.data;
+		const element = this.front.data;
 		this.front = this.front.next;
 		this.length--;
 
 		if (!this.front) this.back = null;	// update back to match front
 
-		return data;
+		return element;
+	}
+}
+
+/** A node of a linked list. */
+class Node {
+	constructor(data) {
+		this.data = data;
+		this.next = null;
 	}
 }

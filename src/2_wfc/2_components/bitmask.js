@@ -1,18 +1,14 @@
 /*
-	Did a lot of AI consulting (ChatGPT and Deepseek) to implement bitmasking for the ImageProcessor and ConstraintSolver
+	Did a lot of AI consulting (ChatGPT and Deepseek) to implement bitmasking for the ImageLearner and ConstraintSolver
 	The optimization idea and the writing of the code is credited to them
 */
 
-/** 
- * Represents either:
- * 	an adjacent patterns Bitmask for a pattern (which patterns are adjacent to a pattern in a direction),
- * 	or a possible patterns Bitmask for a cell (which patterns a cell can be).
- */
+/** A bitmask that can store more than 32 bits. Can be interfaced with via its methods. */
 export default class Bitmask {
-	/** Since a single int can only store up to 32 bits (or patterns), use an array of ints to represent one giant int with infinite size. */
+	/** Since a single int can only store up to 32 bits (or patterns), use an array of ints to represent a giant int with unlimited size. */
 	array;
 
-	/** @param {number} numBits is equal to numPatterns */
+	/** @param {number} numBits Is equal to the number of patterns. */
 	constructor(numBits) {
 		const length = Math.ceil(numBits/32);
 		this.array = new Uint32Array(length);

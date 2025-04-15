@@ -8,8 +8,8 @@ export default class WFCModel {
 	/**
 	 * Learns the images' patterns and those patterns' weights and adjacencies.
  	 * Doesn't process images as periodic, and doesn't rotate or reflect patterns.
-	 * @param {number[][][]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
-	 * @param {number} N the width and height of the learned patterns
+	 * @param {TilemapImage[]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
+	 * @param {number} N the width and height of the patterns
 	 * @param {bool} profile whether to profile the performance of this function or not
 	 */
 	learn(images, N, profile) {
@@ -18,12 +18,12 @@ export default class WFCModel {
 
 	/**
 	 * Attempts to create an output image based on the patterns, weights, and adjacencies learned from process().
-	 * @param {number} width of output
-	 * @param {number} height of output
+	 * @param {number} width The width of the output image.
+	 * @param {number} height The height of the output image.
 	 * @param {number} maxAttempts
-	 * @param {bool} logProgress whether to log the progress of this function or not
-	 * @param {bool} profile whether to profile the performance of this function or not
-	 * @returns {number[][] | null} an image as a 2D matrix of tile IDs if successful, or null if not
+	 * @param {bool} logProgress Whether to log the progress of this function or not.
+	 * @param {bool} profile Whether to profile the performance of this function or not.
+	 * @returns {TilemapImage | null} an image as a 2D matrix of tile IDs if successful, or null if not
 	 */
 	generate(width, height, maxAttempts, logProgress, profile) {
 		if (!this.imageLearner.patterns) throw new Error("Model must learn before generating");

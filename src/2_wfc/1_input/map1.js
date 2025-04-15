@@ -1,6 +1,6 @@
 /**
  * From Pathfinder 
- * @type {{ GROUND: InputImage[], STRUCTURES: InputImage[] }}
+ * @type {{ GROUND: TilemapImage[], STRUCTURES: TilemapImage[] }}
  */
 const MAP1 = {
 	GROUND: [
