@@ -1,6 +1,6 @@
 import Phaser from "../../lib/phaserModule.js"
-import WFCModel from "../3_wfc/wfcModel.js";
-import { IMAGES_GROUND, IMAGES_STRUCTURES } from "../3_wfc/images.js";
+import WFCModel from "../2_wfc/wfcModel.js";
+import IMAGES from "../2_wfc/wfcInput.js"
 
 export default class WFCTesting extends Phaser.Scene {
 	displayedMapID = 3;	// check assets folder to see all maps
@@ -72,12 +72,12 @@ export default class WFCTesting extends Phaser.Scene {
 
 	generateMap(){
 		console.log("Using model for ground");
-		this.model.learn(IMAGES_GROUND, this.N, this.profileLearning);
+		this.model.learn(IMAGES.GROUND, this.N, this.profileLearning);
 		const groundImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
 		if (!groundImage) return;
 
 		console.log("Using model for structures");
-		this.model.learn(IMAGES_STRUCTURES, this.N, this.profileLearning);
+		this.model.learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
 		const structuresImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
 		if (!structuresImage) return;
 

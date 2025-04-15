@@ -1,7 +1,7 @@
 "use strict"	// execute JS code in strict mode
 
 import Phaser from "./lib/phaserModule.js";
-import WFCTesting from "./src/4_phaserScenes/wfcTesting.js";
+import WFCTesting from "./src/3_phaserScenes/wfcTesting.js";
 
 const config = {
 	parent: "phaserCanvas",
