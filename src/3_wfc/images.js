@@ -3,14 +3,14 @@ import { MAP2_GROUND, MAP2_STRUCTURES } from "./1_input/map2.js";
 import { MAP3_GROUND, MAP3_STRUCTURES } from "./1_input/map3.js";
 import { MAP4_GROUND, MAP4_STRUCTURES } from "./1_input/map4.js";
 
-export const MAPS_GROUND = [
+export const IMAGES_GROUND = [
 	MAP1_GROUND,
 	//MAP2_GROUND,
 	//MAP3_GROUND,
 	//MAP4_GROUND
 ];
 
-export const MAPS_STRUCTURES = [
+export const IMAGES_STRUCTURES = [
 	//MAP1_STRUCTURES,
 	//MAP2_STRUCTURES,
 	MAP3_STRUCTURES,
