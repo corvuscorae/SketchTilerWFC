@@ -6,12 +6,14 @@ export default class WFCTesting extends Phaser.Scene {
 	displayedMapID = 3;	// check assets folder to see all maps
 
 	model = new WFCModel();
+
 	N = 2;
+	profileLearning = false;
+
 	width = 24;
 	height = 15;
 	maxAttempts = 10;
 	logProgress = true;
-	profileLearning = false;
 	profileSolving = true;
 
 	numRuns = 10;	// for this.getAverageGenerationDuration()
