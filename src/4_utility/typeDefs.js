@@ -3,10 +3,10 @@
 	These typedefs simply exist to improve code readability and editor support, especially for JSDoc comments
 
 	The "include" directive in jsconfig.json ensures that this file is always loaded by VS Code, even if it’s not open
-	That way, these typedefs will always be known by Intellisense
+	That way, these typedefs will always be known by IntelliSense
 */
 
-// Imports (for the later typedefs to use)
+// Imports (for the following typedefs to use)
 /** @typedef {import("../2_wfc/2_components/bitmask.js").default} Bitmask */
 
 // WFC

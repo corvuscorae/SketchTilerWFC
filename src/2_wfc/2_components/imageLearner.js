@@ -16,9 +16,9 @@ export default class ImageLearner {
 
 	/**
 	 * Learns the patterns of one or more images. Doesn't process images as periodic, and doesn't rotate or reflect patterns.
-	 * @param {TilemapImage[]} images an array of 2D tile ID matrices that each represent a layer of a tilemap
-	 * @param {number} N the width and height of patterns
-	 * @param {bool} profile whether to profile the performance of this function or not
+	 * @param {TilemapImage[]} images The images to learn. If you only want to learn one pass an array with a single image in it.
+	 * @param {number} N The width and height of the patterns.
+	 * @param {bool} profile Whether to profile the performance of this function or not.
 	 */
 	learn(images, N, profile) {
 		this.patterns = [];

@@ -86,10 +86,6 @@ export default class WFCTesting extends Phaser.Scene {
 		this.displayMap(groundImage, structuresImage);
 	}
 
-	/**
-	 * @param {number[][]} groundImage 
-	 * @param {number[][]} structuresImage 
-	 */
 	displayMap(groundImage, structuresImage) {
 		if (this.groundMap) this.groundMap.destroy();
 		if (this.structuresMap) this.structuresMap.destroy();

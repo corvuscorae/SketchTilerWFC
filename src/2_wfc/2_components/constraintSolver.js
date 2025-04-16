@@ -5,7 +5,7 @@ import PerformanceProfiler from "../../4_utility/performanceProfiler.js";
 
 export default class ConstraintSolver {
 	/** @type {Cell[][]} */
-	waveMatrix;
+	waveMatrix;	// not currently implemented
 
 	performanceProfiler = new PerformanceProfiler();
 
@@ -14,12 +14,12 @@ export default class ConstraintSolver {
 	 * @param {Pattern[]} patterns
 	 * @param {number[]} weights
 	 * @param {AdjacentPatternsMap[]} adjacencies
-	 * @param {number} width of output
-	 * @param {number} height of output
+	 * @param {number} width The width to set this.waveMatrix to.
+	 * @param {number} height The height to set this.waveMatrix to.
 	 * @param {number} maxAttempts
-	 * @param {bool} logProgress whether to log the progress of this function or not
-	 * @param {bool} profile whether to profile the duration of this function or not
-	 * @returns {bool} whether the attempt was successful or not
+	 * @param {bool} logProgress Whether to log the progress of this function or not.
+	 * @param {bool} profile Whether to profile the performance of this function or not.
+	 * @returns {bool} Whether the attempt was successful or not.
 	 */
 	solve(patterns, weights, adjacencies, width, height, maxAttempts, logProgress, profile) {
 		this.performanceProfiler.clearData();
@@ -89,11 +89,10 @@ export default class ConstraintSolver {
 	}
 
 	/**
-	 * Creates a 2D matrix of cells whose possible patterns are initialized to every pattern.
-	 * Because the only data a cell contains is its possible patterns Bitmask, the wave matrix is actually just a matrix of those Bitmasks.
-	 * @param {number} numPatterns 
-	 * @param {number} width of output
-	 * @param {number} height of output
+	 * Creates a 2D matrix of cells and initializes each cell to have every pattern be possible.
+	 * @param {number} numPatterns Used to create PossiblePatternBitmasks for cells.
+	 * @param {number} width The width to set this.waveMatrix to.
+	 * @param {number} height The height to set this.waveMatrix to.
 	 * @returns {Cell[][]}
 	 */
 	createWaveMatrix(numPatterns, width, height) {
@@ -112,14 +111,15 @@ export default class ConstraintSolver {
 	}
 
 	/**
-	 * Picks a pattern for a cell to become using weighted random.
-	 * @param {Cell[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
-	 * @param {number} y 
-	 * @param {number} x 
+	 * Picks a pattern for a cell in the waveMatrix to become.
+	 * @param {Cell[][]} waveMatrix
+	 * @param {number} y The y position/index of the cell.
+	 * @param {number} x The x position/index of the cell.
 	 * @param {number[]} weights 
 	 */
 	observe(waveMatrix, y, x, weights) {
-		// used https://dev.to/jacktt/understanding-the-weighted-random-algorithm-581p
+		// Uses weighted random
+		// https://dev.to/jacktt/understanding-the-weighted-random-algorithm-581p
 
 		const possiblePatterns = waveMatrix[y][x].toArray();
 
@@ -147,12 +147,12 @@ export default class ConstraintSolver {
 	}
 
 	/**
-	 * Adjusts all cells' possible patterns if they need to due to the observation of a cell.
-	 * @param {Cell[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
-	 * @param {number} y 
-	 * @param {number} x
+	 * Adjusts the possible patterns of each cell affected by the observation of a cell.
+	 * @param {Cell[][]} waveMatrix
+	 * @param {number} y The y position/index of the observed cell.
+	 * @param {number} x The x position/index of the observed cell.
 	 * @param {AdjacentPatternsMap[]} adjacencies
-	 * @returns {boolean} whether a contradiction was created or not
+	 * @returns {boolean} Whether a contradiction was created or not.
 	 */
 	propagate(waveMatrix, y, x, adjacencies) {
 		const queue = new Queue();
@@ -209,15 +209,15 @@ export default class ConstraintSolver {
 	}
 
 	/**
-	 * Get the position of the cell with the least entropy that's not 0. If all cells are solved, returns [-1, -1].
-	 * @param {Cell[][]} waveMatrix a 2D matrix of cells (which are actually just their possible pattern Bitmasks)
+	 * Returns the position of the least entropy unsolved (entropy > 0) cell. If all cells are solved, returns [-1, -1].
+	 * @param {Cell[][]} waveMatrix
 	 * @param {number[]} weights
-	 * @returns {number[]} [y, x] if there's an unsolved cell or [-1, -1] if there aren't any
+	 * @returns {number[]} The position of the cell ([y, x]) or [-1, -1] if all cells are solved.
 	 */
 	getLeastEntropyUnsolvedCellPosition(waveMatrix, weights) {
 		/*
 			Build an array containing the positions of all cells tied with the least entropy
-			Return a random position from that array
+			Return the position of a random cell from that array
 		*/
 
 		let leastEntropy = Infinity;
@@ -244,7 +244,7 @@ export default class ConstraintSolver {
 	}
 
 	/**
-	 * Gets the Shannon Entropy of a cell using its possible patterns and those patterns' weights.
+	 * Returns the Shannon Entropy of a cell using its possible patterns and those patterns' weights.
 	 * @param {PossiblePatternsBitmask} bitmask 
 	 * @param {number[]} weights 
 	 * @returns {number}

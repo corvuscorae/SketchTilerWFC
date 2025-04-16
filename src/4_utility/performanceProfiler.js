@@ -1,8 +1,3 @@
-/*
-	Did a lot of AI consulting (ChatGPT) to write register()
-	The ideas of returning a wrapped function and using Function.apply() is credited to it
-*/
-
 /** Profiles the performances of functions. */
 export default class PerformanceProfiler {
 	/** @type {Map<string, { totalExecutionTime: number, timesCalled: number }>} */
@@ -10,8 +5,8 @@ export default class PerformanceProfiler {
 
 	/**
 	 * Registers a function to have its performance data recorded each time it's called. Returns the function back.
-	 * @param {Function} func
-	 * @returns {Function}
+	 * @param {Function} func The function to be registered.
+	 * @returns {Function} The registered version of func().
 	 */
 	register(func) {
 		if (!func.name) throw new Error("The function cannot be anonymous (nameless)");
@@ -21,9 +16,9 @@ export default class PerformanceProfiler {
 
 		/**
 		 * A wrapped version of func() that executes like normal but now additionally lets the profiler record its performance data.
-		 * @template T func()'s return type
-		 * @param {...any} args any amount of arguments
-		 * @returns {T} whatever func() returns
+		 * @template T The return type of func().
+		 * @param {...any} args The arguments to be passed to func(). Can be any amount of arguments.
+		 * @returns {T} Whatever func() returns.
 		 */
 		function func_Registered(...args) {
 			const start = performance.now();
@@ -50,8 +45,8 @@ export default class PerformanceProfiler {
 
 	/**
 	 * Unregisters a function from having its performance data recorded each time it's called.
-	 * @param {Function} func
-	 * @returns {Function}
+	 * @param {Function} func The function to be unregistered.
+	 * @returns {Function} The unregistered (original) version of func().
 	 */
 	unregister(func) {
 		return func.unregistered ?? func;	// only unwrap if func is wrapped
