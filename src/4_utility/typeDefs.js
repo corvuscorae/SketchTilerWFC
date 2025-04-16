@@ -15,7 +15,7 @@
  * 
  * @typedef {number[][]} TilemapImage A 2D matrix of tile IDs that represents a layer of a tilemap.
  * 
- * @typedef {number[][]} Pattern An 2D NxN matrix of tile IDs.
+ * @typedef {number[][]} Pattern A 2D NxN matrix of tile IDs.
  *
  * @typedef {Bitmask} AdjacentPatternsBitmask Given a pattern A, stores which patterns are adjacent to A in a single direction.
  * @typedef {AdjacentPatternsBitmask[]} AdjacentPatternsMap An array of four AdjacentPatternsBitmasks. Given a pattern A, stores which patterns are adjacent to A in each of the four directions.
