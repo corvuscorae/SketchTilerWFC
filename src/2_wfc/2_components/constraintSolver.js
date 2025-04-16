@@ -56,8 +56,7 @@ export default class ConstraintSolver {
 			if (y === -1 && x === -1) {
 				if (logProgress) console.log("solved! took " + numAttempts + " attempt(s)");
 				if (profile) this.performanceProfiler.logData();
-				return this.waveMatrixToImage(patterns);
-				break;
+				return true;
 			}
 		}
 
@@ -76,7 +75,6 @@ export default class ConstraintSolver {
 			this.propagate = this.performanceProfiler.register(this.propagate);
 			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.register(this.getLeastEntropyUnsolvedCellPosition);
 			this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy);
-			this.waveMatrixToImage = this.performanceProfiler.register(this.waveMatrixToImage);
 		}
 		else {
 			this.createWaveMatrix = this.performanceProfiler.unregister(this.initializeWaveMatrix);
@@ -84,7 +82,6 @@ export default class ConstraintSolver {
 			this.propagate = this.performanceProfiler.unregister(this.propagate);
 			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.unregister(this.getLeastEntropyUnsolvedCellPosition);
 			this.getShannonEntropy = this.performanceProfiler.unregister(this.getShannonEntropy);
-			this.waveMatrixToImage = this.performanceProfiler.unregister(this.waveMatrixToImage);
 		}
 	}
 
@@ -255,25 +252,5 @@ export default class ConstraintSolver {
 		}
 
 		return Math.log(sumOfWeights) - sumOfWeightLogWeights/sumOfWeights;
-	}
-
-	/**
-	 * Build a 2D image matrix using the top left tile of each cell's pattern.
-	 * @param {Pattern[]} patterns 
-	 * @returns {TilemapImage}
-	 */
-	waveMatrixToImage(patterns) {
-		const image = [];
-		for (let y = 0; y < this.waveMatrix.length; y++) image[y] = [];
-
-		for (let y = 0; y < this.waveMatrix.length; y++) {
-		for (let x = 0; x < this.waveMatrix[0].length; x++) {
-			const possiblePatterns_Array = this.waveMatrix[y][x].toArray();
-			const i = possiblePatterns_Array[0];	// should be guaranteed to only have 1 possible pattern
-			const tileID = patterns[i][0][0];
-			image[y][x] = tileID;
-		}}
-
-		return image;
 	}
 }
