@@ -8,13 +8,13 @@ export default class WFCTesting extends Phaser.Scene {
 	model = new WFCModel();
 
 	N = 2;
-	profileLearning = true;
+	profileLearning = false;
 
 	width = 24;
 	height = 15;
 	maxAttempts = 10;
-	logProgress = false;
-	profileSolving = false;
+	logProgress = true;
+	profileSolving = true;
 
 	numRuns = 10;	// for this.getAverageGenerationDuration()
 

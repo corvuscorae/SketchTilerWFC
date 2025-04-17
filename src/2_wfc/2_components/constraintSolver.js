@@ -70,14 +70,14 @@ export default class ConstraintSolver {
 	 */
 	profileFunctions(value) {
 		if (value) {
-			this.createWaveMatrix = this.performanceProfiler.register(this.initializeWaveMatrix);
+			this.initializeWaveMatrix = this.performanceProfiler.register(this.initializeWaveMatrix);
 			this.observe = this.performanceProfiler.register(this.observe);
 			this.propagate = this.performanceProfiler.register(this.propagate);
 			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.register(this.getLeastEntropyUnsolvedCellPosition);
 			this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy);
 		}
 		else {
-			this.createWaveMatrix = this.performanceProfiler.unregister(this.initializeWaveMatrix);
+			this.initializeWaveMatrix = this.performanceProfiler.unregister(this.initializeWaveMatrix);
 			this.observe = this.performanceProfiler.unregister(this.observe);
 			this.propagate = this.performanceProfiler.unregister(this.propagate);
 			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.unregister(this.getLeastEntropyUnsolvedCellPosition);
