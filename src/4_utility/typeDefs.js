@@ -16,8 +16,11 @@
  * 
  * @typedef {number[][]} Pattern A 2D NxN matrix of tile IDs.
  *
+ * @typedef {Bitmask} TilePatternsBitmask Given a tile A, stores which patterns contain A as their top left tile.
+ * 
  * @typedef {Bitmask} AdjacentPatternsBitmask Given a pattern A, stores which patterns are adjacent to A in a single direction.
  * @typedef {AdjacentPatternsBitmask[]} AdjacentPatternsMap An array of four AdjacentPatternsBitmasks. Given a pattern A, stores which patterns are adjacent to A in each of the four directions.
+ * 
  * @typedef {Bitmask} PossiblePatternsBitmask Stores which patterns a cell can become.
  * 
  * @typedef {PossiblePatternsBitmask} Cell Currently the only info a cell needs to contain is its PossiblePatternsBitmask so for simplicity it is just that instead of an object containing it.

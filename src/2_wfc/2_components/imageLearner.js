@@ -12,6 +12,13 @@ export default class ImageLearner {
 	/** @type {AdjacentPatternsMap[]} */
 	adjacencies;
 
+	/**
+	 * For every tile, stores which patterns contain that tile as its top left tile.
+	 * This data is necessary for letting the wfc model user set tiles they desire in the output.
+	 * @type {Map<number, TilePatternsBitmask>}
+	 */
+	tilesToPatterns;
+
 	performanceProfiler = new PerformanceProfiler();
 
 	/**
@@ -24,11 +31,13 @@ export default class ImageLearner {
 		this.patterns = [];
 		this.weights = [];
 		this.adjacencies = [];
+		this.tilesToPatterns = new Map();
 
 		this.performanceProfiler.clearData();
 		this.profileFunctions(profile)
 
 		this.getPatternsAndWeights(images, N);
+		this.getTilesToPatterns();
 		this.getAdjacencies();
 
 		if (profile) this.performanceProfiler.logData();
@@ -83,6 +92,15 @@ export default class ImageLearner {
 					uniquePatterns.set(p_str, this.patterns.length-1);
 				}
 			}}
+		}
+	}
+
+	/** Populates this.tilesToPatterns. */
+	getTilesToPatterns() {
+		for (let i = 0; i < this.patterns.length; i++) {
+			const tileID = this.patterns[i][0][0];
+			if (this.tilesToPatterns.has(tileID)) this.tilesToPatterns.get(tileID).setBit(i);
+			else this.tilesToPatterns.set(tileID, new Bitmask(this.patterns.length).setBit(i));
 		}
 	}
 
