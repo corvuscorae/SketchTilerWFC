@@ -4,7 +4,10 @@ import Queue from "./queue.js";
 import PerformanceProfiler from "../5_Utility/performanceProfiler.js";
 
 export default class ConstraintSolver {
-	/** @type {Cell[][]} */
+	/**
+	 * Represents the current state of output possibilities for a generated image.
+	 * @type {Cell[][]}
+	 */
 	waveMatrix;
 
 	performanceProfiler = new PerformanceProfiler();
@@ -16,12 +19,13 @@ export default class ConstraintSolver {
 	 * @param {AdjacentPatternsMap[]} adjacencies
 	 * @param {number} width The width to set this.waveMatrix to.
 	 * @param {number} height The height to set this.waveMatrix to.
-	 * @param {number} maxAttempts
-	 * @param {bool} logProgress Whether to log the progress of this function or not.
-	 * @param {bool} profile Whether to profile the performance of this function or not.
+	 * @param {SetTileDataObject[]} setTiles
+	 * @param {number} maxAttempts (Default 10)
+	 * @param {bool} logProgress (Default true) Whether to log the progress of this function or not.
+	 * @param {bool} profile (Default false) Whether to profile the performance of this function or not.
 	 * @returns {bool} Whether the attempt was successful or not.
 	 */
-	solve(patterns, weights, adjacencies, width, height, maxAttempts, logProgress, profile) {
+	solve(patterns, weights, adjacencies, width, height, setTiles, maxAttempts = 10, logProgress = true, profile = false) {
 		this.performanceProfiler.clearData();
 		this.profileFunctions(profile);
 

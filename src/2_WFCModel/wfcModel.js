@@ -5,6 +5,9 @@ export default class WFCModel {
 	imageLearner = new ImageLearner();
 	constraintSolver = new ConstraintSolver();
 
+	/** @type {SetTileDataObject[]} */
+	setTiles = [];
+
 	/**
 	 * Learns the patterns of one or more images. Doesn't process images as periodic, and doesn't rotate or reflect patterns.
 	 * @param {TilemapImage[]} images The images to learn. If you only want to learn one pass an array with a single image in it.
@@ -13,6 +16,27 @@ export default class WFCModel {
 	 */
 	learn(images, N, profile) {
 		this.imageLearner.learn(images, N, profile);
+	}
+
+	/**
+	 * Sets the tile at (x, y) for future generated images.
+	 * @param {number} x
+	 * @param {number} y
+	 * @param {number} id
+	 */
+	setTile(x, y, id) {
+		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before setting tiles");
+		if (!this.imageLearner.tilesToPatterns.has(id)) throw new Error("Tile of given ID does not exist in the learned patterns");
+		this.setTiles.push({
+			x: x,
+			y: y,
+			tilePatternsBitmask: this.imageLearner.tilesToPatterns.get(id)
+		});
+	}
+
+	/** Leaves it up to this model to determine what each tile is going to be in future generated images. */
+	clearSetTiles() {
+		this.setTiles = [];
 	}
 
 	/**
@@ -25,7 +49,8 @@ export default class WFCModel {
 	 * @returns {TilemapImage | null}
 	 */
 	generate(width, height, maxAttempts, logProgress, profile) {
-		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before generation");
+		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before generating images");
+		if (!this.constraintSolver.width || !this.constraintSolver.height) throw new Error("Width and height of future generated images must be set before setting tiles")
 		const result = this.constraintSolver.solve(this.imageLearner.patterns, this.imageLearner.weights, this.imageLearner.adjacencies, width, height, maxAttempts, logProgress, profile);
 		if (result) return this.generateImage();
 		else return null;
