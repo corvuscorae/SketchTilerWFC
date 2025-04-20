@@ -47,8 +47,7 @@ export default class WFCModel {
 	generate(width, height, maxAttempts = 10, logProgress = true, profile = false) {
 		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before generating images");
 		const result = this.constraintSolver.solve(this.imageLearner.patterns, this.imageLearner.weights, this.imageLearner.adjacencies, this.setTiles, width, height, maxAttempts, logProgress, profile);
-		if (result) return this.generateImage();
-		else return null;
+		return result ? this.generateImage() : null;
 	}
 
 	/**
