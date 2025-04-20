@@ -17,15 +17,15 @@ export default class ConstraintSolver {
 	 * @param {Pattern[]} patterns
 	 * @param {number[]} weights
 	 * @param {AdjacentPatternsMap[]} adjacencies
+	 * @param {SetTileInstruction[]} setTiles
 	 * @param {number} width The width to set this.waveMatrix to.
 	 * @param {number} height The height to set this.waveMatrix to.
-	 * @param {SetTileDataObject[]} setTiles
-	 * @param {number} maxAttempts (Default 10)
-	 * @param {bool} logProgress (Default true) Whether to log the progress of this function or not.
-	 * @param {bool} profile (Default false) Whether to profile the performance of this function or not.
+	 * @param {number} maxAttempts
+	 * @param {bool} logProgress Whether to log the progress of this function or not.
+	 * @param {bool} profile Whether to profile the performance of this function or not.
 	 * @returns {bool} Whether the attempt was successful or not.
 	 */
-	solve(patterns, weights, adjacencies, width, height, setTiles, maxAttempts = 10, logProgress = true, profile = false) {
+	solve(patterns, weights, adjacencies, setTiles, width, height, maxAttempts, logProgress, profile) {
 		this.performanceProfiler.clearData();
 		this.profileFunctions(profile);
 

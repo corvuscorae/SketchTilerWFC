@@ -25,9 +25,9 @@ export default class ImageLearner {
 	 * Learns the patterns of one or more images. Doesn't process images as periodic, and doesn't rotate or reflect patterns.
 	 * @param {TilemapImage[]} images The images to learn. If you only want to learn one pass an array with a single image in it.
 	 * @param {number} N The width and height of the patterns.
-	 * @param {bool} profile (Default false) Whether to profile the performance of this function or not.
+	 * @param {bool} profile Whether to profile the performance of this function or not.
 	 */
-	learn(images, N, profile = false) {
+	learn(images, N, profile) {
 		this.patterns = [];
 		this.weights = [];
 		this.adjacencies = [];
