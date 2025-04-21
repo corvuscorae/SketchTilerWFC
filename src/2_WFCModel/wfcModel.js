@@ -5,8 +5,11 @@ export default class WFCModel {
 	imageLearner = new ImageLearner();
 	constraintSolver = new ConstraintSolver();
 
-	/** @type {SetTileInstruction[]} */
-	setTiles = [];
+	/**
+	 * Stores the set tile instructions generated from the user's usage of setTile().
+	 * @type {SetTileInstruction[]}
+	 */
+	setTilesInstructions = [];
 
 	/**
 	 * Learns the patterns of one or more images. Doesn't process images as periodic, and doesn't rotate or reflect patterns.
@@ -19,7 +22,7 @@ export default class WFCModel {
 	}
 
 	/**
-	 * Sets the tile at (x, y) for future generated images.
+	 * Set the tile at (x, y) for future generated images.
 	 * @param {number} x
 	 * @param {number} y
 	 * @param {number} id
@@ -27,12 +30,12 @@ export default class WFCModel {
 	setTile(x, y, id) {
 		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before setting tiles");
 		if (!this.imageLearner.tilesToPatterns.has(id)) throw new Error("Tile of given ID does not exist in the learned patterns");
-		this.setTiles.push([y, x, this.imageLearner.tilesToPatterns.get(id)]);
+		this.setTilesInstructions.push([y, x, this.imageLearner.tilesToPatterns.get(id)]);
 	}
 
-	/** Leaves it up to this model to determine what each tile is going to be in future generated images. */
+	/** Clear all tiles previously set. */
 	clearSetTiles() {
-		this.setTiles = [];
+		this.setTilesInstructions = [];
 	}
 
 	/**
@@ -46,8 +49,8 @@ export default class WFCModel {
 	 */
 	generate(width, height, maxAttempts = 10, logProgress = true, profile = false) {
 		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before generating images");
-		const result = this.constraintSolver.solve(this.imageLearner.weights, this.imageLearner.adjacencies, this.setTiles, width, height, maxAttempts, logProgress, profile);
-		return result ? this.generateImage() : null;
+		const success = this.constraintSolver.solve(this.imageLearner.weights, this.imageLearner.adjacencies, this.setTilesInstructions, width, height, maxAttempts, logProgress, profile);
+		return success ? this.generateImage() : null;
 	}
 
 	/**
@@ -55,19 +58,15 @@ export default class WFCModel {
 	 * @returns {TilemapImage}
 	 */
 	generateImage() {
-		// Build the image using the top left tile of each cell's pattern.
-
-		const patterns = this.imageLearner.patterns;
-		const waveMatrix = this.constraintSolver.waveMatrix;
-
 		const image = [];
 		for (let y = 0; y < waveMatrix.length; y++) image[y] = [];
 
-		for (let y = 0; y < waveMatrix.length; y++) {
-		for (let x = 0; x < waveMatrix[0].length; x++) {
-			const possiblePatterns_Array = waveMatrix[y][x].toArray();
+		// Build the image using the top left tile of each cell's pattern
+		for (let y = 0; y < this.constraintSolver.waveMatrix.length; y++) {
+		for (let x = 0; x < this.constraintSolver.waveMatrix[0].length; x++) {
+			const possiblePatterns_Array = this.constraintSolver.waveMatrix[y][x].toArray();
 			const i = possiblePatterns_Array[0];	// should be guaranteed to only have 1 possible pattern
-			const tileID = patterns[i][0][0];
+			const tileID = this.imageLearner.patterns[i][0][0];
 			image[y][x] = tileID;
 		}}
 

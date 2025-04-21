@@ -5,7 +5,7 @@ import PerformanceProfiler from "../5_Utility/performanceProfiler.js";
 
 export default class ConstraintSolver {
 	/**
-	 * Represents the current state of output possibilities for a generated image.
+	 * Represents the possibility space of an image in the middle of generation.
 	 * @type {Cell[][]}
 	 */
 	waveMatrix;

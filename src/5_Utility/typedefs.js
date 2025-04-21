@@ -20,7 +20,7 @@
  * @typedef {[y: number, x: number, tilePatternsBitmask: TilePatternsBitmask]} SetTileInstruction
  * 
  * @typedef {Bitmask} AdjacentPatternsBitmask Given a pattern A, stores which patterns are adjacent to A in a single direction.
- * @typedef {AdjacentPatternsBitmask[]} AdjacentPatternsMap An array of four AdjacentPatternsBitmasks. Given a pattern A, stores which patterns are adjacent to A in each of the four directions.
+ * @typedef {AdjacentPatternsBitmask[]} AdjacentPatternsMap An array of four AdjacentPatternsBitmasks. Given a pattern A, stores which patterns are adjacent to A in each of the four directions (in order of up, down, left, right).
  * 
  * @typedef {Bitmask} PossiblePatternsBitmask Stores which patterns a cell can become.
  * 
