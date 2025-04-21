@@ -14,7 +14,6 @@ export default class ConstraintSolver {
 
 	/**
 	 * Attempts to solve this.waveMatrix based on learned pattern data.
-	 * @param {Pattern[]} patterns
 	 * @param {number[]} weights
 	 * @param {AdjacentPatternsMap[]} adjacencies
 	 * @param {SetTileInstruction[]} setTiles
@@ -25,13 +24,20 @@ export default class ConstraintSolver {
 	 * @param {bool} profile Whether to profile the performance of this function or not.
 	 * @returns {bool} Whether the attempt was successful or not.
 	 */
-	solve(patterns, weights, adjacencies, setTiles, width, height, maxAttempts, logProgress, profile) {
+	solve(weights, adjacencies, setTileInstructions, width, height, maxAttempts, logProgress, profile) {
 		this.performanceProfiler.clearData();
 		this.profileFunctions(profile);
 
-		if (logProgress) console.log("starting");
+		this.initializeWaveMatrix(weights.length, width, height);
 
-		this.initializeWaveMatrix(patterns.length, width, height);
+		let contradictionCreated = this.setTiles(setTileInstructions, adjacencies);
+		if (contradictionCreated) {
+			console.log("A contradiction was created while trying to set tiles.");
+			if (profile) this.performanceProfiler.logData();
+			return false;
+		}
+
+		if (logProgress) console.log("starting constraint solving loop");
 		let numAttempts = 1;
 
 		/*
@@ -47,9 +53,17 @@ export default class ConstraintSolver {
 			this.observe(y, x, weights);
 
 			if (logProgress) console.log("propagating...");
-			let contradictionCreated = this.propagate(y, x, adjacencies);
+			contradictionCreated = this.propagate(y, x, adjacencies);
 			if (contradictionCreated) {
-				this.initializeWaveMatrix(patterns.length, width, height);
+				this.initializeWaveMatrix(weights.length, width, height);
+
+				let contradictionCreated = this.setTiles(setTileInstructions, adjacencies);
+				if (contradictionCreated) {
+					console.log("A contradiction was created while trying to set tiles.");
+					if (profile) this.performanceProfiler.logData();
+					return false;
+				}
+				
 				y = Math.floor(Math.random() * height);	// random in range [0, outputHeight-1]
 				x = Math.floor(Math.random() * width);	// random in range [0, outputWidth-1]
 				numAttempts++;
@@ -65,6 +79,7 @@ export default class ConstraintSolver {
 		}
 
 		if (logProgress) console.log("max attempts reached");
+		if (profile) this.performanceProfiler.logData();
 		return false;
 	}
 
@@ -75,6 +90,7 @@ export default class ConstraintSolver {
 	profileFunctions(value) {
 		if (value) {
 			this.initializeWaveMatrix = this.performanceProfiler.register(this.initializeWaveMatrix);
+			this.setTiles = this.performanceProfiler.register(this.setTiles);
 			this.observe = this.performanceProfiler.register(this.observe);
 			this.propagate = this.performanceProfiler.register(this.propagate);
 			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.register(this.getLeastEntropyUnsolvedCellPosition);
@@ -82,6 +98,7 @@ export default class ConstraintSolver {
 		}
 		else {
 			this.initializeWaveMatrix = this.performanceProfiler.unregister(this.initializeWaveMatrix);
+			this.setTiles = this.performanceProfiler.unregister(this.setTiles);
 			this.observe = this.performanceProfiler.unregister(this.observe);
 			this.propagate = this.performanceProfiler.unregister(this.propagate);
 			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.unregister(this.getLeastEntropyUnsolvedCellPosition);
@@ -106,6 +123,28 @@ export default class ConstraintSolver {
 		for (let x = 0; x < width; x++) {
 			this.waveMatrix[y][x] = Bitmask.createCopy(allPatternsPossible);
 		}}
+	}
+
+	/**
+	 * Follows the set tile instructions given by the user.
+	 * @param {SetTileInstruction[]} setTileInstructions 
+	 * @param {AdjacentPatternsMap[]} adjacencies 
+	 * @returns {bool} Whether a contradiction was created or not.
+	 */
+	setTiles(setTileInstructions, adjacencies) {
+		for (const [y, x, tilePatternsBitmask] of setTileInstructions) {
+			if (y < 0 || y > this.waveMatrix.length-1 || x < 0 || x > this.waveMatrix[0].length-1) {
+				console.warn("A set tile instruction asks for a position outside of the wave matrix. Ignoring this instruction.");
+				continue;
+			}
+				
+			this.waveMatrix[y][x] = Bitmask.AND(this.waveMatrix[y][x], tilePatternsBitmask);
+			if (this.waveMatrix[y][x].isEmpty()) return true;
+			
+			const contradictionCreated = this.propagate(y, x, adjacencies);
+			if (contradictionCreated) return true;
+		}
+		return false;
 	}
 
 	/**
@@ -178,8 +217,7 @@ export default class ConstraintSolver {
 				const x2 = x1+dx;
 
 				// Don't go out of bounds
-				if (y2 < 0 || y2 > this.waveMatrix.length-1) continue;
-				if (x2 < 0 || x2 > this.waveMatrix[0].length-1) continue;
+				if (y2 < 0 || y2 > this.waveMatrix.length-1 || x2 < 0 || x2 > this.waveMatrix[0].length-1) continue;
 
 				const cell2_PossiblePatterns_Bitmask = this.waveMatrix[y2][x2];
 

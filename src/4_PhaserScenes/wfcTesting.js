@@ -80,6 +80,13 @@ export default class WFCTesting extends Phaser.Scene {
 
 		console.log("Using model for structures");
 		this.model.learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
+
+		this.model.setTile(12, 8, 105);	// well
+		this.model.setTile(12, 3, 96);	// target
+		this.model.setTile(12, 13, 96);	// target
+		this.model.setTile(7, 8, 96);	// target
+		this.model.setTile(17, 8, 96);	// target
+
 		const structuresImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
 		if (!structuresImage) return;
 

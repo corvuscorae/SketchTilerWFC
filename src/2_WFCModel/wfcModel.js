@@ -27,7 +27,7 @@ export default class WFCModel {
 	setTile(x, y, id) {
 		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before setting tiles");
 		if (!this.imageLearner.tilesToPatterns.has(id)) throw new Error("Tile of given ID does not exist in the learned patterns");
-		this.setTiles.push([x, y, this.imageLearner.tilesToPatterns.get(id)]);
+		this.setTiles.push([y, x, this.imageLearner.tilesToPatterns.get(id)]);
 	}
 
 	/** Leaves it up to this model to determine what each tile is going to be in future generated images. */
@@ -46,7 +46,7 @@ export default class WFCModel {
 	 */
 	generate(width, height, maxAttempts = 10, logProgress = true, profile = false) {
 		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before generating images");
-		const result = this.constraintSolver.solve(this.imageLearner.patterns, this.imageLearner.weights, this.imageLearner.adjacencies, this.setTiles, width, height, maxAttempts, logProgress, profile);
+		const result = this.constraintSolver.solve(this.imageLearner.weights, this.imageLearner.adjacencies, this.setTiles, width, height, maxAttempts, logProgress, profile);
 		return result ? this.generateImage() : null;
 	}
 

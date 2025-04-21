@@ -17,7 +17,7 @@
  * @typedef {number[][]} Pattern A 2D NxN matrix of tile IDs.
  *
  * @typedef {Bitmask} TilePatternsBitmask Given a tile A, stores which patterns contain A as their top left tile.
- * @typedef {[x: number, y: number, tilePatternsBitmask: TilePatternsBitmask]} SetTileInstruction
+ * @typedef {[y: number, x: number, tilePatternsBitmask: TilePatternsBitmask]} SetTileInstruction
  * 
  * @typedef {Bitmask} AdjacentPatternsBitmask Given a pattern A, stores which patterns are adjacent to A in a single direction.
  * @typedef {AdjacentPatternsBitmask[]} AdjacentPatternsMap An array of four AdjacentPatternsBitmasks. Given a pattern A, stores which patterns are adjacent to A in each of the four directions.
