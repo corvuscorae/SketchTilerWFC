@@ -59,7 +59,7 @@ export default class WFCModel {
 	 */
 	generateImage() {
 		const image = [];
-		for (let y = 0; y < waveMatrix.length; y++) image[y] = [];
+		for (let y = 0; y < this.constraintSolver.waveMatrix.length; y++) image[y] = [];
 
 		// Build the image using the top left tile of each cell's pattern
 		for (let y = 0; y < this.constraintSolver.waveMatrix.length; y++) {
