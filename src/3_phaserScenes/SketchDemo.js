@@ -1,0 +1,184 @@
+import Phaser from "../../lib/phaser.module.js"
+
+export default class SketchDemo_Scene extends Phaser.Scene {
+    constructor(){
+		super("SketchDemo");
+    }
+
+    outputWidth = 24;
+    outputHeight = 15;
+    cellSize = 16 // TODO: this will need correspond to cell size in tilemap/phaser
+    regionBlock = {
+      "box":    (strokes, color) => this.getBoundingBox(strokes, color),
+      "trace":  (strokes, color) => this.getTrace(strokes, color),
+    }
+
+    create() {
+      this.gridLines_gfx = this.add.graphics();
+      this.fillTiles_gfx = this.add.graphics();
+  
+      this.drawGridLines();
+      this.structures = {};
+      this.genRegions = {};
+
+      // receives sketches from sketch tool
+      window.addEventListener('sketchToPhaser', (e) => {
+        this.structures = e.detail;   
+        // TODO: optimize; this.structures is overwritten everytime when we only 
+        //    really need to add new structures
+        this.getStructureRegions(this.structures);
+      });
+    
+      window.addEventListener('clearSketch', (e) => {
+        this.structures = {};
+        this.genRegions = {};
+        this.fillTiles_gfx.clear();
+      });
+    }
+
+    // TODO: for trace and box regions
+    //    > normalize region blocking 
+    //      (cleanup tiles, combine house strokes to a single bounding box*)
+    getStructureRegions(sketch){
+      let result = {};
+
+      for(let structType in sketch){
+        let struct = sketch[structType];
+        // only looking through structures (not other attributes) with points drawn
+        if(struct.info && struct.strokes && struct.strokes.length > 0){
+          result[structType] = [];
+          let regionType = struct.info.region;
+          for(let stroke of struct.strokes){
+            result[structType].push(
+              this.regionBlock[regionType](stroke, struct.info.color)
+            );
+          }
+        }
+      }
+
+      //console.log(result);
+
+      // DEBUG: color generation regions (placeholder visualization -- this will
+      //    eventually call structure generators instead!)
+      for(let structType in result){
+        let regionType = sketch[structType].info.region;
+        let color = sketch[structType].info.color;
+
+        for(let region of result[structType]){
+          this.fillTiles(region, regionType, color)
+        }
+      }
+      return result;
+    }
+
+    getBoundingBox(stroke, color){
+      if(!stroke) return;
+      // console.log("getting bounding box...", stroke)
+
+      let tiles = this.pointsToCells(stroke);
+
+      // get top-left and bottom-right of stroke and fill in that region of tiles
+      let min = {x: this.outputWidth, y: this.outputHeight};
+      let max = {x: -1, y: -1};
+      for(let tile of tiles){
+        // top-left
+        if(tile.x < min.x){ min.x = tile.x; }
+        if(tile.y < min.y){ min.y = tile.y; }
+
+        // bottom-right
+        if(tile.x > max.x){ max.x = tile.x; }
+        if(tile.y > max.y){ max.y = tile.y; }
+      }
+
+      min = {x: min.x*this.cellSize, y: min.y*this.cellSize}
+      max = {x: max.x*this.cellSize, y: max.y*this.cellSize}
+
+      return {
+        min: min,
+        max: max
+      }
+    }
+
+    getTrace(stroke, color){
+      if(!stroke) return;
+      console.log("getting region trace...", stroke);
+      let result = this.pointsToCells(stroke);
+      //this.fillTiles(result, color);  // DEBUG: visualizer
+      return result;
+    }
+
+    pointsToCells(stroke){
+      let result = [];
+
+      for(let point of stroke){
+          //console.log(this.getCell(point.x, point.y))
+          result.push(this.getCell(point.x, point.y))
+      }
+
+      result = this.removeDuplicates(result);
+      return result;
+    }  
+
+    getCell(x, y){
+      return {
+        x: Math.floor(x / this.cellSize),
+        y: Math.floor(y / this.cellSize)
+      }
+    }
+
+    removeDuplicates(arr){
+      const uniqueArray = Array.from(
+        new Set(arr.map(obj => JSON.stringify(obj)))
+      ).map(str => JSON.parse(str));
+
+      return uniqueArray;
+    }
+  
+    /** VIZUALIZERS **/
+    // draw a grid
+    drawGridLines(){
+      this.gridLines_gfx.lineStyle(0.5, 0xffffff, 1);
+
+      let w = window.game.config.width;
+      let h = window.game.config.height;
+
+      // vertical lines
+      for(let i = this.cellSize; i < w; i+=this.cellSize){
+        this.gridLines_gfx.lineBetween(i, 0, i, h);
+      }
+      
+      // horizontal lines
+      for(let j = this.cellSize; j < h; j+=this.cellSize){
+        this.gridLines_gfx.lineBetween(0, j, w, j);
+      }
+    }
+
+    // fill colors
+    fillTiles(data, style, color){
+      color = color.replace(/\#/g, '0x');   // make hex-formatted color readable for phaser
+      this.fillTiles_gfx.fillStyle(color);
+      let sz = this.cellSize;
+      
+      // data should have all coords to be filled
+      if(style === "trace"){
+        for(let i = 0; i < data.length; i++){
+          let {x, y} = data[i];
+          this.fillTiles_gfx.fillRect(sz*x, sz*y, sz, sz);
+        }
+      }
+      // data should have {min: {x, y}, max: {x, y}}
+      if(style === "box"){
+        let {min, max} = data;
+        let box = { 
+          width:  Math.max(max.x - min.x, sz), 
+          height: Math.max(max.y - min.y, sz), 
+        }
+
+        color = color.replace(/\#/g, '0x');   // make hex-formatted color readable for phaser
+        this.fillTiles_gfx.fillStyle(color);
+        this.fillTiles_gfx.fillRect(min.x, min.y, box.width, box.height);
+      }
+    
+    }
+  }
+  
