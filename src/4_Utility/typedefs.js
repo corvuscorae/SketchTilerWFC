@@ -6,7 +6,7 @@
 */
 
 // Imports (for the following typedefs to use)
-/** @typedef {import("../2_WFCModel/bitmask.js").default} Bitmask */
+/** @typedef {import("../2_WFC/1_Model/bitmask.js").default} Bitmask */
 
 // WFC
 /**

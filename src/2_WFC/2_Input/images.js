@@ -1,7 +1,7 @@
-import MAP1 from "./map1.js";
-import MAP2 from "./map2.js";
-import MAP3 from "./map3.js";
-import MAP4 from "./map4.js";
+import MAP1 from "./1_Maps/map1.js";
+import MAP2 from "./1_Maps/map2.js";
+import MAP3 from "./1_Maps/map3.js";
+import MAP4 from "./1_Maps/map4.js";
 
 /** @type {{ GROUND: TilemapImage[], STRUCTURES: TilemapImage[] }} */
 const IMAGES = {

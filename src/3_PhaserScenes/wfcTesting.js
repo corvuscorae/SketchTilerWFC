@@ -1,6 +1,6 @@
 import Phaser from "../../lib/phaserModule.js"
-import WFCModel from "../2_WFCModel/wfcModel.js";
-import IMAGES from "../3_WFCInput/images.js";
+import WFCModel from "../2_WFC/1_Model/wfcModel.js";
+import IMAGES from "../2_WFC/2_Input/images.js";
 
 export default class WFCTesting extends Phaser.Scene {
 	displayedMapID = 3;	// check assets folder to see all maps
@@ -11,8 +11,8 @@ export default class WFCTesting extends Phaser.Scene {
 	profileLearning = false;
 
 	// width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
-	width = 10;
-	height = 10;
+	width = 9;
+	height = 4;
 	maxAttempts = 10;
 	logProgress = true;
 	profileSolving = true;
@@ -94,7 +94,6 @@ export default class WFCTesting extends Phaser.Scene {
 		this.model.learn([houseImage], this.N, this.profileLearning);
 
 		this.model.setTile(0, this.height-1, 73);	// brown BL corner
-		this.model.setTile(4, this.height-1, 74);	// brown BM tile
 		this.model.setTile(this.width-1, this.height-1, 76)	// brown BR corner
 
 		const structuresImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
