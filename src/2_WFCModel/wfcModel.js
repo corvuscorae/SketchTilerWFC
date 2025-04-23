@@ -12,13 +12,16 @@ export default class WFCModel {
 	setTilesInstructions = [];
 
 	/**
-	 * Learns the patterns of one or more images. Doesn't process images as periodic, and doesn't rotate or reflect patterns.
+	 * Learns the patterns of one or more images.
+	 * Doesn't process images as periodic, and doesn't rotate or reflect patterns.
+	 * Additionally, clears all set tiles.
 	 * @param {TilemapImage[]} images The images to learn. If you only want to learn one pass an array with a single image in it.
 	 * @param {number} N The width and height of the patterns.
 	 * @param {bool} profile (Default false) Whether to profile the performance of this function or not.
 	 */
 	learn(images, N, profile = false) {
 		this.imageLearner.learn(images, N, profile);
+		this.clearSetTiles();
 	}
 
 	/**
@@ -28,8 +31,6 @@ export default class WFCModel {
 	 * @param {number} id
 	 */
 	setTile(x, y, id) {
-		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before setting tiles");
-		if (!this.imageLearner.tilesToPatterns.has(id)) throw new Error("Tile of given ID does not exist in the learned patterns");
 		this.setTilesInstructions.push([y, x, this.imageLearner.tilesToPatterns.get(id)]);
 	}
 
@@ -48,7 +49,6 @@ export default class WFCModel {
 	 * @returns {TilemapImage | null}
 	 */
 	generate(width, height, maxAttempts = 10, logProgress = true, profile = false) {
-		if (!this.imageLearner.patterns) throw new Error("Patterns must be learned before generating images");
 		const success = this.constraintSolver.solve(this.imageLearner.weights, this.imageLearner.adjacencies, this.setTilesInstructions, width, height, maxAttempts, logProgress, profile);
 		return success ? this.generateImage() : null;
 	}

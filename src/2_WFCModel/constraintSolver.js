@@ -29,7 +29,7 @@ export default class ConstraintSolver {
 		this.profileFunctions(profile);
 
 		this.initializeWaveMatrix(weights.length, width, height);
-		this.setTiles(setTileInstructions);
+		this.setTiles(setTileInstructions, adjacencies);
 
 		let numAttempts = 1;
 		while (numAttempts <= maxAttempts) {	// use <= so maxAttempts can be 1
@@ -46,7 +46,7 @@ export default class ConstraintSolver {
 			const contradictionCreated = this.propagate(y, x, adjacencies);
 			if (contradictionCreated) {
 				this.initializeWaveMatrix(weights.length, width, height);
-				this.setTiles(setTileInstructions);
+				this.setTiles(setTileInstructions, adjacencies);
 				numAttempts++;
 			}
 		}
@@ -107,14 +107,17 @@ export default class ConstraintSolver {
 	/**
 	 * Executes the user's set tile instructions.
 	 * @param {SetTileInstruction[]} setTileInstructions 
+	 * @param {AdjacentPatternsMap[]} adjacencies
 	 */
-	setTiles(setTileInstructions) {
+	setTiles(setTileInstructions, adjacencies) {
 		for (const [y, x, tilePatternsBitmask] of setTileInstructions) {
 			if (y < 0 || y > this.waveMatrix.length-1 || x < 0 || x > this.waveMatrix[0].length-1) {
 				console.warn("A set tile instruction asks for a position outside of the wave matrix. Ignoring this instruction.");
 				continue;
 			}
 			this.waveMatrix[y][x] = Bitmask.createCopy(tilePatternsBitmask);
+			const contradictionCreated = this.propagate(y, x, adjacencies);
+			if (contradictionCreated) throw new Error("User's set tiles formed a contradiction.");
 		}
 	}
 
