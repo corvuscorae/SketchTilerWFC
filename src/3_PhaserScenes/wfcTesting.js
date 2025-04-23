@@ -3,6 +3,20 @@ import WFCModel from "../2_WFC/1_Model/wfcModel.js";
 import IMAGES from "../2_WFC/2_Input/images.js";
 
 export default class WFCTesting extends Phaser.Scene {
+
+	/*
+	const map3House = [
+		[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+		[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+		[-1, -1, 49, 50, 50, 50, 52, -1, -1, -1, -1, -1, -1],
+		[-1, -1, 61, 62, 62, 62, 62, 49, 50, 50, 51, -1, -1],
+		[-1, -1, 73, 85, 74, 85, 74, 61, 62, 64, 63, -1, -1],
+		[-1, -1, 73, 86, 74, 86, 74, 73, 74, 86, 76, -1, -1],
+		[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+		[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+	];
+	*/
+
 	displayedMapID = 3;	// check assets folder to see all maps
 
 	model = new WFCModel();
@@ -11,8 +25,8 @@ export default class WFCTesting extends Phaser.Scene {
 	profileLearning = false;
 
 	// width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
-	width = 9;
-	height = 4;
+	width = 24;
+	height = 15;
 	maxAttempts = 10;
 	logProgress = true;
 	profileSolving = true;
@@ -79,22 +93,12 @@ export default class WFCTesting extends Phaser.Scene {
 		const groundImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
 		if (!groundImage) return;
 
-		const houseImage = [
-			[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-			[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-			[-1, -1, 49, 50, 50, 50, 52, -1, -1, -1, -1, -1, -1],
-			[-1, -1, 61, 62, 62, 62, 62, 49, 50, 50, 51, -1, -1],
-			[-1, -1, 73, 85, 74, 85, 74, 61, 62, 64, 63, -1, -1],
-			[-1, -1, 73, 86, 74, 86, 74, 73, 74, 86, 76, -1, -1],
-			[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
-			[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
-		];
-
 		console.log("Using model for structures");
-		this.model.learn([houseImage], this.N, this.profileLearning);
+		this.model.learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
 
-		this.model.setTile(0, this.height-1, 73);	// brown BL corner
-		this.model.setTile(this.width-1, this.height-1, 76)	// brown BR corner
+		//this.model.setTile(0, this.height-1, 73);	// brown BL corner
+		//this.model.setTile(this.width-1, this.height-1, 76)	// brown BR corner
+		//this.model.setTile(0, 0, 49)				// blue roof TL corner
 
 		const structuresImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
 		if (!structuresImage) return;
