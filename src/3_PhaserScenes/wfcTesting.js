@@ -3,7 +3,7 @@ import WFCModel from "../2_WFC/1_Model/wfcModel.js";
 import IMAGES from "../2_WFC/2_Input/images.js";
 
 export default class WFCTesting extends Phaser.Scene {
-	displayedMapID = 3;	// check assets folder to see all maps
+	displayedMapID = 1;	// check assets folder to see all maps
 
 	model = new WFCModel();
 
@@ -80,15 +80,15 @@ export default class WFCTesting extends Phaser.Scene {
 		if (!groundImage) return;
 
 		console.log("Using model for structures");
-		this.model.learn([...IMAGES.STRUCTURES, ...IMAGES.HOUSES], this.N, this.profileLearning);
+		this.model.learn(IMAGES.HOUSES, this.N, this.profileLearning);
 
-		//this.model.setTile(0, this.height-1, 73);	// brown BL corner
-		//this.model.setTile(this.width-1, this.height-1, 76)	// brown BR corner
+		this.model.setTile(0, this.height-1, 73);	// brown BL corner
+		this.model.setTile(this.width-1, this.height-1, 76)	// brown BR corner
 
 		//this.model.setTile(0, this.height-1, 77);	// blue BL corner
 		//this.model.setTile(this.width-1, this.height-1, 80)	// blue BR corner
 
-		//this.model.setTile(0, 0, 49)	// blue roof TL corner
+		this.model.setTile(0, 0, 49)	// blue roof TL corner
 		//this.model.setTile(this.width-1, 0, 51)	// blue roof TR corner
 		//this.model.setTile(this.width-1, 0, 52)	// blue roof TR chimney
 
