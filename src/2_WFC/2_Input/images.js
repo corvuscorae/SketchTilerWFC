@@ -4,7 +4,7 @@ import MAP3 from "./map3.js";
 import MAP4 from "./map4.js";
 import HOUSES from "./houses.js";
 
-/** @type {{ GROUND: TilemapImage[], STRUCTURES: TilemapImage[], HOUSES: TilemapImage[] }} */
+/** @type {{ GROUND: TilemapImage[], STRUCTURES: TilemapImage[], HOUSES: TilemapImage[], FORESTS: TilemapImage[] }} */
 const IMAGES = {
 	GROUND: [
 		MAP1.GROUND,
