@@ -3,7 +3,7 @@ import WFCModel from "../2_WFC/1_Model/wfcModel.js";
 import IMAGES from "../2_WFC/2_Input/images.js";
 
 export default class WFCTesting extends Phaser.Scene {
-	displayedMapID = 3;	// check assets folder to see all maps
+	displayedMapID = 1;	// check assets folder to see all maps
 
 	model = new WFCModel();
 
