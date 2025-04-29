@@ -198,7 +198,7 @@ export default class ConstraintSolver {
 				const cell1_PossibleAdjacentPatterns_Bitmask = new Bitmask(adjacencies.length);
 				for (const i of cell1_PossiblePatterns_Array) {
 					const i_AdjacentPatterns_Bitmask = adjacencies[i][k];
-					cell1_PossibleAdjacentPatterns_Bitmask.combineWith(i_AdjacentPatterns_Bitmask);
+					cell1_PossibleAdjacentPatterns_Bitmask.mergeWith(i_AdjacentPatterns_Bitmask);
 				}
 
 				const cell2_NewPossiblePatterns_Bitmask = Bitmask.AND(cell2_PossiblePatterns_Bitmask, cell1_PossibleAdjacentPatterns_Bitmask);

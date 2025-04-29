@@ -95,7 +95,7 @@ export default class Bitmask {
 	 * Sets any unset bits in this Bitmask that are set in other. Equivalent to a Bitwise OR Assignment (|=) operation.
 	 * @param {Bitmask} other 
 	 */
-	combineWith(other) {
+	mergeWith(other) {
 		for (let i = 0; i < this.array.length; i++) this.array[i] |= other.array[i];
 	}
 
