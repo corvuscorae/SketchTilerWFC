@@ -115,7 +115,7 @@ export default class ConstraintSolver {
 				console.warn("A set tile instruction asks for a position outside of the wave matrix. Ignoring this instruction.");
 				continue;
 			}
-			this.waveMatrix[y][x] = Bitmask.createCopy(tilePatternsBitmask);
+			this.waveMatrix[y][x].intersectWith(tilePatternsBitmask);
 			const contradictionCreated = this.propagate(y, x, adjacencies);
 			if (contradictionCreated) throw new Error("User's set tiles formed a contradiction.");
 		}

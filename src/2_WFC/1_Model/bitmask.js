@@ -84,7 +84,15 @@ export default class Bitmask {
 	}
 
 	/**
-	 * Sets any unset bits in this Bitmask that are set in other.
+	 * Unsets any set bits in this Bitmask that are unset in other. Equivalent to a Bitwise AND Assignment (&=) operation.
+	 * @param {Bitmask} other 
+	 */
+	intersectWith(other) {
+		for (let i = 0; i < this.array.length; i++) this.array[i] &= other.array[i];
+	}
+
+	/**
+	 * Sets any unset bits in this Bitmask that are set in other. Equivalent to a Bitwise OR Assignment (|=) operation.
 	 * @param {Bitmask} other 
 	 */
 	combineWith(other) {
