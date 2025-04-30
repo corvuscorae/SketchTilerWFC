@@ -1,16 +1,15 @@
 "use strict"	// execute JS code in strict mode
 import Phaser from "./lib/phaser.module.js";
 import SketchDemo_Scene from "./src/3_phaserScenes/SketchDemo.js";
-//import TinyTownGenerator_Scene from "./src/3_phaserScenes/tinyTownGenerator.js";
 
 const config = {
 	parent: "phaserCanvas",
 	type: Phaser.CANVAS,
-	width: 640,
-	height: 400,
-	backgroundColor: "rgb(143, 143, 143)",
+	width: 640,		// 40 tiles x 16 pixels each
+	height: 400,	// 25 tiles x 16 pixels each
 	zoom: 1,
-	//autoCenter: true,
+	autoCenter: true,
+	backgroundColor: "rgb(143, 143, 143)",
 	render: { pixelArt: true },	// scale pixel art without blurring
 	scene: [SketchDemo_Scene]
 }
