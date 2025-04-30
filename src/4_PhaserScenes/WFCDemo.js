@@ -1,14 +1,14 @@
-import Phaser from "../../lib/phaserModule.js"
-import WFCModel from "../2_WFC/1_Model/wfcModel.js";
+import Phaser from "../../lib/PhaserModule.js";
+import WFCModel from "../2_WFC/1_Model/WFCModel.js";
 import IMAGES from "../2_WFC/2_Input/images.js";
 
-export default class WFCTesting extends Phaser.Scene {
+export default class WFCDemo extends Phaser.Scene {
 	displayedMapID = 1;	// check assets folder to see all maps
 
 	model = new WFCModel();
 
 	N = 2;
-	profileLearning = false;
+	profileLearning = true;
 
 	// width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
 	width = 24;
@@ -64,7 +64,7 @@ export default class WFCTesting extends Phaser.Scene {
 		});
 		this.timedRuns_Key.on("down", () => this.getAverageGenerationDuration(this.numRuns));
 
-		document.getElementById("descriptionText").innerHTML = `
+		document.getElementById("description").innerHTML = `
 			<h2>Controls</h2>
 			(Opening the console is recommended) <br><br>
 			Generate: G <br>

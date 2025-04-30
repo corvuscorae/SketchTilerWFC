@@ -1,6 +1,6 @@
 import DIRECTIONS from "./directions.js";
-import Bitmask from "./bitmask.js";
-import PerformanceProfiler from "../../4_Utility/performanceProfiler.js";
+import Bitmask from "./Bitmask.js";
+import PerformanceProfiler from "../../5_Utility/PerformanceProfiler.js";
 
 export default class ImageLearner {
 	/**

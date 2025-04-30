@@ -5,17 +5,17 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Sketch to Tilemap Application</title>
 
-		<script type="module" src="./lib/phaserModule.js"></script>
+		<script type="module" src="./lib/PhaserModule.js"></script>
+
+		
 
 		<script type="module" src="./src/2_WFC/1_Model/directions.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/bitmask.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/queue.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/imageLearner.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/constraintSolver.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/wfcModel.js"></script>
+		<script type="module" src="./src/2_WFC/1_Model/Bitmask.js"></script>
+		<script type="module" src="./src/2_WFC/1_Model/Queue.js"></script>
+		<script type="module" src="./src/2_WFC/1_Model/ImageLearner.js"></script>
+		<script type="module" src="./src/2_WFC/1_Model/ConstraintSolver.js"></script>
+		<script type="module" src="./src/2_WFC/1_Model/WFCModel.js"></script>
 
-		<!-- <script type="module" src="./src/3_phaserScenes/tinyTownGenerator.js"></script> -->	
-		<script type="module" src="./src/3_phaserScenes/SketchDemo.js"></script>
 		<script type="module" src="./src/2_WFC/2_Input/map1.js"></script>
 		<script type="module" src="./src/2_WFC/2_Input/map2.js"></script>
 		<script type="module" src="./src/2_WFC/2_Input/map3.js"></script>
@@ -23,19 +23,19 @@
 		<script type="module" src="./src/2_WFC/2_Input/houses.js"></script>
 		<script type="module" src="./src/2_WFC/2_Input/images.js"></script>
 
-		<script type="module" src="./src/3_PhaserScenes/wfcTesting.js"></script>
+		<script type="module" src="./src/4_PhaserScenes/SketchDemo.js"></script>
 
-		<script type="module" src="./src/4_Utility/performanceProfiler.js"></script>
+		<script type="module" src="./src/5_Utility/PerformanceProfiler.js"></script>
 		
-		<script type="module" src="./main.js"></script>	
+		<script type="module" src="./main.js"></script>
 
-		<script type="module" src ="src/sketching-tool/utils/init.js"></script>
-		<script type="module" src ="src/sketching-tool/utils/lineCleanup.js"></script>
-		<script type="module" src ="src/sketching-tool/sketch.js"></script>
+		<script type="module" src="./src/1_Sketchpad/2_Utility/init.js"></script>
+		<script type="module" src="./src/1_Sketchpad/2_Utility/lineCleanup.js"></script>
+		<script type="module" src="./src/1_Sketchpad/sketchpad.js"></script>
 	</head>
 	<body>
-		<div id="app"> </div>
-		<div id="phaserCanvas"></div>
-		<div id="descriptionText"></div>
+		<div id="app"></div>
+		<div id="phaser"></div>
+		<div id="description"></div>
 	</body>
 </html>

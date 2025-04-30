@@ -1,7 +1,7 @@
 //import "./style.css";
 //* HTML SETUP *//
 const APP_NAME = "Sketch Co-Collaborate";
-const app = document.querySelector("#app");
+const app = document.getElementById("app");
 
 // page info
 document.title = APP_NAME;

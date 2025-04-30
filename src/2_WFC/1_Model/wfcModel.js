@@ -1,5 +1,5 @@
-import ImageLearner from "./imageLearner.js";
-import ConstraintSolver from "./constraintSolver.js";
+import ImageLearner from "./ImageLearner.js";
+import ConstraintSolver from "./ConstraintSolver.js";
 
 export default class WFCModel {
 	imageLearner = new ImageLearner();

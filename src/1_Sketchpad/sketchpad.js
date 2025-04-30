@@ -1,6 +1,6 @@
-import { canvas, context, buttonContainer, drawGrid } from "./utils/init.js";
-import { ramerDouglasPeucker } from "./utils/lineCleanup.js";
-import { LineDisplayble, mouseDisplayable } from "./classes/displayables.js";
+import { canvas, context, buttonContainer, drawGrid } from "./2_Utility/init.js";
+import { ramerDouglasPeucker } from "./2_Utility/lineCleanup.js";
+import { LineDisplayble, mouseDisplayable } from "./1_Classes/displayables.js";
 
 // TODO: UIX cleanup (after we get wireframes)
 drawGrid();
