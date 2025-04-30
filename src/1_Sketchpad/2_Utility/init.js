@@ -1,20 +1,18 @@
+const width = window.game.config.width;
+const height = window.game.config.height;
+
 const sketchpad = document.getElementById("sketchpad");
-sketchpad.style.width = window.game.config.width;
-sketchpad.style.height = window.game.config.height;
-//sketchpad.style.position = "relative";
+sketchpad.style.width = `${width}px`;
+sketchpad.style.height = `${height}px`;
 
 const gridCanvas = document.getElementById("grid-canvas");
-gridCanvas.width = window.game.config.width;
-gridCanvas.height = window.game.config.height;
-//gridCanvas.style.position = "absolute";
+gridCanvas.width = width;
+gridCanvas.height = height;
 drawGrid();
 
 const sketchCanvas = document.getElementById("sketch-canvas");
-sketchCanvas.width = window.game.config.width;
-sketchCanvas.height = window.game.config.height;
-//sketchCanvas.style.position = "absolute";
-//sketchCanvas.style.cursor = "none";
-//const ctx = sketchCanvas.getContext("2d");
+sketchCanvas.width = width;
+sketchCanvas.height = height;
 //ctx.font = "30px serif";
 
 // TODO: make grid togglable+
@@ -24,7 +22,7 @@ function drawGrid() {
 
 	const width = gridCanvas.width;
 	const height = gridCanvas.height;
-	const ctx = gridCanvas.getContext('2d');
+	const ctx = gridCanvas.getContext("2d");
 	ctx.strokeStyle = color;
 	ctx.lineWidth = 1;
 
