@@ -61,27 +61,21 @@ export default class ConstraintSolver {
 	 * @param {bool} value Whether to profile (register) or not (unregister).
 	 */
 	profileFunctions(value) {
-		/*
-			When adding functions, be wary of adding functions that get called by other functions
-			(e.g. if you were to add getLeastEntropyCell() and getCellEntropy())
-			If you do this, the combined total duration displayed by the profiler will be incorrect
-		*/
-		
 		if (value) {
-			this.initializeWaveMatrix = this.performanceProfiler.register(this.initializeWaveMatrix);
-			this.setTiles = this.performanceProfiler.register(this.setTiles);
-			this.observe = this.performanceProfiler.register(this.observe);
-			this.propagate = this.performanceProfiler.register(this.propagate);
-			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.register(this.getLeastEntropyUnsolvedCellPosition);
-			//this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy);
+			this.initializeWaveMatrix = this.performanceProfiler.register(this.initializeWaveMatrix, false);
+			this.setTiles = this.performanceProfiler.register(this.setTiles, false);
+			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.register(this.getLeastEntropyUnsolvedCellPosition, false);
+			this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy, true);
+			this.observe = this.performanceProfiler.register(this.observe, false);
+			this.propagate = this.performanceProfiler.register(this.propagate, false);
 		}
 		else {
 			this.initializeWaveMatrix = this.performanceProfiler.unregister(this.initializeWaveMatrix);
 			this.setTiles = this.performanceProfiler.unregister(this.setTiles);
+			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.unregister(this.getLeastEntropyUnsolvedCellPosition);
+			this.getShannonEntropy = this.performanceProfiler.unregister(this.getShannonEntropy);
 			this.observe = this.performanceProfiler.unregister(this.observe);
 			this.propagate = this.performanceProfiler.unregister(this.propagate);
-			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.unregister(this.getLeastEntropyUnsolvedCellPosition);
-			//this.getShannonEntropy = this.performanceProfiler.unregister(this.getShannonEntropy);
 		}
 	}
 
@@ -119,6 +113,58 @@ export default class ConstraintSolver {
 			const contradictionCreated = this.propagate(y, x, adjacencies);
 			if (contradictionCreated) throw new Error("User's set tiles formed a contradiction.");
 		}
+	}
+
+	/**
+	 * Returns the position of the least entropy unsolved (entropy > 0) cell. If all cells are solved, returns [-1, -1].
+	 * @param {number[]} weights
+	 * @returns {number[]} The position of the cell ([y, x]) or [-1, -1] if all cells are solved.
+	 */
+	getLeastEntropyUnsolvedCellPosition(weights) {
+		/*
+			Build an array containing the positions of all cells tied with the least entropy
+			Return the position of a random cell from that array
+		*/
+
+		let leastEntropy = Infinity;
+		let leastEntropyCellPositions = [];
+
+		for (let y = 0; y < this.waveMatrix.length; y++) {
+		for (let x = 0; x < this.waveMatrix[0].length; x++) {
+			const entropy = this.getShannonEntropy(this.waveMatrix[y][x], weights);
+			if (entropy < leastEntropy && entropy > 0) {
+				leastEntropy = entropy;
+				leastEntropyCellPositions = [[y, x]];
+			}
+			else if (entropy === leastEntropy) leastEntropyCellPositions.push([y, x]);
+		}}
+
+		const len = leastEntropyCellPositions.length;
+		if (len > 0) return leastEntropyCellPositions[Math.floor(Math.random() * len)];	// random element (cell position)
+		else return [-1, -1];
+	}
+
+	/**
+	 * Returns the Shannon Entropy of a cell using its possible patterns and those patterns' weights.
+	 * @param {PossiblePatternsBitmask} bitmask 
+	 * @param {number[]} weights 
+	 * @returns {number}
+	 */
+	getShannonEntropy(bitmask, weights) {
+		const possiblePatterns = bitmask.toArray();
+
+		if (possiblePatterns.length === 0) throw new Error("Contradiction found.");
+		if (possiblePatterns.length === 1) return 0;	// what the calculated result would have been
+
+		let sumOfWeights = 0;
+		let sumOfWeightLogWeights = 0;
+		for (const i of possiblePatterns) {
+			const w = weights[i];
+			sumOfWeights += w;
+			sumOfWeightLogWeights += w * Math.log(w);
+		}
+
+		return Math.log(sumOfWeights) - sumOfWeightLogWeights/sumOfWeights;
 	}
 
 	/**
@@ -214,57 +260,5 @@ export default class ConstraintSolver {
 			}
 		}
 		return false;	// no contradiction created
-	}
-
-	/**
-	 * Returns the position of the least entropy unsolved (entropy > 0) cell. If all cells are solved, returns [-1, -1].
-	 * @param {number[]} weights
-	 * @returns {number[]} The position of the cell ([y, x]) or [-1, -1] if all cells are solved.
-	 */
-	getLeastEntropyUnsolvedCellPosition(weights) {
-		/*
-			Build an array containing the positions of all cells tied with the least entropy
-			Return the position of a random cell from that array
-		*/
-
-		let leastEntropy = Infinity;
-		let leastEntropyCellPositions = [];
-
-		for (let y = 0; y < this.waveMatrix.length; y++) {
-		for (let x = 0; x < this.waveMatrix[0].length; x++) {
-			const entropy = this.getShannonEntropy(this.waveMatrix[y][x], weights);
-			if (entropy < leastEntropy && entropy > 0) {
-				leastEntropy = entropy;
-				leastEntropyCellPositions = [[y, x]];
-			}
-			else if (entropy === leastEntropy) leastEntropyCellPositions.push([y, x]);
-		}}
-
-		const len = leastEntropyCellPositions.length;
-		if (len > 0) return leastEntropyCellPositions[Math.floor(Math.random() * len)];	// random element (cell position)
-		else return [-1, -1];
-	}
-
-	/**
-	 * Returns the Shannon Entropy of a cell using its possible patterns and those patterns' weights.
-	 * @param {PossiblePatternsBitmask} bitmask 
-	 * @param {number[]} weights 
-	 * @returns {number}
-	 */
-	getShannonEntropy(bitmask, weights) {
-		const possiblePatterns = bitmask.toArray();
-
-		if (possiblePatterns.length === 0) throw new Error("Contradiction found.");
-		if (possiblePatterns.length === 1) return 0;	// what the calculated result would have been
-
-		let sumOfWeights = 0;
-		let sumOfWeightLogWeights = 0;
-		for (const i of possiblePatterns) {
-			const w = weights[i];
-			sumOfWeights += w;
-			sumOfWeightLogWeights += w * Math.log(w);
-		}
-
-		return Math.log(sumOfWeights) - sumOfWeightLogWeights/sumOfWeights;
 	}
 }

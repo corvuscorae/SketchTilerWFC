@@ -56,24 +56,18 @@ export default class ImageLearner {
 	 * @param {bool} value Whether to profile (register) or not (unregister).
 	 */
 	profileFunctions(value) {
-		/*
-			When adding functions, be wary of adding functions that get called by other functions
-			(e.g. if you were to add getLeastEntropyCell() and getCellEntropy())
-			If you do this, the combined total duration displayed by the profiler will be incorrect
-		*/
-
 		if (value) {
-			this.getPatternsAndWeights = this.performanceProfiler.register(this.getPatternsAndWeights);
-			//this.getPattern = this.performanceProfiler.register(this.getPattern);
-			this.getAdjacencies = this.performanceProfiler.register(this.getAdjacencies);
-			//this.isAdjacent = this.performanceProfiler.register(this.isAdjacent);
-			this.getTilesToPatterns = this.performanceProfiler.register(this.getTilesToPatterns);
+			this.getPatternsAndWeights = this.performanceProfiler.register(this.getPatternsAndWeights, false);
+			this.getPattern = this.performanceProfiler.register(this.getPattern, true);
+			this.getAdjacencies = this.performanceProfiler.register(this.getAdjacencies, false);
+			this.isAdjacent = this.performanceProfiler.register(this.isAdjacent, true);
+			this.getTilesToPatterns = this.performanceProfiler.register(this.getTilesToPatterns, false);
 		}
 		else {
 			this.getPatternsAndWeights = this.performanceProfiler.unregister(this.getPatternsAndWeights);
-			//this.getPattern = this.performanceProfiler.unregister(this.getPattern);
+			this.getPattern = this.performanceProfiler.unregister(this.getPattern);
 			this.getAdjacencies = this.performanceProfiler.unregister(this.getAdjacencies);
-			//this.isAdjacent = this.performanceProfiler.unregister(this.isAdjacent);
+			this.isAdjacent = this.performanceProfiler.unregister(this.isAdjacent);
 			this.getTilesToPatterns = this.performanceProfiler.unregister(this.getTilesToPatterns);
 		}
 	}

@@ -11,8 +11,8 @@ export default class WFCTesting extends Phaser.Scene {
 	profileLearning = false;
 
 	// width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
-	width = 10;
-	height = 10;
+	width = 24;
+	height = 15;
 	maxAttempts = 10;
 	logProgress = true;
 	profileSolving = true;
@@ -80,7 +80,7 @@ export default class WFCTesting extends Phaser.Scene {
 		if (!groundImage) return;
 
 		console.log("Using model for structures");
-		this.model.learn(IMAGES.FORESTS, this.N, this.profileLearning);
+		this.model.learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
 
 		//this.model.setTile(0, this.height-1, 73);	// brown BL corner
 		//this.model.setTile(this.width-1, this.height-1, 76)	// brown BR corner

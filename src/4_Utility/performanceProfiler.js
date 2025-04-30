@@ -1,14 +1,15 @@
 /** Profiles the performances of functions. */
 export default class PerformanceProfiler {
-	/** @type {Map<string, { totalExecutionTime: number, timesCalled: number }>} */
+	/** @type {Map<string, { totalExecutionTime: number, timesCalled: number, isInnerFunctionCall: boolean }>} */
 	data = new Map();
 
 	/**
 	 * Registers a function to have its performance data recorded each time it's called. Returns the function back.
 	 * @param {Function} func The function to be registered.
+	 * @param {boolean} isInnerFunctionCall Whether the function should contribute to the combined total execution time or not.
 	 * @returns {Function} The registered version of func().
 	 */
-	register(func) {
+	register(func, isInnerFunctionCall) {
 		if (!func.name) throw new Error("The function cannot be anonymous (nameless)");
 		if (func.originalVersion) return func;	// prevent double-wrapping
 
@@ -33,6 +34,7 @@ export default class PerformanceProfiler {
 				profiler.data.set(func.name, {
 					totalExecutionTime: duration,
 					timesCalled: 1,
+					isInnerFunctionCall: isInnerFunctionCall
 				});
 			}
 	
@@ -62,7 +64,7 @@ export default class PerformanceProfiler {
 			message += `\tTotal Duration: ${funcData.totalExecutionTime} ms\n`;
 			message += `\tAverage Duration: ${(funcData.totalExecutionTime / funcData.timesCalled).toFixed(2)} ms\n`
 			message += `\tNum Calls: ${funcData.timesCalled}\n`;
-			combinedTotalExecutionTime += funcData.totalExecutionTime;
+			if (!funcData.isInnerFunctionCall) combinedTotalExecutionTime += funcData.totalExecutionTime;
 		}
 		message += `\nCombined Total Duration: ${combinedTotalExecutionTime} ms`;
 
