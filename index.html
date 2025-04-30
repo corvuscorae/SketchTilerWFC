@@ -1,41 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Sketch to Tilemap Application</title>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sketch to Tilemap App</title>
 
-		<script type="module" src="./lib/PhaserModule.js"></script>
+    <script type="module" src="./lib/PhaserModule.js"></script>
 
-		
+    <script type="module" src="./src/2_WFC/1_Model/directions.js"></script>
+    <script type="module" src="./src/2_WFC/1_Model/Bitmask.js"></script>
+    <script type="module" src="./src/2_WFC/1_Model/Queue.js"></script>
+    <script type="module" src="./src/2_WFC/1_Model/ImageLearner.js"></script>
+    <script type="module" src="./src/2_WFC/1_Model/ConstraintSolver.js"></script>
+    <script type="module" src="./src/2_WFC/1_Model/WFCModel.js"></script>
 
-		<script type="module" src="./src/2_WFC/1_Model/directions.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/Bitmask.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/Queue.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/ImageLearner.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/ConstraintSolver.js"></script>
-		<script type="module" src="./src/2_WFC/1_Model/WFCModel.js"></script>
+    <script type="module" src="./src/2_WFC/2_Input/map1.js"></script>
+    <script type="module" src="./src/2_WFC/2_Input/map2.js"></script>
+    <script type="module" src="./src/2_WFC/2_Input/map3.js"></script>
+    <script type="module" src="./src/2_WFC/2_Input/map4.js"></script>
+    <script type="module" src="./src/2_WFC/2_Input/houses.js"></script>
+    <script type="module" src="./src/2_WFC/2_Input/images.js"></script>
 
-		<script type="module" src="./src/2_WFC/2_Input/map1.js"></script>
-		<script type="module" src="./src/2_WFC/2_Input/map2.js"></script>
-		<script type="module" src="./src/2_WFC/2_Input/map3.js"></script>
-		<script type="module" src="./src/2_WFC/2_Input/map4.js"></script>
-		<script type="module" src="./src/2_WFC/2_Input/houses.js"></script>
-		<script type="module" src="./src/2_WFC/2_Input/images.js"></script>
+    <script type="module" src="./src/4_PhaserScenes/SketchDemo.js"></script>
 
-		<script type="module" src="./src/4_PhaserScenes/SketchDemo.js"></script>
+    <script type="module" src="./src/5_Utility/PerformanceProfiler.js"></script>
+    
+    <script type="module" src="./main.js"></script>
 
-		<script type="module" src="./src/5_Utility/PerformanceProfiler.js"></script>
-		
-		<script type="module" src="./main.js"></script>
-
-		<script type="module" src="./src/1_Sketchpad/2_Utility/init.js"></script>
-		<script type="module" src="./src/1_Sketchpad/2_Utility/lineCleanup.js"></script>
-		<script type="module" src="./src/1_Sketchpad/sketchpad.js"></script>
-	</head>
-	<body>
-		<div id="app"></div>
-		<div id="phaser"></div>
-		<div id="description"></div>
-	</body>
+    <script type="module" src="./src/1_Sketchpad/2_Utility/init.js"></script>
+    <script type="module" src="./src/1_Sketchpad/2_Utility/lineCleanup.js"></script>
+    <script type="module" src="./src/1_Sketchpad/sketchpad.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="sketchpad">
+        <canvas id="grid-canvas"></canvas>
+        <canvas id="sketch-canvas"></canvas>
+        <div id="buttons">
+          <button id="house-button">House</button>
+          <button id="forest-button">Forest</button>
+          <button id="fence-button">Fence</button>
+          <button id="path-button">Path</button>
+          <button id="straighten-lines-button">Straighten Lines</button>
+          <button id="generate-button">Generate</button>
+        </div>
+      </div>
+      <div id="phaser"></div>
+    </div>
+  </body>
 </html>
