@@ -17,8 +17,7 @@ export default class Queue {
 		if (this.length === 0) {
 			this.front = node;
 			this.back = node;
-		}
-		else {
+		} else {
 			this.back.next = node;
 			this.back = node;
 		}

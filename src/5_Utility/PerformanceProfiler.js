@@ -29,8 +29,7 @@ export default class PerformanceProfiler {
 			if (profiler.data.has(func.name)) {
 				profiler.data.get(func.name).totalExecutionTime += duration;
 				profiler.data.get(func.name).timesCalled++;
-			}
-			else {
+			} else {
 				profiler.data.set(func.name, {
 					totalExecutionTime: duration,
 					timesCalled: 1,

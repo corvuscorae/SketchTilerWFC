@@ -62,8 +62,7 @@ export default class ImageLearner {
 			this.getAdjacencies = this.performanceProfiler.register(this.getAdjacencies, false);
 			this.isAdjacent = this.performanceProfiler.register(this.isAdjacent, true);
 			this.getTilesToPatterns = this.performanceProfiler.register(this.getTilesToPatterns, false);
-		}
-		else {
+		} else {
 			this.getPatternsAndWeights = this.performanceProfiler.unregister(this.getPatternsAndWeights);
 			this.getPattern = this.performanceProfiler.unregister(this.getPattern);
 			this.getAdjacencies = this.performanceProfiler.unregister(this.getAdjacencies);
@@ -95,8 +94,7 @@ export default class ImageLearner {
 				if (uniquePatterns.has(p_str)) {
 					const i = uniquePatterns.get(p_str);
 					this.weights[i]++;
-				}
-				else {
+				} else {
 					this.patterns.push(p);
 					this.weights.push(1);
 					uniquePatterns.set(p_str, this.patterns.length-1);

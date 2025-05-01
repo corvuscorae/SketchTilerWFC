@@ -1,25 +1,30 @@
-const width = window.game.config.width;
-const height = window.game.config.height;
-
 const sketchpad = document.getElementById("sketchpad");
-sketchpad.style.width = `${width}px`;
-sketchpad.style.height = `${height}px`;
-
 const gridCanvas = document.getElementById("grid-canvas");
-gridCanvas.width = width;
-gridCanvas.height = height;
-drawGrid();
-
 const sketchCanvas = document.getElementById("sketch-canvas");
-sketchCanvas.width = width;
-sketchCanvas.height = height;
-//ctx.font = "30px serif";
 
-// TODO: make grid togglable+
+export default function initSketchpad() {
+	const width = window.game.config.width;
+	const height = window.game.config.height;
+	
+	sketchpad.style.width = `${width}px`;
+	sketchpad.style.height = `${height}px`;
+	
+	gridCanvas.width = width;
+	gridCanvas.height = height;
+	drawGrid();
+	
+	sketchCanvas.width = width;
+	sketchCanvas.height = height;
+	//ctx.font = "30px serif";
+}
+
+// TODO: make grid toggleable+
 function drawGrid() {
 	const cellSize = 16;
 	const color = "#DBDBDB";
 
+	const width = gridCanvas.width;
+	const height = gridCanvas.height;
 	const ctx = gridCanvas.getContext("2d");
 	ctx.strokeStyle = color;
 	ctx.lineWidth = 1;

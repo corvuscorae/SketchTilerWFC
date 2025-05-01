@@ -68,8 +68,7 @@ export default class ConstraintSolver {
 			this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy, true);
 			this.observe = this.performanceProfiler.register(this.observe, false);
 			this.propagate = this.performanceProfiler.register(this.propagate, false);
-		}
-		else {
+		} else {
 			this.initializeWaveMatrix = this.performanceProfiler.unregister(this.initializeWaveMatrix);
 			this.setTiles = this.performanceProfiler.unregister(this.setTiles);
 			this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.unregister(this.getLeastEntropyUnsolvedCellPosition);
@@ -136,7 +135,9 @@ export default class ConstraintSolver {
 				leastEntropy = entropy;
 				leastEntropyCellPositions = [[y, x]];
 			}
-			else if (entropy === leastEntropy) leastEntropyCellPositions.push([y, x]);
+			else if (entropy === leastEntropy) {
+				leastEntropyCellPositions.push([y, x]);
+			}
 		}}
 
 		const len = leastEntropyCellPositions.length;

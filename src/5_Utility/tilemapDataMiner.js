@@ -78,11 +78,9 @@ export default class TilemapDataMiner extends Phaser.Scene {
 					const id = data[y][x].index;
 					if (id < 1) {
 						continue;
-					}
-					else if ([1, 2, 3].includes(id)) {	// id is 1, 2, or 3
+					} else if ([1, 2, 3].includes(id)) {	// id is 1, 2, or 3
 						this.groundData[y][x] = id;
-					}
-					else {
+					} else {
 						this.structuresData[y][x] = id;
 					}
 				}

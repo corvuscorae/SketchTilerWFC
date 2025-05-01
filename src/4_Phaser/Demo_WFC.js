@@ -43,8 +43,7 @@ export default class Demo_WFC extends Phaser.Scene {
 			this.treesLayer = this.multiLayerMap.createLayer("Trees-n-Bushes", this.tileset, 0, 0);
 			this.housesLayer = this.multiLayerMap.createLayer("Houses-n-Fences", this.tileset, 0, 0);
 			this.multiLayerMapLayers = [this.groundLayer, this.treesLayer, this.housesLayer];
-		}
-		else {
+		} else {
 			this.groundLayer = this.multiLayerMap.createLayer("Ground", this.tileset, 0, 0);
 			this.structuresLayer = this.multiLayerMap.createLayer("Structures", this.tileset, 0, 0);
 			this.multiLayerMapLayers = [this.groundLayer, this.structuresLayer];
