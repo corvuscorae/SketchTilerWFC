@@ -183,15 +183,13 @@ exportButton.onclick = () => {
 };
 */
 
-// structure buttons
+// assign structure buttons
 for (const structure of structures) {
 	const button = document.getElementById(`${structure.type.toLowerCase()}-button`);
 	button.onclick = () => {
-		/*
-		mouseObject.mouse.hue = hue;
-		hueButton.style.borderColor = hue;  // TODO: only highlight active button
-		workingLine.structure = name;
-		*/
+		mouseObject.mouse.hue = structure.color;
+		button.style.borderColor = structure.color;  // TODO: only highlight active button
+		workingLine.structure = structure.type;
 	}
 }
 
@@ -201,7 +199,6 @@ document.getElementById("house-button").click();
 // straighten lines
 const straightenLinesButton = document.getElementById("straighten-lines-button");
 straightenLinesButton.onclick = () => {
-	/*
 	// Simplify each line in displayList
 	for (const displayable of displayList) {
 		if (displayable instanceof LineDisplayble) {
@@ -211,16 +208,13 @@ straightenLinesButton.onclick = () => {
 	}
 	
 	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
-	*/
 }
 
 // generate button
 const generateButton = document.getElementById("generate-button");
 generateButton.onclick = () => {
-	/*
 	showDebugText();
 	window.dispatchEvent(toPhaser);
-	*/
 }
 
 
