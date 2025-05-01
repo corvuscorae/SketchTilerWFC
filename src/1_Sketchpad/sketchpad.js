@@ -1,5 +1,5 @@
-import { ramerDouglasPeucker } from "./2_Utility/lineCleanup.js";
-import { LineDisplayble, mouseDisplayable } from "./1_Classes/displayables.js";
+import { ramerDouglasPeucker } from "./lineCleanup.js";
+import { LineDisplayble, mouseDisplayable } from "./displayables.js";
 
 // TODO: UIX cleanup (after we get wireframes)
 
