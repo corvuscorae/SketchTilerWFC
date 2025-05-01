@@ -13,6 +13,14 @@ export default class SketchDemo extends Phaser.Scene {
       "trace":  (strokes, color) => this.getTrace(strokes, color),
     }
 
+    // TODO: replace function calls with actual generators
+    generator = {
+      "House": (region) =>  console.log("TODO: link house generator", region),
+      "Path": (region) =>   console.log("TODO: link path generator", region),
+      "Fence": (region) =>  console.log("TODO: link fence generator", region),
+      "Forest": (region) => console.log("TODO: link forest generator", region),
+    }
+
     create() {
       this.gridLines_gfx = this.add.graphics();
       this.fillTiles_gfx = this.add.graphics();
@@ -66,6 +74,12 @@ export default class SketchDemo extends Phaser.Scene {
 
         for(let region of result[structType]){
           this.fillTiles(region, regionType, color)
+          // NOTE: this is where we will call generators
+          // `structType` is "House" or "Path" or "Forest" or "Fence"
+          // `regionType` is either "box" or trace, and the associated
+          //    `region` is either a min/max pair (for box) or 
+          //    an array of points (for trace) 
+          this.generator[structType](region);
         }
       }
       return result;
