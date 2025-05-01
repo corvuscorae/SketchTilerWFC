@@ -1,8 +1,8 @@
 #sketchpad {
-	position: relative;	/* so child canvases are positioned relative to this element */
+  position: relative;	/* so child canvases are positioned relative to this element */
 }
 
 #sketchpad > canvas {
-	position: absolute;
-	/* cursor: none; */
+  position: absolute;
+  /* cursor: none; */
 }

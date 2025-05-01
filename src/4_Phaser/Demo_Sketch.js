@@ -2,7 +2,7 @@ import Phaser from "../../lib/PhaserModule.js";
 
 export default class Demo_Sketch extends Phaser.Scene {
     constructor(){
-		super("SketchDemo");
+      super("SketchDemo");
     }
 
     outputWidth = 24;
