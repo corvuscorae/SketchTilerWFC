@@ -1,10 +1,12 @@
+import TILEMAP from "../4_Phaser/tilemap.js";
+
 const sketchpad = document.getElementById("sketchpad");
 const gridCanvas = document.getElementById("grid-canvas");
 const sketchCanvas = document.getElementById("sketch-canvas");
 
 export default function initSketchpad() {
-  const width = window.game.config.width;
-  const height = window.game.config.height;
+  const width = TILEMAP.WIDTH;
+  const height = TILEMAP.HEIGHT;
   
   sketchpad.style.width = `${width}px`;
   sketchpad.style.height = `${height}px`;

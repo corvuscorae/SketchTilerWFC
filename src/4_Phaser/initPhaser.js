@@ -1,12 +1,13 @@
 import Phaser from "../../lib/PhaserModule.js";
+import TILEMAP from "./tilemap.js";
 import Autotiler from "./Autotiler.js";
 
 export default function initPhaser() {
   window.game = new Phaser.Game({
     parent: "phaser",
     type: Phaser.CANVAS,
-    width: 640,		// 40 tiles x 16 pixels each
-    height: 400,	// 25 tiles x 16 pixels each
+    width: TILEMAP.WIDTH * TILEMAP.TILE_WIDTH,
+    height: TILEMAP.HEIGHT * TILEMAP.TILE_WIDTH,
     zoom: 1,
     //autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,	// comment out this line to not center
     backgroundColor: "rgb(143, 143, 143)",
