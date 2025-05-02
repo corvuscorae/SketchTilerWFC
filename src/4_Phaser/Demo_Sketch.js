@@ -5,8 +5,8 @@ export default class Demo_Sketch extends Phaser.Scene {
       super("SketchDemo");
     }
 
-    outputWidth = 24;
-    outputHeight = 15;
+    outputWidth = 40;
+    outputHeight = 25;
     cellSize = 16 // TODO: this will need correspond to cell size in tilemap/phaser
     regionBlock = {
       "box":    (strokes, color) => this.getBoundingBox(strokes, color),

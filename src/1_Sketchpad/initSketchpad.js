@@ -5,8 +5,8 @@ const gridCanvas = document.getElementById("grid-canvas");
 const sketchCanvas = document.getElementById("sketch-canvas");
 
 export default function initSketchpad() {
-  const width = TILEMAP.WIDTH;
-  const height = TILEMAP.HEIGHT;
+  const width = TILEMAP.WIDTH * TILEMAP.TILE_WIDTH;
+  const height = TILEMAP.HEIGHT * TILEMAP.TILE_WIDTH;
   
   sketchpad.style.width = `${width}px`;
   sketchpad.style.height = `${height}px`;

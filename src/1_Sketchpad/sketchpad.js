@@ -39,7 +39,7 @@ console.log(structureSketches); // DEBUG
 
 //* EVENTS *//
 // sends sketch data to Phaser scene
-const toPhaser = new CustomEvent('sketchToPhaser', { detail: structureSketches });
+const toPhaser = new CustomEvent("generate", { detail: structureSketches });
 
 // updates phaser scene, clearing structures
 const clearPhaser = new CustomEvent('clearSketch');
