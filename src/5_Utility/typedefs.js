@@ -6,7 +6,15 @@
 */
 
 // Imports (for the following typedefs to use)
-/** @typedef {import("../2_WFC/1_Model/Bitmask.js/index.js").default} Bitmask */
+/**
+ * @typedef {import("../2_WFC/1_Model/Bitmask.js/index.js").default} Bitmask
+ */
+
+// Sketchpad
+/**
+ * @typedef {{ x: number, y: number }} Point Note that these are canvas coordinates.
+ * @typedef {{ topLeft: Point, bottomRight: Point, width: number, height: number }} BoundingBox Note that the two points are in tilemap coordinates.
+ */
 
 // WFC
 /**

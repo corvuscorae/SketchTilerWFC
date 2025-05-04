@@ -33,7 +33,7 @@ structures.forEach((s) => {
   structureSketches[s.type] = {
     info: s,
     strokes: []
-  }
+  };
 });
 console.log(structureSketches); // DEBUG
 
