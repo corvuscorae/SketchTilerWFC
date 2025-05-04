@@ -114,12 +114,9 @@ sketchCanvas.addEventListener("mouseup", (ev) => {
 });
 
 //* BUTTONS *//
-/*
 
 // clear drawing
-const clearButton = document.createElement("button");
-clearButton.innerHTML = "Clear Drawing";
-buttonContainer.append(clearButton);
+const clearButton = document.getElementById(`clear-button`);
 clearButton.onclick = () => {
   ctx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
   displayList = [];
@@ -128,6 +125,7 @@ clearButton.onclick = () => {
   window.dispatchEvent(clearPhaser);
 };
 
+/*
 // undo last stroke
 const undoButton = document.createElement("button");
 undoButton.innerHTML = "Undo";
