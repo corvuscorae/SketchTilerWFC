@@ -8,8 +8,8 @@ import HOUSES from "./houses.js";
 const IMAGES = {
   GROUND: [
     MAP1.GROUND,
-    //MAP2.GROUND,
-    //MAP3.GROUND,
+    MAP2.GROUND,
+    MAP3.GROUND,
     //MAP4.GROUND
   ],
   STRUCTURES: [

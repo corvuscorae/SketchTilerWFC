@@ -9,5 +9,7 @@ const model = new WFCModel().learn(IMAGES.FORESTS, 2);
  */
 export default function generateForest(boundingBox) {
   model.clearSetTiles();
-  return model.generate(boundingBox.width, boundingBox.height, 10, false, false);
+  const forest = model.generate(boundingBox.width, boundingBox.height, 10, false, false);
+  if (!forest) throw new Error ("Contradiction created");
+  return forest;
 }
