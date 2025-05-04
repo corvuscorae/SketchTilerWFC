@@ -22,6 +22,7 @@ export default class WFCModel {
   learn(images, N, profile = false) {
     this.imageLearner.learn(images, N, profile);
     this.clearSetTiles();
+    return this;
   }
 
   /**

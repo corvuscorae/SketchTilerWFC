@@ -15,10 +15,21 @@ export default class Autotiler extends Phaser.Scene {
   }
 
   create() {
+    this.multiLayerMap = this.add.tilemap("tinyTownMap", 16, 16, 40, 25);
+    this.tileset = this.multiLayerMap.addTilesetImage("kenney-tiny-town", "tilemap");
+
+    const houseModel = new WFCModel().learn(IMAGES.HOUSES, 2);
+
     window.addEventListener("generate", (e) => {
       const details = e.detail;
 
-      console.log(Object.values(details));
+      const tilemapData = [];
+      for (let y = 0; y < TILEMAP.HEIGHT; y++) {
+        tilemapData[y] = [];
+        for (let x = 0; x < TILEMAP.WIDTH; x++) {
+          tilemapData[y][x] = -1;
+        }
+      }
 
       for (const structure of Object.values(details)) {
         if (!structure.strokes) continue;
@@ -44,19 +55,10 @@ export default class Autotiler extends Phaser.Scene {
           const width = bottomRight[0] - topLeft[0] + 1;
           const height = bottomRight[1] - topLeft[1] + 1;
 
-          const model = new WFCModel();
-          model.learn(IMAGES.HOUSES, 2, false);
-          model.setTile(0, height-1, 77); // blue BL corner
-          model.setTile(0, 0, 53)	// orange roof TL corner
-          const image = model.generate(width, height, 10, false, false);
-
-          const tilemapData = [];
-          for (let y = 0; y < TILEMAP.HEIGHT; y++) {
-            tilemapData[y] = [];
-            for (let x = 0; x < TILEMAP.WIDTH; x++) {
-              tilemapData[y][x] = -1;
-            }
-          }
+          houseModel.clearSetTiles();
+          houseModel.setTile(0, height-1, 77); // blue BL corner
+          houseModel.setTile(0, 0, 53)	// orange roof TL corner
+          const image = houseModel.generate(width, height, 10, false, false);
 
           for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
@@ -64,20 +66,16 @@ export default class Autotiler extends Phaser.Scene {
             const dx = x + topLeft[0];
             tilemapData[dy][dx] = image[y][x];
           }}
-
-          const multiLayerMap = this.add.tilemap("tinyTownMap", 16, 16, 40, 25);
-          const tileset = multiLayerMap.addTilesetImage("kenney-tiny-town", "tilemap");
-
-          const tilemap = this.make.tilemap({
-            data: tilemapData,
-            tileWidth: TILEMAP.TILE_WIDTH,
-            tileHeight: TILEMAP.TILE_WIDTH
-          });
-          tilemap.createLayer(0, tileset, 0, 0);
-
-          break;
         }
       }
+
+      if (this.tilemap) this.tilemap.destroy();
+      this.tilemap = this.make.tilemap({
+        data: tilemapData,
+        tileWidth: TILEMAP.TILE_WIDTH,
+        tileHeight: TILEMAP.TILE_WIDTH
+      });
+      this.tilemap.createLayer(0, this.tileset, 0, 0);
     });
   }
 }
