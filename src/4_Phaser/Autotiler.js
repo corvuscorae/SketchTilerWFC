@@ -2,6 +2,7 @@ import Phaser from "../../lib/PhaserModule.js";
 import TILEMAP from "./tilemap.js";
 import getBoundingBox from "../3_Generators/getBoundingBox.js";
 import generateHouse from "../3_Generators/generateHouse.js";
+import generateForest from "../3_Generators/generateForest.js";
 
 export default class Autotiler extends Phaser.Scene {
   constructor() {
@@ -30,17 +31,20 @@ export default class Autotiler extends Phaser.Scene {
       for (const structure of Object.values(e.detail)) {
         if (!structure.strokes) continue;
         if (structure.strokes.length < 1) continue;
-        if (structure.info.type.toLowerCase() != "house") continue;
 
-        for (const stroke of structure.strokes) {
-          const boundingBox = getBoundingBox(stroke);
-          const house = generateHouse(boundingBox);
-          for (let y = 0; y < boundingBox.height; y++) {
-          for (let x = 0; x < boundingBox.width; x++) {
-            const dy = y + boundingBox.topLeft.y;
-            const dx = x + boundingBox.topLeft.x;
-            tilemapData[dy][dx] = house[y][x];
-          }}
+        if (structure.info.region == "box") {
+          for (const stroke of structure.strokes) {
+            const boundingBox = getBoundingBox(stroke);
+            const struct = structure.info.type == "House" ? generateHouse(boundingBox) : generateForest(boundingBox);
+            for (let y = 0; y < boundingBox.height; y++) {
+            for (let x = 0; x < boundingBox.width; x++) {
+              const dy = y + boundingBox.topLeft.y;
+              const dx = x + boundingBox.topLeft.x;
+              tilemapData[dy][dx] = struct[y][x];
+            }}
+          }
+        } else {
+
         }
       }
 
