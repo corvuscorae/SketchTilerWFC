@@ -1,29 +1,55 @@
 import { ramerDouglasPeucker } from "./lineCleanup.js";
 
 /* SHAPE DETECTION */
-export function getShape(pts, threshold = 300){
-    if(isCircle(pts, threshold)) return "circle";
-    else if(isRect(pts)) return "rect";
-    else if(isTriangle(pts)) return "triangle";
-    else return "unrecognized"
+export function redrawShape(name, data){
+}
+
+export function getShape(pts){
+    let name;
+    let points;
+
+    const circle = isCircle(pts);
+    const rect = (circle) ? null : isRect(pts); // only checking if stroke is not a circle
+    const tri = (circle || rect) ? null : isTriangle(pts); // ... ^
+
+    if(circle){
+        name = "circle"; 
+        points = circle;
+    }
+    else if(rect){
+        name = "rect";
+        points = rect;
+    }
+    else if(tri){
+        name = "triangle";
+        points = tri;
+    }
+
+    if(!name){ return false; }
+
+    return { name: name, points: points }
 }
 
 // triangle
 function isTriangle(pts){
-    const anglePts = ramerDouglasPeucker(pts, 10);    // simplify strokes
-    if (countSharpAngles(anglePts) === 3) return true;
+    const anglePts = (pts.length > 5) ? ramerDouglasPeucker(pts, 10) : pts;    // simplify long strokes
+    if (countSharpAngles(anglePts) === 3){ 
+        return normalizeTriangle(anglePts);
+    }
     return false;
 }
 
 // rect
 function isRect(pts){
-    const anglePts = ramerDouglasPeucker(pts, 10);    // simplify strokes
-    if (countSharpAngles(anglePts) === 4) return true;
+    const anglePts = (pts.length > 4) ? ramerDouglasPeucker(pts, 10) : pts;    // simplify long strokes
+    if (countSharpAngles(anglePts) === 4){ 
+        return normalizeRect(anglePts);
+    }
     return false;
 }
 
 // circle
-function isCircle(pts, threshold) {
+function isCircle(pts, threshold = 500) {
 	if (!isClosed(pts)) return false;
 
 	const center = getCentroid(pts);
@@ -40,8 +66,60 @@ function isCircle(pts, threshold) {
     if (countSharpAngles(anglePts) > 2) return false;
 
 	// higher threshold = more sloppiness allowed
-	return variance < threshold; 
+	if(variance < threshold){
+        // return center and radius if this stroke is a circle
+        return normalizeCircle(center, avg);
+    } else {
+        return false;
+    }
 }
+
+// helper: adjust points so rect lines are straight 
+function normalizeRect(pts){
+    const points = [];
+
+    const topLeft = pts.reduce((acc, p) => ({
+        x: Math.min(acc.x, p.x),
+        y: Math.min(acc.y, p.y)
+    }), { x: Infinity, y: Infinity });
+      
+    const bottomRight = pts.reduce((acc, p) => ({
+        x: Math.max(acc.x, p.x),
+        y: Math.max(acc.y, p.y)
+    }), { x: -Infinity, y: -Infinity });
+
+    points.push(topLeft);                           // top left
+    points.push({x: bottomRight.x, y: topLeft.y});  // top right
+    points.push(bottomRight);                       // bottom right
+    points.push({x: topLeft.x, y: bottomRight.y});  // bottom left
+    points.push(topLeft);                           // closes shape
+
+    return points;
+}
+
+// helper: TODO
+// right now, its just ensures that shape is closed
+function normalizeTriangle(pts){
+    pts.pop();
+    pts.push(pts[0]);
+    return pts;
+}
+
+// helper: draw a circle around given center, with given radius
+// TODO: fix shift bug (on repeat auto-shape clicks, shape scoots to the right???)
+function normalizeCircle(center, radius, numPoints = 60) { 
+    const points = [];
+    for (let i = 0; i < numPoints; i++) {
+      const angle = (i / numPoints) * Math.PI * 2;
+      points.push({
+        x: center.x + radius * Math.cos(angle),
+        y: center.y + radius * Math.sin(angle)
+      });
+    }
+    points.push(points[0]); // close circle
+    return points;
+  }
+  
 
 // helper: approximates the center of the shape by averaging the x and y values of each point
 function getCentroid(pts) {

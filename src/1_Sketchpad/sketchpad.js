@@ -187,9 +187,14 @@ shapeButton.onclick = () => {
 	// shape-ify each line in displayList
 	for (const displayable of displayList) {
 		if (displayable instanceof LineDisplayble) {
-			console.log(displayable, getShape(displayable.line.points))
+			const shape = getShape(displayable.line.points);
+			console.log(displayable, shape)
+			if(shape){
+				displayable.line.points = shape.points;
+			}
 		}
 	}
+	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
 }
 
 // assign structure buttons
@@ -204,6 +209,7 @@ for (const structure of structures) {
 // initial selected marker
 document.getElementById("house-button").click();
 
+/*
 // straighten lines
 const straightenLinesButton = document.getElementById("straighten-lines-button");
 straightenLinesButton.onclick = () => {
@@ -216,6 +222,7 @@ straightenLinesButton.onclick = () => {
 	}
 	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
 }
+*/
 
 // generate button
 const generateButton = document.getElementById("generate-button");
