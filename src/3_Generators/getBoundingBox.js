@@ -1,4 +1,4 @@
-import TILEMAP from "../4_Phaser/tilemap.js";
+import TILEMAP from "../4_Phaser/TILEMAP.js";
 
 /**
  * @param {Point[]} stroke

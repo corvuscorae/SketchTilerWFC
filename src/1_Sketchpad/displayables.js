@@ -14,7 +14,7 @@ export class LineDisplayble {
   }
 }
 
-export class mouseDisplayable {
+export class MouseDisplayable {
   constructor(mouse, lineThickness) { 
     this.mouse = mouse; 
     this.lineThickness = lineThickness;

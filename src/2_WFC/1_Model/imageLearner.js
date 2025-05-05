@@ -1,4 +1,4 @@
-import DIRECTIONS from "./directions.js";
+import DIRECTIONS from "./DIRECTIONS.js";
 import Bitmask from "./Bitmask.js";
 import PerformanceProfiler from "../../5_Utility/PerformanceProfiler.js";
 
