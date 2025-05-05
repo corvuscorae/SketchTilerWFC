@@ -81,6 +81,11 @@ export default class Demo_WFC extends Phaser.Scene {
     console.log("Using model for structures");
     this.model.learn(IMAGES.HOUSES, this.N, this.profileLearning);
 
+    this.model.setTile(0, this.height-1, [73, 77]); // BL
+    this.model.setTile(this.width-1, this.height-1, [76, 80]);  // BR
+    this.model.setTile(0, 0, [49, 53]); // TL
+    this.model.setTile(this.width-1, 0, [51, 55]);  // TR
+
     //this.model.setTile(0, this.height-1, 73);	// brown BL corner
     //this.model.setTile(this.width-1, this.height-1, 76)	// brown BR corner
 
