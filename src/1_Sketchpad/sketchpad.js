@@ -1,6 +1,6 @@
 import { ramerDouglasPeucker } from "./2_Utility/lineCleanup.js";
 import { LineDisplayble, mouseDisplayable } from "./1_Classes/displayables.js";
-
+import { getShape } from "./2_Utility/shapeDetection.js";
 // TODO: UIX cleanup (after we get wireframes)
 
 const sketchCanvas = document.getElementById("sketch-canvas");
@@ -181,6 +181,17 @@ exportButton.onclick = () => {
 };
 */
 
+// shape recognition using shapeit
+const shapeButton = document.getElementById(`shape-button`);
+shapeButton.onclick = () => {
+	// shape-ify each line in displayList
+	for (const displayable of displayList) {
+		if (displayable instanceof LineDisplayble) {
+			console.log(displayable, getShape(displayable.line.points))
+		}
+	}
+}
+
 // assign structure buttons
 for (const structure of structures) {
 	const button = document.getElementById(`${structure.type.toLowerCase()}-button`);
@@ -190,7 +201,6 @@ for (const structure of structures) {
 		workingLine.structure = structure.type;
 	}
 }
-
 // initial selected marker
 document.getElementById("house-button").click();
 
@@ -204,7 +214,6 @@ straightenLinesButton.onclick = () => {
 			displayable.line.points = simplifiedPoints;
 		}
 	}
-	
 	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
 }
 
@@ -214,7 +223,6 @@ generateButton.onclick = () => {
 	showDebugText();
 	window.dispatchEvent(toPhaser);
 }
-
 
 //* STRUCTURES ORGANIZATION *//
 // organize displayList by structure,
@@ -254,3 +262,6 @@ function showDebugText(){
 		}
 	}
 }
+
+
+  
