@@ -9,9 +9,11 @@
 
     <script type="module" src="./lib/PhaserModule.js"></script>
 
+    <!--
     <script type="module" src="./src/1_Sketchpad/initSketchpad.js"></script>
     <script type="module" src="./src/1_Sketchpad/lineCleanup.js"></script>
     <script type="module" src="./src/1_Sketchpad/sketchpad.js"></script>
+    -->
 
     <script type="module" src="./src/2_WFC/1_Model/directions.js"></script>
     <script type="module" src="./src/2_WFC/1_Model/Bitmask.js"></script>
@@ -33,7 +35,11 @@
 
     <script type="module" src="./src/4_Phaser/tilemap.js"></script>
     <script type="module" src="./src/4_Phaser/initPhaser.js"></script>
+    <!--
     <script type="module" src="./src/4_Phaser/Autotiler.js"></script>
+    -->
+
+    <script type="module" src="./src/4_Phaser/Demo_WFC.js"></script>
 
     <script type="module" src="./src/5_Utility/PerformanceProfiler.js"></script>
 
@@ -41,6 +47,7 @@
   </head>
   <body>
     <div id="app">
+      <!--
       <div id="sketchpad">
         <canvas id="grid-canvas"></canvas>
         <canvas id="sketch-canvas"></canvas>
@@ -54,7 +61,9 @@
         <button id="generate-button">Generate</button>
         <button id="clear-button">Clear</button>
       </div>
+      -->
       <div id="phaser"></div>
+      <p id="instructions"></p>
     </div>
   </body>
 </html>

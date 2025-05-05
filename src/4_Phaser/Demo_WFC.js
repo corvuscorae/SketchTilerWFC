@@ -11,8 +11,8 @@ export default class Demo_WFC extends Phaser.Scene {
   profileLearning = true;
 
   // width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
-  width = 24;
-  height = 15;
+  width = 6;
+  height = 3;
   maxAttempts = 10;
   logProgress = true;
   profileSolving = true;
@@ -26,7 +26,7 @@ export default class Demo_WFC extends Phaser.Scene {
   preload() {
     this.load.setPath("./assets/");
     this.load.image("tilemap", "tinyTown_Tilemap_Packed.png");
-    this.load.tilemapTiledJSON("tinyTownMap", `map${this.displayedMapID}.tmj`);
+    this.load.tilemapTiledJSON("tinyTownMap", `maps/map${this.displayedMapID}.tmj`);
   }
 
   create() {
@@ -63,7 +63,7 @@ export default class Demo_WFC extends Phaser.Scene {
     });
     this.timedRuns_Key.on("down", () => this.getAverageGenerationDuration(this.numRuns));
 
-    document.getElementById("description").innerHTML = `
+    document.getElementById("instructions").innerHTML = `
       <h2>Controls</h2>
       (Opening the console is recommended) <br><br>
       Generate: G <br>
@@ -79,7 +79,7 @@ export default class Demo_WFC extends Phaser.Scene {
     if (!groundImage) return;
 
     console.log("Using model for structures");
-    this.model.learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
+    this.model.learn(IMAGES.HOUSES, this.N, this.profileLearning);
 
     //this.model.setTile(0, this.height-1, 73);	// brown BL corner
     //this.model.setTile(this.width-1, this.height-1, 76)	// brown BR corner
