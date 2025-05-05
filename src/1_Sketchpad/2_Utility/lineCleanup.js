@@ -30,3 +30,35 @@ function perpendicularDistance(point, start, end) {
     const denominator = Math.sqrt(Math.pow(end.y - start.y, 2) + Math.pow(end.x - start.x, 2));
     return numerator / denominator;
 }
+
+// Chaikin smoothing
+// https://medium.com/@jrespinozah/creating-smooth-curves-with-chaikins-algorithm-a0ad91d98ef7 
+export function chaikinSmooth(points, iterations = 2) {
+  let result = points;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const newPoints = [result[0]];
+
+    for (let i = 0; i < result.length - 1; i++) {
+      const p1 = result[i];
+      const p2 = result[i + 1];
+
+      const a = {
+        x: 0.75 * p1.x + 0.25 * p2.x,
+        y: 0.75 * p1.y + 0.25 * p2.y
+      };
+      const b = {
+        x: 0.25 * p1.x + 0.75 * p2.x,
+        y: 0.25 * p1.y + 0.75 * p2.y
+      };
+
+      newPoints.push(a, b);
+    }
+
+    newPoints.push(result[result.length - 1]);
+    result = newPoints;
+  }
+
+  return result;
+}
+

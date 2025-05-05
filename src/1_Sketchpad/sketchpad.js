@@ -1,4 +1,4 @@
-import { ramerDouglasPeucker } from "./2_Utility/lineCleanup.js";
+import { chaikinSmooth, ramerDouglasPeucker } from "./2_Utility/lineCleanup.js";
 import { LineDisplayble, mouseDisplayable } from "./1_Classes/displayables.js";
 import { getShape } from "./2_Utility/shapeDetection.js";
 // TODO: UIX cleanup (after we get wireframes)
@@ -187,10 +187,18 @@ shapeButton.onclick = () => {
 	// shape-ify each line in displayList
 	for (const displayable of displayList) {
 		if (displayable instanceof LineDisplayble) {
-			const shape = getShape(displayable.line.points);
-			console.log(displayable, shape)
-			if(shape){
-				displayable.line.points = shape.points;
+			if(!displayable.normalized){	// don't re-normalize a stroke that has already been normalized
+				displayable.normalized = true;
+				const shape = getShape(displayable.line.points);
+				console.log(displayable, shape)
+				if(shape){
+					displayable.line.points = shape.points;
+				} else {
+					// for unrecognized shapes, de-noise stroke by running rdp, then chaikin
+					const simplified = ramerDouglasPeucker(displayable.line.points, 10); // Adjust tolerance as needed
+					const smoothed = chaikinSmooth(simplified, 4);
+					displayable.line.points = smoothed;
+				}
 			}
 		}
 	}

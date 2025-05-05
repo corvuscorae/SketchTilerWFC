@@ -32,6 +32,7 @@ export function getShape(pts){
 
 // triangle
 function isTriangle(pts){
+	if (!isClosed(pts)) return false;
     const anglePts = (pts.length > 5) ? ramerDouglasPeucker(pts, 10) : pts;    // simplify long strokes
     if (countSharpAngles(anglePts) === 3){ 
         return normalizeTriangle(anglePts);
@@ -41,6 +42,7 @@ function isTriangle(pts){
 
 // rect
 function isRect(pts){
+	if (!isClosed(pts)) return false;
     const anglePts = (pts.length > 4) ? ramerDouglasPeucker(pts, 10) : pts;    // simplify long strokes
     if (countSharpAngles(anglePts) === 4){ 
         return normalizeRect(anglePts);
