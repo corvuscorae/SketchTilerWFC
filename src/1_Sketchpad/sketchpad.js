@@ -7,6 +7,9 @@ const sketchCanvas = document.getElementById("sketch-canvas");
 const ctx = sketchCanvas.getContext("2d");
 
 //* DRAWING *//
+const normalizeToggle = document.getElementById("normalize-toggle");
+let normalizing = normalizeToggle.checked;
+
 const lineThickness = 5;
 let workingLine = { points: [], thickness: lineThickness, hue: 0, structure: null };
 let mouseObject = new mouseDisplayable({
@@ -71,13 +74,13 @@ sketchCanvas.addEventListener("mousedown", (ev) => {
 		hue: mouseObject.mouse.hue,
 		active: true,
 	}, lineThickness);
-		workingLine = {
-			points: [{ x: mouseObject.mouse.x, y: mouseObject.mouse.y }],
-			thickness: lineThickness,
-			hue: mouseObject.mouse.hue,
-			structure: workingLine.structure
-		};
-		displayList.push(new LineDisplayble(workingLine));
+	workingLine = {
+		points: [{ x: mouseObject.mouse.x, y: mouseObject.mouse.y }],
+		thickness: lineThickness,
+		hue: mouseObject.mouse.hue,
+		structure: workingLine.structure
+	};
+	displayList.push(new LineDisplayble(workingLine));
 	sketchCanvas.dispatchEvent(changeDraw);
 	sketchCanvas.dispatchEvent(movedTool);
 });
@@ -108,6 +111,11 @@ sketchCanvas.addEventListener("mouseup", (ev) => {
 		hue: mouseObject.mouse.hue,
 		active: false,
 	}, lineThickness);
+
+	// check if "Normalize shapes" is checked
+	normalizing = document.getElementById("normalize-toggle").checked;
+	if(normalizing) normalizeStrokes();
+
 	updateStructureSketchHistory();
 	sketchCanvas.dispatchEvent(changeDraw);
 	sketchCanvas.dispatchEvent(movedTool);
@@ -181,30 +189,6 @@ exportButton.onclick = () => {
 };
 */
 
-// shape recognition using shapeit
-const shapeButton = document.getElementById(`shape-button`);
-shapeButton.onclick = () => {
-	// shape-ify each line in displayList
-	for (const displayable of displayList) {
-		if (displayable instanceof LineDisplayble) {
-			if(!displayable.normalized){	// don't re-normalize a stroke that has already been normalized
-				displayable.normalized = true;
-				const shape = getShape(displayable.line.points);
-				console.log(displayable, shape)
-				if(shape){
-					displayable.line.points = shape.points;
-				} else {
-					// for unrecognized shapes, de-noise stroke by running rdp, then chaikin
-					const simplified = ramerDouglasPeucker(displayable.line.points, 10); // Adjust tolerance as needed
-					const smoothed = chaikinSmooth(simplified, 4);
-					displayable.line.points = smoothed;
-				}
-			}
-		}
-	}
-	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
-}
-
 // assign structure buttons
 for (const structure of structures) {
 	const button = document.getElementById(`${structure.type.toLowerCase()}-button`);
@@ -237,6 +221,34 @@ const generateButton = document.getElementById("generate-button");
 generateButton.onclick = () => {
 	showDebugText();
 	window.dispatchEvent(toPhaser);
+}
+
+//* NORMALIZE STROKES *//
+normalizeToggle.onclick = () => {
+	normalizing = document.getElementById("normalize-toggle").checked;
+	if(normalizing){ normalizeStrokes(); }
+}
+
+function normalizeStrokes(){
+	// shape-ify each line in displayList
+	for (const displayable of displayList) {
+		if (displayable instanceof LineDisplayble) {
+			if(!displayable.normalized){	// don't re-normalize a stroke that has already been normalized
+				displayable.normalized = true;
+				const shape = getShape(displayable.line.points);
+				console.log(displayable, shape)
+				if(shape){
+					displayable.line.points = shape.points;
+				} else {
+					// for unrecognized shapes, de-noise stroke by running rdp, then chaikin
+					const simplified = ramerDouglasPeucker(displayable.line.points, 10); // Adjust tolerance as needed
+					const smoothed = chaikinSmooth(simplified, 4);
+					displayable.line.points = smoothed;
+				}
+			}
+		}
+	}
+	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
 }
 
 //* STRUCTURES ORGANIZATION *//
