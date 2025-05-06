@@ -7,14 +7,14 @@ export default class Demo_WFC extends Phaser.Scene {
   displayedMapID = 3;	// check assets folder to see all maps  
 
   N = 2;
-  profileLearning = true;
+  profileLearning = false;
 
   // width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
   width = 3;
   height = 3;
   maxAttempts = 10;
-  logProgress = true;
-  profileSolving = true;
+  logProgress = false;
+  profileSolving = false;
 
   numRuns = 10;	// for this.getAverageGenerationDuration()
 
@@ -40,10 +40,16 @@ export default class Demo_WFC extends Phaser.Scene {
     //this.structuresModel = new WFCModel().learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
 
     this.houseModel = new WFCModel().learn(IMAGES.HOUSES, this.N, this.profileLearning);
-    this.houseModel.setTile(0, this.height-1, TILEMAP.HOUSE_BOTTOM_LEFT_TILES);
-    this.houseModel.setTile(this.width-1, this.height-1, TILEMAP.HOUSE_BOTTOM_RIGHT_TILES);
     this.houseModel.setTile(0, 0, TILEMAP.HOUSE_TOP_LEFT_TILES);
     this.houseModel.setTile(this.width-1, 0, TILEMAP.HOUSE_TOP_RIGHT_TILES);
+    this.houseModel.setTile(0, this.height-1, TILEMAP.HOUSE_BOTTOM_LEFT_TILES);
+    this.houseModel.setTile(this.width-1, this.height-1, TILEMAP.HOUSE_BOTTOM_RIGHT_TILES);
+    this.houseModel.setTile(getRandIntInRange(1, this.width-1), this.height-1, TILEMAP.HOUSE_DOOR_TILES);
+
+    /** min = inclusive, max = exclusive, make sure both inputs are ints */
+    function getRandIntInRange(min, max) {
+      return Math.floor(Math.random() * (max - min) + min);
+    }
   }
 
   showInputImage() {
@@ -89,19 +95,15 @@ export default class Demo_WFC extends Phaser.Scene {
     const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
     if (!groundImage) return;
 
-    console.log("Using model for structures");    
-    const structuresImage = this.houseModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
-    if (!structuresImage) return;
+    console.log("Using model for house");    
+    const houseImage = this.houseModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
+    if (!houseImage) return;
 
-    this.displayMap(groundImage, structuresImage);
+    this.displayMap(groundImage, houseImage);
 
     this.width++;
     this.height++;
-    this.houseModel.clearSetTiles();
-    this.houseModel.setTile(0, this.height-1, TILEMAP.HOUSE_BOTTOM_LEFT_TILES);
-    this.houseModel.setTile(this.width-1, this.height-1, TILEMAP.HOUSE_BOTTOM_RIGHT_TILES);
-    this.houseModel.setTile(0, 0, TILEMAP.HOUSE_TOP_LEFT_TILES);
-    this.houseModel.setTile(this.width-1, 0, TILEMAP.HOUSE_TOP_RIGHT_TILES);
+    this.setupWFCModels();
   }
 
   displayMap(groundImage, structuresImage) {
