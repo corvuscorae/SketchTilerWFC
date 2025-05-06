@@ -29,14 +29,14 @@ export default class Demo_Sketch extends Phaser.Scene {
       this.genRegions = {};
 
       // receives sketches from sketch tool
-      window.addEventListener('sketchToPhaser', (e) => {
+      window.addEventListener("generate", (e) => {
         this.structures = e.detail;   
         // TODO: optimize; this.structures is overwritten everytime when we only 
         //    really need to add new structures
         this.getStructureRegions(this.structures);
       });
     
-      window.addEventListener('clearSketch', (e) => {
+      window.addEventListener("clearSketch", (e) => {
         this.structures = {};
         this.genRegions = {};
         this.fillTiles_gfx.clear();
