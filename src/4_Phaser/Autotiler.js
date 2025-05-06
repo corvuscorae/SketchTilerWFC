@@ -38,15 +38,6 @@ export default class Autotiler extends Phaser.Scene {
       });
       this.groundMap.createLayer(0, this.tileset, 0, 0);
 
-      /*
-      const structsMapData = [];
-      for (let y = 0; y < TILEMAP.HEIGHT; y++) {
-        structsMapData[y] = [];
-        for (let x = 0; x < TILEMAP.WIDTH; x++) {
-          structsMapData[y][x] = -1;
-        }
-      }
-      */
       this.structsModel.clearSetTiles();
 
       for (const structure of Object.values(e.detail)) {
@@ -61,7 +52,6 @@ export default class Autotiler extends Phaser.Scene {
             for (let x = 0; x < boundingBox.width; x++) {
               const dy = y + boundingBox.topLeft.y;
               const dx = x + boundingBox.topLeft.x;
-              //structsMapData[dy][dx] = struct[y][x];
               this.structsModel.setTile(dx, dy, struct[y][x]);
             }}
           }

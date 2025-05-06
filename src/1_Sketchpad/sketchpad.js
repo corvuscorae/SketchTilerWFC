@@ -1,7 +1,6 @@
-import { chaikinSmooth, ramerDouglasPeucker } from "./2_Utility/lineCleanup.js";
-import { LineDisplayble, mouseDisplayable } from "./1_Classes/displayables.js";
-import { getShape } from "./2_Utility/shapeDetection.js";
-// TODO: UIX cleanup (after we get wireframes)
+import { chaikinSmooth, ramerDouglasPeucker } from "./lineCleanup.js";
+import { LineDisplayble, mouseDisplayable } from "./displayables.js";
+import { getShape } from "./shapeDetection.js";
 
 const sketchCanvas = document.getElementById("sketch-canvas");
 const ctx = sketchCanvas.getContext("2d");
@@ -42,10 +41,10 @@ console.log(structureSketches); // DEBUG
 
 //* EVENTS *//
 // sends sketch data to Phaser scene
-const toPhaser = new CustomEvent('sketchToPhaser', { detail: structureSketches });
+const toPhaser = new CustomEvent("generate", { detail: structureSketches });
 
 // updates phaser scene, clearing structures
-const clearPhaser = new CustomEvent('clearSketch');
+const clearPhaser = new CustomEvent("clearSketch");
 
 // When changeDraw is dispatched, the drawing area will be repainted.
 const changeDraw = new Event("drawing-changed"); 

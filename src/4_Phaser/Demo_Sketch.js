@@ -1,6 +1,6 @@
 import Phaser from "../../lib/PhaserModule.js"
 
-export default class SketchDemo extends Phaser.Scene {
+export default class Demo_Sketch extends Phaser.Scene {
     constructor(){
 		super("SketchDemo");
     }
