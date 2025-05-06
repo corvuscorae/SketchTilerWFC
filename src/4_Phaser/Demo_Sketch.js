@@ -1,13 +1,12 @@
-import Phaser from "../../lib/PhaserModule.js";
+import Phaser from "../../lib/PhaserModule.js"
 
-export default class Demo_Sketch extends Phaser.Scene {
+export default class SketchDemo extends Phaser.Scene {
     constructor(){
-      super("SketchDemo");
+		super("SketchDemo");
     }
 
-    outputWidth = 40;
-    outputHeight = 25;
     cellSize = 16 // TODO: this will need correspond to cell size in tilemap/phaser
+
     regionBlock = {
       "box":    (strokes, color) => this.getBoundingBox(strokes, color),
       "trace":  (strokes, color) => this.getTrace(strokes, color),
@@ -88,11 +87,13 @@ export default class Demo_Sketch extends Phaser.Scene {
     getBoundingBox(stroke, color){
       if(!stroke) return;
       // console.log("getting bounding box...", stroke)
-
+      const outputWidth = window.game.config.width / this.cellSize;
+      const outputHeight = window.game.config.height / this.cellSize;
+  
       let tiles = this.pointsToCells(stroke);
 
       // get top-left and bottom-right of stroke and fill in that region of tiles
-      let min = {x: this.outputWidth, y: this.outputHeight};
+      let min = {x: outputWidth, y: outputHeight};
       let max = {x: -1, y: -1};
       for(let tile of tiles){
         // top-left
@@ -116,10 +117,42 @@ export default class Demo_Sketch extends Phaser.Scene {
     getTrace(stroke, color){
       if(!stroke) return;
       console.log("getting region trace...", stroke);
+
       let result = this.pointsToCells(stroke);
       //this.fillTiles(result, color);  // DEBUG: visualizer
+
+      // normalized squares, triangles will have very few points. 
+      //    need to fill in-between tiles in these cases
+      if(result.length < 5){ result = this.completeShape(result); }
+
       return result;
     }
+
+    completeShape(points) {
+      if (!points || points.length < 2) return points;
+    
+      const filled = [];
+    
+      for (let i = 0; i < points.length; i++) {
+        const start = points[i];
+        const end = points[(i + 1) % points.length]; // next point (wraps around for closed shape)
+    
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        const steps = Math.max(Math.abs(dx), Math.abs(dy));
+    
+        // linear interpolation between start and end
+        for (let j = 0; j <= steps; j++) {
+          const x = Math.round(start.x + (dx * j) / steps);
+          const y = Math.round(start.y + (dy * j) / steps);
+    
+          filled.push({ x, y });
+        }
+      }
+    
+      return filled;
+    }
+    
 
     pointsToCells(stroke){
       let result = [];
