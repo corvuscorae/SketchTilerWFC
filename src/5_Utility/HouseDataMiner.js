@@ -4,12 +4,6 @@ import Phaser from "../../lib/PhaserModule.js";
 
 export default class HouseDataMiner extends Phaser.Scene {
   fileName = "house5.tmj";
-  width = 4;   // width of tilemap, in tiles
-  height = 4;  // height of tilemap, in tiles
-  layerNames = [
-    "redBase-blueRoof",
-    "blueBase-redRoof"
-  ];
 
   constructor() {
     super("HouseDataMinerScene");
@@ -21,10 +15,10 @@ export default class HouseDataMiner extends Phaser.Scene {
     this.load.tilemapTiledJSON("tilemapJSON", `houses/${this.fileName}`);
   }
 
-  create()
+  async create()
   {
+    await this.getTilemapData();
     this.createTilemap();
-    this.setupControls();
     
     return;
     this.getGroundAndStructuresData(width, height);
@@ -34,9 +28,23 @@ export default class HouseDataMiner extends Phaser.Scene {
     this.setupControls();
   }
 
+  async getTilemapData() {
+    // modified code from "Top-level function" section from here: https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON
+
+    const response = await fetch(`../../assets/houses/${this.fileName}`);
+    if (!response.ok) throw new Error("There was an error with fetching the tilemap file.");
+
+    const tilemap = await response.json();
+
+    this.width = tilemap.width;
+    this.height = tilemap.height;
+    this.tilesetName = tilemap.tilesets[0].name;
+    this.layerNames = tilemap.layers.map(layer => layer.name);
+  }
+
   createTilemap() {
     this.tilemap = this.add.tilemap("tilemapJSON", 16, 16, this.width, this.height);
-    this.tileset = this.tilemap.addTilesetImage("tinyTown_Tilemap_Packed", "tilemapImage");
+    this.tileset = this.tilemap.addTilesetImage(this.tilesetName, "tilemapImage");
     this.layers = this.layerNames.map(name => this.tilemap.createLayer(name, this.tileset));
     this.tilemapLayers = [this.layers];
   }
