@@ -13,6 +13,6 @@ export default function initPhaser() {
     zoom: 1,
     //autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,	// comment out this line to not center
     render: { pixelArt: true },	// scale pixel art without blurring
-    scene: [Demo_WFC]
+    scene: [Autotiler]
   });
 }
