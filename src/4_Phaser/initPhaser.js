@@ -1,7 +1,5 @@
 import Phaser from "../../lib/PhaserModule.js";
 import TILEMAP from "./TILEMAP.js";
-import Demo_WFC from "./Demo_WFC.js";
-import HouseDataMiner from "../5_Utility/HouseDataMiner.js";
 import Autotiler from "./Autotiler.js";
 
 export default function initPhaser() {
