@@ -3,30 +3,30 @@
  "infinite":false,
  "layers":[
         {
-         "data":[53, 56, 54, 55,
-            65, 68, 66, 67,
-            77, 89, 90, 80],
+         "data":[53, 54, 54, 56, 55,
+            65, 68, 66, 68, 67,
+            77, 89, 90, 89, 80],
          "height":3,
          "id":1,
          "name":"blueBase-redRoof",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
-         "width":4,
+         "width":5,
          "x":0,
          "y":0
         }, 
         {
-         "data":[49, 52, 50, 51,
-            61, 64, 62, 63,
-            73, 85, 86, 76],
+         "data":[49, 50, 50, 52, 51,
+            61, 64, 62, 64, 63,
+            73, 85, 86, 85, 76],
          "height":3,
          "id":2,
          "name":"redBase-blueRoof",
          "opacity":1,
          "type":"tilelayer",
          "visible":true,
-         "width":4,
+         "width":5,
          "x":0,
          "y":0
         }],
@@ -53,5 +53,5 @@
  "tilewidth":16,
  "type":"map",
  "version":"1.10",
- "width":4
+ "width":5
 }
