@@ -23,6 +23,8 @@ export default class Autotiler extends Phaser.Scene {
 
     this.groundModel = new WFCModel();
     this.groundModel.learn(IMAGES.GROUND, 2);
+    this.structsModel = new WFCModel();
+    this.structsModel.learn(IMAGES.STRUCTURES, 2);
 
     window.addEventListener("generate", (e) => {
       const groundMapData = this.groundModel.generate(TILEMAP.WIDTH, TILEMAP.HEIGHT, 10, false, false);
@@ -36,13 +38,7 @@ export default class Autotiler extends Phaser.Scene {
       });
       this.groundMap.createLayer(0, this.tileset, 0, 0);
 
-      const structsMapData = [];
-      for (let y = 0; y < TILEMAP.HEIGHT; y++) {
-        structsMapData[y] = [];
-        for (let x = 0; x < TILEMAP.WIDTH; x++) {
-          structsMapData[y][x] = -1;
-        }
-      }
+      this.structsModel.clearSetTiles();
 
       for (const structure of Object.values(e.detail)) {
         if (!structure.strokes) continue;
@@ -56,7 +52,7 @@ export default class Autotiler extends Phaser.Scene {
             for (let x = 0; x < boundingBox.width; x++) {
               const dy = y + boundingBox.topLeft.y;
               const dx = x + boundingBox.topLeft.x;
-              structsMapData[dy][dx] = struct[y][x];
+              this.structsModel.setTile(dx, dy, struct[y][x]);
             }}
           }
         } else {
@@ -66,6 +62,9 @@ export default class Autotiler extends Phaser.Scene {
           }
         }
       }
+
+      const structsMapData = this.structsModel.generate(TILEMAP.WIDTH, TILEMAP.HEIGHT, 10, true, true);
+      if (!structsMapData) throw new Error ("Contradiction created");
 
       if (this.structsMap) this.structsMap.destroy();
       this.structsMap = this.make.tilemap({
