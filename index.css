@@ -4,5 +4,5 @@
 
 #sketchpad > canvas {
   position: absolute;
-  /* cursor: none; */
+  cursor: none;
 }
