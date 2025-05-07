@@ -1,5 +1,6 @@
 import ImageLearner from "./ImageLearner.js";
 import ConstraintSolver from "./ConstraintSolver.js";
+import Bitmask from "./Bitmask.js";
 
 export default class WFCModel {
   imageLearner = new ImageLearner();
@@ -26,13 +27,18 @@ export default class WFCModel {
   }
 
   /**
-   * Set the tile at (x, y) for future generated images.
+   * Set the tile at (x, y) to be any of the ids for future generated images.
    * @param {number} x
    * @param {number} y
-   * @param {number} id
+   * @param {number[]} ids
    */
-  setTile(x, y, id) {
-    this.setTilesInstructions.push([y, x, this.imageLearner.tilesToPatterns.get(id)]);
+  setTile(x, y, ids) {
+    const combinedTilePatternsBitmask = new Bitmask(this.imageLearner.patterns.length);
+    for (const id of ids) {
+      const tilePatternsBitmask = this.imageLearner.tilesToPatterns.get(id);
+      combinedTilePatternsBitmask.mergeWith(tilePatternsBitmask);
+    }
+    this.setTilesInstructions.push([y, x, combinedTilePatternsBitmask]);
   }
 
   /** Clear all tiles previously set. */
