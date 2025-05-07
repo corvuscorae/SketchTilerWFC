@@ -1,5 +1,5 @@
 import { chaikinSmooth, ramerDouglasPeucker } from "./lineCleanup.js";
-import { LineDisplayble, mouseDisplayable } from "./displayables.js";
+import { LineDisplayble, MouseDisplayable } from "./displayables.js";
 import { getShape } from "./shapeDetection.js";
 
 const sketchCanvas = document.getElementById("sketch-canvas");
@@ -11,7 +11,7 @@ let normalizing = normalizeToggle.checked;
 
 const lineThickness = 5;
 let workingLine = { points: [], thickness: lineThickness, hue: 0, structure: null };
-let mouseObject = new mouseDisplayable({
+let mouseObject = new MouseDisplayable({
 	x: 0,
 	y: 0,
 	hue: 0,
@@ -67,7 +67,7 @@ sketchCanvas.addEventListener("tool-moved", () => {
 
 // mouse click event, start drawing
 sketchCanvas.addEventListener("mousedown", (ev) => {
-	mouseObject = new mouseDisplayable({
+	mouseObject = new MouseDisplayable({
 		x: ev.offsetX,
 		y: ev.offsetY,
 		hue: mouseObject.mouse.hue,
@@ -86,7 +86,7 @@ sketchCanvas.addEventListener("mousedown", (ev) => {
 
 // mouse move event, draw on canvas
 sketchCanvas.addEventListener("mousemove", (ev) => {
-	mouseObject = new mouseDisplayable({
+	mouseObject = new MouseDisplayable({
 		x: ev.offsetX,
 		y: ev.offsetY,
 		hue: mouseObject.mouse.hue,
@@ -104,7 +104,7 @@ sketchCanvas.addEventListener("mousemove", (ev) => {
 
 // mouse up event, stop drawing
 sketchCanvas.addEventListener("mouseup", (ev) => {
-	mouseObject = new mouseDisplayable({
+	mouseObject = new MouseDisplayable({
 		x: ev.offsetX,
 		y: ev.offsetY,
 		hue: mouseObject.mouse.hue,
