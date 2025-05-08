@@ -7,8 +7,8 @@
             65, 66, 66, 66, 67,
             77, 78, 78, 89, 80,
             77, 78, 78, 78, 80,
-            209, 78, 78, 89, 80,
-            209, 90, 78, 78, 80],
+            77, 78, 78, 89, 80,
+            77, 90, 78, 78, 80],
          "height":6,
          "id":1,
          "name":"blueBase-redRoof",
@@ -55,10 +55,6 @@
          "tilecount":132,
          "tileheight":16,
          "tilewidth":16
-        }, 
-        {
-         "firstgid":133,
-         "source":"..\/tinyTown_Tilemap_Packed.tsx"
         }],
  "tilewidth":16,
  "type":"map",
