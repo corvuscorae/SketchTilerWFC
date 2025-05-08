@@ -1,6 +1,7 @@
 import Phaser from "../../lib/PhaserModule.js";
 import TILEMAP from "./TILEMAP.js";
 import Autotiler from "./Autotiler.js";
+import Demo_WFC from "./Demo_WFC.js";
 
 export default function initPhaser() {
   window.game = new Phaser.Game({
@@ -11,6 +12,6 @@ export default function initPhaser() {
     zoom: 1,
     //autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,	// comment out this line to not center
     render: { pixelArt: true },	// scale pixel art without blurring
-    scene: [Autotiler]
+    scene: [Demo_WFC]
   });
 }
