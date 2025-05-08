@@ -1,6 +1,6 @@
 import Phaser from "../../lib/PhaserModule.js";
 import TILEMAP from "./TILEMAP.js";
-import Autotiler from "./Autotiler.js";
+//import Autotiler from "./Autotiler.js";
 import Demo_WFC from "./Demo_WFC.js";
 
 export default function initPhaser() {
