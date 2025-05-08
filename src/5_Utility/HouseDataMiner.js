@@ -89,8 +89,13 @@ export default class HouseDataMiner extends Phaser.Scene {
       for (const id of row) {
         result += id + ",";
       }
-      result += "],\n";
+      result += "-1,],\n";
     }
+    result += "\t[";
+    for (let i = 0; i < matrix[0].length + 1; i++) {
+      result += "-1,";
+    }
+    result += "],\n";
     result += "],";
     console.log(result);
   }
