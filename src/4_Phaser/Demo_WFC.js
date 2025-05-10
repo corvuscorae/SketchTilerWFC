@@ -1,23 +1,25 @@
 import Phaser from "../../lib/PhaserModule.js";
 import WFCModel from "../2_WFC/1_Model/WFCModel.js";
-import IMAGES from "../2_WFC/2_Input/images.js";
+import IMAGES from "../2_WFC/2_Input/IMAGES.js";
+import generateHouse from "../3_Generators/generateHouse.js";
 
 export default class Demo_WFC extends Phaser.Scene {
-  displayedMapID = 1;	// check assets folder to see all maps
-
-  model = new WFCModel();
+  displayedMapID = 3;	// check assets folder to see all maps  
 
   N = 2;
-  profileLearning = true;
+  profileLearning = false;
 
   // width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
-  width = 24;
-  height = 15;
+  width = 3;
+  height = 3;
   maxAttempts = 10;
-  logProgress = true;
-  profileSolving = true;
+  logProgress = false;
+  profileSolving = false;
 
   numRuns = 10;	// for this.getAverageGenerationDuration()
+
+  groundModel = new WFCModel().learn(IMAGES.GROUND, this.N, this.profileLearning);
+  //structuresModel = new WFCModel().learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
 
   constructor() {
     super("wfcTestingScene");
@@ -26,7 +28,7 @@ export default class Demo_WFC extends Phaser.Scene {
   preload() {
     this.load.setPath("./assets/");
     this.load.image("tilemap", "tinyTown_Tilemap_Packed.png");
-    this.load.tilemapTiledJSON("tinyTownMap", `map${this.displayedMapID}.tmj`);
+    this.load.tilemapTiledJSON("tinyTownMap", `maps/map${this.displayedMapID}.tmj`);
   }
 
   create() {
@@ -63,7 +65,7 @@ export default class Demo_WFC extends Phaser.Scene {
     });
     this.timedRuns_Key.on("down", () => this.getAverageGenerationDuration(this.numRuns));
 
-    document.getElementById("description").innerHTML = `
+    document.getElementById("instructions").innerHTML = `
       <h2>Controls</h2>
       (Opening the console is recommended) <br><br>
       Generate: G <br>
@@ -74,31 +76,22 @@ export default class Demo_WFC extends Phaser.Scene {
 
   generateMap(){
     console.log("Using model for ground");
-    this.model.learn(IMAGES.GROUND, this.N, this.profileLearning);
-    const groundImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
+    const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
     if (!groundImage) return;
 
-    console.log("Using model for structures");
-    this.model.learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
+    console.log("Using house generator");
+    const houseImage = generateHouse({
+      topLeft: { x: 0, y: 0 },
+      bottomRight: { x: this.width-1, y: this.height-1 },
+      width: this.width,
+      height: this.height
+    });
+    if (!houseImage) return;
 
-    //this.model.setTile(0, this.height-1, 73);	// brown BL corner
-    //this.model.setTile(this.width-1, this.height-1, 76)	// brown BR corner
+    this.displayMap(groundImage, houseImage);
 
-    //this.model.setTile(0, this.height-1, 77);	// blue BL corner
-    //this.model.setTile(this.width-1, this.height-1, 80)	// blue BR corner
-
-    //this.model.setTile(0, 0, 49)	// blue roof TL corner
-    //this.model.setTile(this.width-1, 0, 51)	// blue roof TR corner
-    //this.model.setTile(this.width-1, 0, 52)	// blue roof TR chimney
-
-    //this.model.setTile(0, 0, 53)	// orange roof TL corner
-    //this.model.setTile(this.width-1, 0, 55)	// orange roof TR corner
-    //this.model.setTile(this.width-1, 0, 56)	// orange roof TRchimney
-
-    const structuresImage = this.model.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
-    if (!structuresImage) return;
-
-    this.displayMap(groundImage, structuresImage);
+    this.width++;
+    this.height++;
   }
 
   displayMap(groundImage, structuresImage) {
@@ -124,7 +117,7 @@ export default class Demo_WFC extends Phaser.Scene {
 
   getAverageGenerationDuration(numRuns) {
     let totalDuration = 0;
-    for (let i = 1; i <= numRuns; i++) {	// we want i to start at one for console logging
+    for (let i = 1; i <= numRuns; i++) {  // we want i to start at one for console logging
       const start = performance.now();
       this.generateMap();
       let duration = performance.now() - start;

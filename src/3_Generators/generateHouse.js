@@ -1,5 +1,6 @@
-import WFCModel from "../2_WFC/1_Model/wfcModel.js";
-import IMAGES from "../2_WFC/2_Input/images.js";
+import WFCModel from "../2_WFC/1_Model/WFCModel.js";
+import IMAGES from "../2_WFC/2_Input/IMAGES.js";
+import TILEMAP from "../4_Phaser/TILEMAP.js";
 
 const model = new WFCModel().learn(IMAGES.HOUSES, 2);
 
@@ -8,23 +9,38 @@ const model = new WFCModel().learn(IMAGES.HOUSES, 2);
  * @returns {TilemapImage}
  */
 export default function generateHouse(boundingBox) {
-  model.clearSetTiles();
+  const [width, height] = [boundingBox.width, boundingBox.height];
 
-  model.setTile(0, boundingBox.height-1, 73);	// brown house BL corner
-  model.setTile(boundingBox.width-1, boundingBox.height-1, 76)	// brown house BR corner
+  model.clearSetTiles();  
 
-  //model.setTile(0, boundingBox.height-1, 77);	// blue house BL corner
-  //model.setTile(boundingBox.width-1, boundingBox.height-1, 80)	// blue house BR corner
+  model.setTile(0, 0, TILEMAP.HOUSE_TOP_LEFT_TILES);
+  model.setTile(width-1, 0, TILEMAP.HOUSE_TOP_RIGHT_TILES);
+  model.setTile(0, height-1, TILEMAP.HOUSE_BOTTOM_LEFT_TILES);
+  model.setTile(width-1, height-1, TILEMAP.HOUSE_BOTTOM_RIGHT_TILES);
 
-  model.setTile(0, 0, 49)	// blue roof TL corner
-  //model.setTile(boundingBox.width-1, 0, 51)	// blue roof TR corner
-  //model.setTile(boundingBox.width-1, 0, 52)	// blue roof TR chimney
+  const x = getRandIntInRange(1, width-1);
+  if (width <= 3) {
+    model.setTile(x, height-1, TILEMAP.HOUSE_DOOR_TILES);
+  } else {
+    if (x == width-2) {
+      model.setTile(x, height-1, [...TILEMAP.HOUSE_DOOR_TILES, ...TILEMAP.HOUSE_DOUBLE_DOOR_RIGHT_TILES]);
+    }
+    else {
+      model.setTile(x, height-1, [...TILEMAP.HOUSE_DOOR_TILES, ...TILEMAP.HOUSE_DOUBLE_DOOR_LEFT_TILES, ...TILEMAP.HOUSE_DOUBLE_DOOR_RIGHT_TILES]);
+    }
+  }
 
-  //model.setTile(0, 0, 53)	// orange roof TL corner
-  //model.setTile(boundingBox.width-1, 0, 55)	// orange roof TR corner
-  //model.setTile(boundingBox.width-1, 0, 56)	// orange roof TRchimney
-
-  const house = model.generate(boundingBox.width, boundingBox.height, 10, false, false);
+  const house = model.generate(width, height, 10, false, false);
   if (!house) throw new Error("Contradiction created");
   return house;
+}
+
+/**
+ * Returns a random integer in the range [min, max). 
+ * @param {number} min Must be an integer.
+ * @param {number} max Must be an integer.
+ * @returns {number}
+*/
+function getRandIntInRange(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
 }

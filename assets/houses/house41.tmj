@@ -1,0 +1,65 @@
+{ "compressionlevel":-1,
+ "height":5,
+ "infinite":false,
+ "layers":[
+        {
+         "data":[185, 186, 186, 186, 188, 187,
+            197, 198, 198, 198, 198, 199,
+            209, 221, 210, 210, 221, 212,
+            209, 210, 210, 210, 210, 212,
+            209, 210, 223, 224, 210, 212],
+         "height":5,
+         "id":1,
+         "name":"blueBase-redRoof",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":6,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[181, 182, 182, 182, 184, 183,
+            193, 194, 194, 194, 194, 195,
+            205, 217, 206, 206, 217, 208,
+            205, 206, 206, 206, 206, 208,
+            205, 206, 219, 220, 206, 208],
+         "height":5,
+         "id":2,
+         "name":"redBase-blueRoof",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":6,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":3,
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "renderorder":"right-down",
+ "tiledversion":"1.10.2",
+ "tileheight":16,
+ "tilesets":[
+        {
+         "columns":12,
+         "firstgid":1,
+         "image":"..\/tinyTown_Tilemap_Packed.png",
+         "imageheight":176,
+         "imagewidth":192,
+         "margin":0,
+         "name":"tinyTown_Tilemap_Packed",
+         "spacing":0,
+         "tilecount":132,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "firstgid":133,
+         "source":"..\/tinyTown_Tilemap_Packed.tsx"
+        }],
+ "tilewidth":16,
+ "type":"map",
+ "version":"1.10",
+ "width":6
+}

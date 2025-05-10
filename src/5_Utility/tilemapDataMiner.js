@@ -1,6 +1,6 @@
 // Used to extract the tile ID matrices from a tilemap's layers.
 
-import Phaser from "../../lib/PhaserModule.js/index.js"
+import Phaser from "../../lib/PhaserModule.js"
 
 export default class TilemapDataMiner extends Phaser.Scene {
 	tilemapLayers = [];

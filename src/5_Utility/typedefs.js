@@ -7,7 +7,7 @@
 
 // Imports (for the following typedefs to use)
 /**
- * @typedef {import("../2_WFC/1_Model/Bitmask.js/index.js").default} Bitmask
+ * @typedef {import("../2_WFC/1_Model/Bitmask.js").default} Bitmask
  */
 
 // Sketchpad
