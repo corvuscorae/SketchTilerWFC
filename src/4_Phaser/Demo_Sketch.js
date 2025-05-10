@@ -43,9 +43,6 @@ export default class Demo_Sketch extends Phaser.Scene {
       });
     }
 
-    // TODO: for trace and box regions
-    //    > normalize region blocking 
-    //      (cleanup tiles, combine house strokes to a single bounding box*)
     getStructureRegions(sketch){
       let result = {};
 
@@ -55,6 +52,9 @@ export default class Demo_Sketch extends Phaser.Scene {
         if(struct.info && struct.strokes && struct.strokes.length > 0){
           result[structType] = [];
           let regionType = struct.info.region;
+
+          struct.strokes = this.groupNearby(struct.strokes);
+
           for(let stroke of struct.strokes){
             result[structType].push(
               this.regionBlock[regionType](stroke, struct.info.color)
@@ -62,8 +62,6 @@ export default class Demo_Sketch extends Phaser.Scene {
           }
         }
       }
-
-      //console.log(result);
 
       // DEBUG: color generation regions (placeholder visualization -- this will
       //    eventually call structure generators instead!)
@@ -81,8 +79,51 @@ export default class Demo_Sketch extends Phaser.Scene {
           this.generator[structType](region);
         }
       }
+
       return result;
     }
+  
+  // BFS search for nearby strokes
+  groupNearby(strokes, threshold = 40) {
+    const visited = new Array(strokes.length).fill(false);
+    const groups = [];
+
+    for (let i = 0; i < strokes.length; i++) {
+      if (visited[i]) continue;
+
+      const group = [];
+      const queue = [i];
+      visited[i] = true;
+
+      while (queue.length > 0) {
+        const current = queue.shift();
+        group.push(...strokes[current]);
+
+        for (let j = 0; j < strokes.length; j++) {
+          if (!visited[j] && this.strokesNearby(strokes[current], strokes[j], threshold)) {
+            visited[j] = true;
+            queue.push(j);
+          }
+        }
+      }
+
+      groups.push(group);
+    }
+
+    return groups;
+  }
+
+  strokesNearby(strokeA, strokeB, threshold) {
+    const boxA = this.getBoundingBox(strokeA);
+    const boxB = this.getBoundingBox(strokeB);
+
+    return (
+      boxA.min.x - threshold < boxB.max.x &&
+      boxA.max.x + threshold > boxB.min.x &&
+      boxA.min.y - threshold < boxB.max.y &&
+      boxA.max.y + threshold > boxB.min.y
+    );
+  }
 
     getBoundingBox(stroke, color){
       if(!stroke) return;
