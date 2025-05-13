@@ -10,13 +10,13 @@ export default class Demo_WFC extends Phaser.Scene {
   profileLearning = false;
 
   // width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
-  width = 3;
-  height = 3;
+  width = 24;
+  height = 15;
   maxAttempts = 10;
   logProgress = true;
-  profileSolving = false;
+  profileSolving = true;
 
-  numRuns = 10;	// for this.getAverageGenerationDuration()
+  numRuns = 100;	// for this.getAverageGenerationDuration()
 
   groundModel = new WFCModel().learn(IMAGES.GROUND, this.N, this.profileLearning);
   structuresModel = new WFCModel().learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
@@ -34,30 +34,6 @@ export default class Demo_WFC extends Phaser.Scene {
   create() {
     this.showInputImage();
     this.setupControls();
-
-    /*
-    const housesModel = new WFCModel().learn(IMAGES.HOUSES, this.N, this.profileLearning);
-    const patternsData = [[], [], [], []];
-    for (let i = 0; i < housesModel.imageLearner.patterns.length; i++) {
-      const pattern = housesModel.imageLearner.patterns[i];
-
-      for (let y = 0; y < 2; y++) {
-      for (let x = 0; x < 2; x++) {
-        patternsData[y].push(pattern[y][x]);
-      }}
-
-      patternsData[0].push(0);
-      patternsData[1].push(0);
-    }
-    const tilemap = this.make.tilemap({
-      data: patternsData,
-      tileWidth: 16,
-      tileHeight: 16
-    });
-    const multiLayerMap = this.add.tilemap("tinyTownMap", 16, 16, 40, 25);
-    this.tileset = multiLayerMap.addTilesetImage("kenney-tiny-town", "tilemap");
-    tilemap.createLayer(0, this.tileset, 0, 300);
-    */
   }
 
   showInputImage() {
@@ -103,12 +79,11 @@ export default class Demo_WFC extends Phaser.Scene {
     const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
     if (!groundImage) return;
 
-    /*
     console.log("Using model for structures");
     const structuresImage = this.structuresModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
     if (!structuresImage) return;
-    */
 
+    /*
     console.log("Using house generator");
     const structuresImage = generateHouse({
       topLeft: { x: 0, y: 0 },
@@ -117,11 +92,9 @@ export default class Demo_WFC extends Phaser.Scene {
       height: this.height
     });
     if (!structuresImage) return;
+    */
 
     this.displayMap(groundImage, structuresImage);
-
-    this.width++;
-    this.height++;
   }
 
   displayMap(groundImage, structuresImage) {
