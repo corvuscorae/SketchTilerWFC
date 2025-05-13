@@ -110,16 +110,6 @@ export default class ConstraintSolver {
       }
       this.waveMatrix[y][x].intersectWith(tilePatternsBitmask);
       const contradictionCreated = this.propagate(y, x, adjacencies);
-
-      const copy = []
-      for (let y = 0; y < this.waveMatrix.length; y++) {
-        copy[y] = [];
-        for (let x = 0; x < this.waveMatrix[y].length; x++) {
-          copy[y][x] = this.waveMatrix[y][x].toArray();
-        }
-      }
-      console.log(copy);
-
       if (contradictionCreated) throw new Error("User's set tiles formed a contradiction.");
     }
   }

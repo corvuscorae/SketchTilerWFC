@@ -13,7 +13,7 @@ export default function initPhaser() {
     height: TILEMAP.HEIGHT * TILEMAP.TILE_WIDTH,
     zoom: 1,
     //autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,	// comment out this line to not center
-    backgroundColor: "#ebebeb",
+    //backgroundColor: "#ebebeb",
     render: { pixelArt: true },	// scale pixel art without blurring
     scene: [Demo_WFC]
   });
