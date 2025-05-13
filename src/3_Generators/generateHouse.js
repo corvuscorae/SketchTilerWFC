@@ -13,10 +13,10 @@ export default function generateHouse(boundingBox) {
 
   model.clearSetTiles();  
 
-  model.setTile(0, 0, TILEMAP.HOUSE_TOP_LEFT_TILES);
-  model.setTile(width-1, 0, TILEMAP.HOUSE_TOP_RIGHT_TILES);
-  model.setTile(0, height-1, TILEMAP.HOUSE_BOTTOM_LEFT_TILES);
-  model.setTile(width-1, height-1, TILEMAP.HOUSE_BOTTOM_RIGHT_TILES);
+  model.setTile(0, 0, [TILEMAP.HOUSE_TOP_LEFT_TILES[0]]);
+  model.setTile(width-1, 0, [TILEMAP.HOUSE_TOP_RIGHT_TILES[0]]);
+  model.setTile(0, height-1, [TILEMAP.HOUSE_BOTTOM_LEFT_TILES[0]]);
+  model.setTile(width-1, height-1, [TILEMAP.HOUSE_BOTTOM_RIGHT_TILES[0]]);
 
   /*
   const x = randIntInRange(1, width-1);

@@ -13,7 +13,7 @@ export default class Demo_WFC extends Phaser.Scene {
   width = 3;
   height = 3;
   maxAttempts = 10;
-  logProgress = true;
+  logProgress = false;
   profileSolving = false;
 
   numRuns = 10;	// for this.getAverageGenerationDuration()
@@ -32,8 +32,30 @@ export default class Demo_WFC extends Phaser.Scene {
   }
 
   create() {
-    this.showInputImage();
+    //this.showInputImage();
     this.setupControls();
+
+    const housesModel = new WFCModel().learn(IMAGES.HOUSES, this.N, this.profileLearning);
+    const patternsData = [[], [], [], []];
+    for (let i = 0; i < housesModel.imageLearner.patterns.length; i++) {
+      const pattern = housesModel.imageLearner.patterns[i];
+
+      for (let y = 0; y < 2; y++) {
+      for (let x = 0; x < 2; x++) {
+        patternsData[y].push(pattern[y][x]);
+      }}
+
+      patternsData[0].push(0);
+      patternsData[1].push(0);
+    }
+    const tilemap = this.make.tilemap({
+      data: patternsData,
+      tileWidth: 16,
+      tileHeight: 16
+    });
+    const multiLayerMap = this.add.tilemap("tinyTownMap", 16, 16, 40, 25);
+    this.tileset = multiLayerMap.addTilesetImage("kenney-tiny-town", "tilemap");
+    tilemap.createLayer(0, this.tileset, 0, 300);
   }
 
   showInputImage() {
@@ -58,11 +80,13 @@ export default class Demo_WFC extends Phaser.Scene {
     this.timedRuns_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
     this.runWFC_Key.on("down", () => this.generateMap());
+    /*
     this.clear_Key.on("down", () => {
       for (const layer of this.multiLayerMapLayers) layer.setVisible(true);
       if (this.groundMap) this.groundMap.destroy();
       if (this.structuresMap) this.structuresMap.destroy();
     });
+    */
     this.timedRuns_Key.on("down", () => this.getAverageGenerationDuration(this.numRuns));
 
     document.getElementById("instructions").innerHTML = `
@@ -118,7 +142,7 @@ export default class Demo_WFC extends Phaser.Scene {
     this.groundMap.createLayer(0, this.tileset, 0, 0);
     this.structuresMap.createLayer(0, this.tileset, 0, 0);
 
-    for (const layer of this.multiLayerMapLayers) layer.setVisible(false);
+    //for (const layer of this.multiLayerMapLayers) layer.setVisible(false);
   }	
 
   getAverageGenerationDuration(numRuns) {
