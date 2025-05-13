@@ -1,5 +1,5 @@
 import Phaser from "../../lib/PhaserModule.js";
-import TILEMAP from "./tilemap.js";
+import TILEMAP from "./TILEMAP.js";
 //import Autotiler from "./Autotiler.js";
 //import Demo_Sketch from "./Demo_Sketch.js";
 import Demo_WFC from "./Demo_WFC.js";
