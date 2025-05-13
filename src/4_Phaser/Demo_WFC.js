@@ -13,13 +13,13 @@ export default class Demo_WFC extends Phaser.Scene {
   width = 3;
   height = 3;
   maxAttempts = 10;
-  logProgress = false;
+  logProgress = true;
   profileSolving = false;
 
   numRuns = 10;	// for this.getAverageGenerationDuration()
 
   groundModel = new WFCModel().learn(IMAGES.GROUND, this.N, this.profileLearning);
-  //structuresModel = new WFCModel().learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
+  structuresModel = new WFCModel().learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
 
   constructor() {
     super("wfcTestingScene");
@@ -78,6 +78,12 @@ export default class Demo_WFC extends Phaser.Scene {
     console.log("Using model for ground");
     const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
     if (!groundImage) return;
+
+    /*
+    console.log("Using model for structures");
+    const structuresImage = this.structuresModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
+    if (!structuresImage) return;
+    */
 
     console.log("Using house generator");
     const houseImage = generateHouse({
