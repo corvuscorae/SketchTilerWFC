@@ -9,10 +9,9 @@ const model = new WFCModel().learn(IMAGES.HOUSES, 2);
  * @returns {TilemapImage}
  */
 export default function generateHouse(boundingBox) {
-  const {width, height} = boundingBox;
+  const { width, height } = boundingBox;
 
-  model.clearSetTiles();  
-
+  model.clearSetTiles();
   model.setTile(0, 0, TILEMAP.HOUSE_TOP_LEFT_TILES);
   model.setTile(width-1, 0, TILEMAP.HOUSE_TOP_RIGHT_TILES);
   model.setTile(0, height-1, TILEMAP.HOUSE_BOTTOM_LEFT_TILES);

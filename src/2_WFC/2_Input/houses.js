@@ -735,7 +735,7 @@ const HOUSES = [
 export default HOUSES;
 
 /*
-  Most basic houses (keep in case debugging is needed):
+  Super basic houses for debugging if needed
   [
     [
       [49, 50, 50, 50, 50, 51,  0,],

@@ -65,13 +65,18 @@ export default class Demo_WFC extends Phaser.Scene {
     });
     this.timedRuns_Key.on("down", () => this.getAverageGenerationDuration(this.numRuns));
 
-    document.getElementById("instructions").innerHTML = `
+    const phaser = document.getElementById("phaser");
+    const instructions = document.createElement("section");
+    instructions.innerHTML = `
       <h2>Controls</h2>
-      (Opening the console is recommended) <br><br>
-      Generate: G <br>
-      Clear generation: C <br>
-      Get average generation duration over ${this.numRuns} runs: A
+      <p>
+        (Opening the console is recommended) <br><br>
+        Generate: G <br>
+        Clear generation: C <br>
+        Get average generation duration over ${this.numRuns} runs: A
+      </p>
     `;
+    phaser.append(instructions);
   }
 
   generateMap(){

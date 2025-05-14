@@ -6,7 +6,7 @@ import getBoundingBox from "../3_Generators/getBoundingBox.js";
 import generateHouse from "../3_Generators/generateHouse.js";
 import generateForest from "../3_Generators/generateForest.js";
 
-const SUGGESTED_TILE_ALPHA = 0.25;  // must be between 0 and 1
+const SUGGESTED_TILE_ALPHA = 0.5;  // must be between 0 and 1
 
 export default class Autotiler extends Phaser.Scene {
   constructor() {
@@ -23,19 +23,11 @@ export default class Autotiler extends Phaser.Scene {
     this.multiLayerMap = this.add.tilemap("tinyTownMap", 16, 16, 40, 25);
     this.tileset = this.multiLayerMap.addTilesetImage("kenney-tiny-town", "tilemap");
 
-    this.groundModel = new WFCModel();
-    this.groundModel.learn(IMAGES.GROUND, 2);
-    this.structsModel = new WFCModel();
-    this.structsModel.learn(IMAGES.STRUCTURES, 2);
+    this.groundModel = new WFCModel().learn(IMAGES.GROUND, 2);
+    this.structsModel = new WFCModel().learn([...IMAGES.STRUCTURES, ...IMAGES.HOUSES], 2);
 
     window.addEventListener("generate", (e) => {
-      const sketchImage = [];
-      for (let y = 0; y < TILEMAP.HEIGHT; y++) {
-        sketchImage[y] = [];
-        for (let x = 0; x < TILEMAP.WIDTH; x++) {
-          sketchImage[y][x] = -1;
-        }
-      }
+      const sketchImage = Array.from({ length: TILEMAP.HEIGHT }, () => Array(TILEMAP.WIDTH).fill(0));  // 2D array of all 0s
 
       this.structsModel.clearSetTiles();
 
@@ -43,10 +35,10 @@ export default class Autotiler extends Phaser.Scene {
         if (!structure.strokes) continue;
         if (structure.strokes.length < 1) continue;
 
-        if (structure.info.region == "box") {
+        if (structure.info.region === "box") {
           for (const stroke of structure.strokes) {
             const boundingBox = getBoundingBox(stroke);
-            const struct = structure.info.type == "House" ? generateHouse(boundingBox) : generateForest(boundingBox);
+            const struct = structure.info.type === "House" ? generateHouse(boundingBox) : generateForest(boundingBox);
             for (let y = 0; y < boundingBox.height; y++) {
             for (let x = 0; x < boundingBox.width; x++) {
               const dy = y + boundingBox.topLeft.y;
@@ -57,7 +49,7 @@ export default class Autotiler extends Phaser.Scene {
           }
         } else {
           for (const stroke of structure.strokes) {
-            if (structure.info.type == "Fence") console.log("Fence generation not implemented yet");
+            if (structure.info.type === "Fence") console.log("Fence generation not implemented yet");
             else console.log("Path generation not implemented yet");
           }
         }
