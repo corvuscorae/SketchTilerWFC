@@ -3,7 +3,8 @@ import TILEMAP from "./TILEMAP.js";
 //import Autotiler from "./Autotiler.js";
 //import Demo_Sketch from "./Demo_Sketch.js";
 import Demo_WFC from "./Demo_WFC.js";
-//import HouseDataMiner2 from "../5_Utility/HouseDataMiner2.js";
+import HouseDataMiner2 from "../5_Utility/HouseDataMiner2.js";
+import HouseDataMiner from "../5_Utility/HouseDataMiner.js";
 
 export default function initPhaser() {
   window.game = new Phaser.Game({

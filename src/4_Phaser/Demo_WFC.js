@@ -10,7 +10,7 @@ export default class Demo_WFC extends Phaser.Scene {
   profileLearning = false;
 
   // width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
-  width = 24;
+  width = 4;
   height = 15;
   maxAttempts = 10;
   logProgress = true;
@@ -78,12 +78,12 @@ export default class Demo_WFC extends Phaser.Scene {
     console.log("Using model for ground");
     const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
     if (!groundImage) return;
-
+    /*
     console.log("Using model for structures");
     const structuresImage = this.structuresModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
     if (!structuresImage) return;
-
-    /*
+    */
+    
     console.log("Using house generator");
     const structuresImage = generateHouse({
       topLeft: { x: 0, y: 0 },
@@ -92,7 +92,7 @@ export default class Demo_WFC extends Phaser.Scene {
       height: this.height
     });
     if (!structuresImage) return;
-    */
+    
 
     this.displayMap(groundImage, structuresImage);
   }
