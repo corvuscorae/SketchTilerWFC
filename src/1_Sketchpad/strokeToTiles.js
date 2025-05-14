@@ -19,7 +19,7 @@ export class Regions {
       let struct = this.sketch[structType];
 
       // only looking through structures (not other attributes) with points drawn
-      if (struct.info && struct.strokes && struct.strokes.length > 1) {
+      if (struct.info && struct.strokes && struct.strokes.length > 0) {
         result[structType] = [];
         let regionType = struct.info.region;
 
@@ -80,10 +80,10 @@ export class Regions {
     const boxB = this.getBoundingBox(strokeB);
 
     return (
-      boxA.min.x - threshold < boxB.max.x &&
-      boxA.max.x + threshold > boxB.min.x &&
-      boxA.min.y - threshold < boxB.max.y &&
-      boxA.max.y + threshold > boxB.min.y
+      boxA.topLeft.x - threshold < boxB.bottomRight.x &&
+      boxA.bottomRight.x + threshold > boxB.topLeft.x &&
+      boxA.topLeft.y - threshold < boxB.bottomRight.y &&
+      boxA.bottomRight.y + threshold > boxB.topLeft.y
     );
   }
 
@@ -98,32 +98,31 @@ export class Regions {
     let tiles = this.pointsToCells(stroke);
 
     // get top-left and bottom-right of stroke and fill in that region of tiles
-    let min = { x: outputWidth, y: outputHeight };
-    let max = { x: -1, y: -1 };
+    let topLeft = { x: outputWidth, y: outputHeight };
+    let bottomRight = { x: -1, y: -1 };
     for (let tile of tiles) {
       // top-left
-      if (tile.x < min.x) {
-        min.x = tile.x;
+      if (tile.x < topLeft.x) {
+        topLeft.x = tile.x;
       }
-      if (tile.y < min.y) {
-        min.y = tile.y;
+      if (tile.y < topLeft.y) {
+        topLeft.y = tile.y;
       }
 
       // bottom-right
-      if (tile.x > max.x) {
-        max.x = tile.x;
+      if (tile.x > bottomRight.x) {
+        bottomRight.x = tile.x;
       }
-      if (tile.y > max.y) {
-        max.y = tile.y;
+      if (tile.y > bottomRight.y) {
+        bottomRight.y = tile.y;
       }
     }
 
-    min = { x: min.x * this.cellSize, y: min.y * this.cellSize };
-    max = { x: max.x * this.cellSize, y: max.y * this.cellSize };
-
     return {
-      min: min,
-      max: max,
+      topLeft: topLeft,
+      bottomRight: bottomRight,
+      width: 1 + bottomRight.x - topLeft.x,
+      height: 1 + bottomRight.y - topLeft.y
     };
   }
 

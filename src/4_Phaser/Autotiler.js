@@ -1,10 +1,11 @@
 import Phaser from "../../lib/PhaserModule.js";
-import WFCModel from "../2_WFC/1_Model/WFCModel.js";
-import IMAGES from "../2_WFC/2_Input/IMAGES.js";
+import WFCModel from "../2_WFC/1_Model/wfcModel.js";
+import IMAGES from "../2_WFC/2_Input/images.js";
 import TILEMAP from "./TILEMAP.js";
 import getBoundingBox from "../3_Generators/getBoundingBox.js";
 import generateHouse from "../3_Generators/generateHouse.js";
 import generateForest from "../3_Generators/generateForest.js";
+import { Regions } from "../1_Sketchpad/strokeToTiles.js";
 
 const SUGGESTED_TILE_ALPHA = 0.5;  // must be between 0 and 1
 
@@ -25,7 +26,7 @@ export default class Autotiler extends Phaser.Scene {
 
     this.groundModel = new WFCModel().learn(IMAGES.GROUND, 2);
     this.structsModel = new WFCModel().learn([...IMAGES.STRUCTURES, ...IMAGES.HOUSES], 2);
-
+    /*
     window.addEventListener("generate", (e) => {
       const sketchImage = Array.from({ length: TILEMAP.HEIGHT }, () => Array(TILEMAP.WIDTH).fill(0));  // 2D array of all 0s
 
@@ -55,12 +56,56 @@ export default class Autotiler extends Phaser.Scene {
         }
       }
 
+    });
+    */
+
+    this.generator = {
+      House: (region) => generateHouse({width: region.width, height: region.height}),
+      Path: (region) => console.log("TODO: link path generator", region),
+      Fence: (region) => console.log("TODO: link fence generator", region),
+      Forest: (region) => generateForest({width: region.width, height: region.height})
+    };
+
+    window.addEventListener("generate", (e) => {
+      this.structures = e.detail;
+      const regions = new Regions(this.structures, 16).get();
+      const sketchImage = Array.from({ length: TILEMAP.HEIGHT }, () => Array(TILEMAP.WIDTH).fill(0));  // 2D array of all 0s
+      
+      this.generate(regions, sketchImage);
+      
       this.createGroundMap()
       this.createStructsMap_WFC();
       this.createStructsMap_Sketch(sketchImage);
 
       console.log("Generation Complete");
     });
+  }
+
+  // calls generators
+  generate(regions, sketchImage) {
+    const result = [];
+    for (let structType in regions) {
+      for (let region of regions[structType]) {
+        const gen = this.generator[structType](region);
+
+        if(this.structures[structType].info.region === "box"){
+          for (let y = 0; y < region.height; y++) {
+            for (let x = 0; x < region.width; x++) {
+              const dy = y + region.topLeft.y;
+              const dx = x + region.topLeft.x;
+              sketchImage[dy][dx] = gen[y][x];
+              this.structsModel.setTile(dx, dy, [gen[y][x]]);
+            }
+          }
+        }
+
+        if(this.structures[structType].info.region === "trace"){
+          // TODO: implement trace region placements
+        }
+
+      }
+    }
+    return result;
   }
 
   createGroundMap() {
