@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SketchTiler</title>
     <link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
   </head>
   <body>
     <div id="page">
@@ -14,8 +15,8 @@
           <canvas id="sketch-canvas"></canvas>
         </div>
         <div id="buttons">
-          <button id="house-button">House</button>
-          <button id="forest-button">Forest</button>
+          <button id="house-button" class="button is-danger">House</button>
+          <button id="forest-button" class="button is-success">Forest</button>
           <!-- <button id="fence-button">Fence</button> -->
           <!-- <button id="path-button">Path</button>   -->
           <!-- <button id="straighten-lines-button">Straighten Lines</button> -->
@@ -24,18 +25,18 @@
               type="checkbox" 
               class="onoffswitch-checkbox"  
               checked="true"
-            /> 
+            />
             Normalize shapes
           </span>
-          <button id="generate-button">Generate</button>
-          <button id="clear-button">Clear</button>
+          <button id="generate-button" class="button is-light">Generate</button>
+          <button id="clear-button" class="button is-light">Clear</button>
         </div>
         <div id="phaser"></div>
       </div>
-      <div id="instructions">
-        <h2>SketchTiler - the sketch to tilemap application</h2>
+      <div id="instructions" class="content">
+        <h2 class="title is-2">SketchTiler - the sketch to tilemap application</h2>
 
-        <h3>Instructions</h3>
+        <h3 class="subtitle is-4">Instructions</h3>
         <ul>
           <li>The "House" and "Forest" buttons are structure pens. To draw a house, use the house pen, etc.</li>
           <li>The “Normalize Shapes” toggle automatically interprets your strokes into the shape it most resembles.</li>
