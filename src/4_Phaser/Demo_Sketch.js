@@ -95,15 +95,14 @@ export default class Demo_Sketch extends Phaser.Scene {
     }
     // data should have {min: {x, y}, max: {x, y}}
     if (style === "box") {
-      let { min, max } = data;
-      let box = {
-        width: Math.max(max.x - min.x, sz),
-        height: Math.max(max.y - min.y, sz),
-      };
-
       color = color.replace(/\#/g, "0x"); // make hex-formatted color readable for phaser
       this.fillTiles_gfx.fillStyle(color);
-      this.fillTiles_gfx.fillRect(min.x, min.y, box.width, box.height);
+      this.fillTiles_gfx.fillRect(
+        data.topLeft.x * sz, 
+        data.topLeft.y * sz, 
+        data.width  * sz, 
+        data.height * sz
+      );
     }
   }
 }
