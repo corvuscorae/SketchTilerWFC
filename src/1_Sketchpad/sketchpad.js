@@ -37,7 +37,7 @@ structures.forEach((s) => {
 		strokes: []
 	}
 });
-console.log(structureSketches); // DEBUG
+//console.log(structureSketches); // DEBUG
 
 //* EVENTS *//
 // sends sketch data to Phaser scene
@@ -235,7 +235,7 @@ function normalizeStrokes(){
 			if(!displayable.normalized){	// don't re-normalize a stroke that has already been normalized
 				displayable.normalized = true;
 				const shape = getShape(displayable.line.points);
-				console.log(displayable, shape)
+				//console.log(displayable, shape)
 				if(shape){
 					displayable.line.points = shape.points;
 				} else {
