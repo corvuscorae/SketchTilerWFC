@@ -5,6 +5,7 @@ import Autotiler from "./Autotiler.js";
 //import Demo_WFC from "./Demo_WFC.js";
 //import HouseDataMiner from "../5_Utility/HouseDataMiner.js";
 //import HouseDataMiner2 from "../5_Utility/HouseDataMiner2.js";
+//import TilemapDataMiner from "../5_Utility/tilemapDataMiner.js";
 
 export default function initPhaser() {
   window.game = new Phaser.Game({
