@@ -42,6 +42,7 @@ export default class Autotiler extends Phaser.Scene {
       this.structsModel.clearSetTiles();
       this.generate(regions, sketchImage);
       
+      console.log("Structures generated, attempting to generate map suggestions.");
       this.createGroundMap()
       this.createStructsMap_WFC();
       this.createStructsMap_Sketch(sketchImage);
@@ -58,14 +59,14 @@ export default class Autotiler extends Phaser.Scene {
         const gen = this.generator[structType](region);
 
         if(this.structures[structType].info.region === "box"){
+          console.log("Attempting to generate a structure.");
           for (let y = 0; y < region.height; y++) {
-            for (let x = 0; x < region.width; x++) {
-              const dy = y + region.topLeft.y;
-              const dx = x + region.topLeft.x;
-              sketchImage[dy][dx] = gen[y][x];
-              this.structsModel.setTile(dx, dy, [gen[y][x]]);
-            }
-          }
+          for (let x = 0; x < region.width; x++) {
+            const dy = y + region.topLeft.y;
+            const dx = x + region.topLeft.x;
+            sketchImage[dy][dx] = gen[y][x];
+            this.structsModel.setTile(dx, dy, [gen[y][x]]);
+          }}
         }
 
         if(this.structures[structType].info.region === "trace"){
@@ -91,7 +92,7 @@ export default class Autotiler extends Phaser.Scene {
   }
 
   createStructsMap_WFC() {
-    const image = this.structsModel.generate(TILEMAP.WIDTH, TILEMAP.HEIGHT, 10, true, true);
+    const image = this.structsModel.generate(TILEMAP.WIDTH, TILEMAP.HEIGHT, 10, true, false);
     if (!image) throw new Error ("Contradiction created");
 
     if (this.structsMap_WFC) this.structsMap_WFC.destroy();
