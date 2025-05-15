@@ -1,6 +1,6 @@
 import Phaser from "../../lib/PhaserModule.js";
-import WFCModel from "../2_WFC/1_Model/wfcModel.js";
-import IMAGES from "../2_WFC/2_Input/images.js";
+import WFCModel from "../2_WFC/1_Model/WFCModel.js";
+import IMAGES from "../2_WFC/2_Input/IMAGES.js";
 import TILEMAP from "./TILEMAP.js";
 import getBoundingBox from "../3_Generators/getBoundingBox.js";
 import generateHouse from "../3_Generators/generateHouse.js";
@@ -26,38 +26,6 @@ export default class Autotiler extends Phaser.Scene {
 
     this.groundModel = new WFCModel().learn(IMAGES.GROUND, 2);
     this.structsModel = new WFCModel().learn([...IMAGES.STRUCTURES, ...IMAGES.HOUSES], 2);
-    /*
-    window.addEventListener("generate", (e) => {
-      const sketchImage = Array.from({ length: TILEMAP.HEIGHT }, () => Array(TILEMAP.WIDTH).fill(0));  // 2D array of all 0s
-
-      this.structsModel.clearSetTiles();
-
-      for (const structure of Object.values(e.detail)) {
-        if (!structure.strokes) continue;
-        if (structure.strokes.length < 1) continue;
-
-        if (structure.info.region === "box") {
-          for (const stroke of structure.strokes) {
-            const boundingBox = getBoundingBox(stroke);
-            const struct = structure.info.type === "House" ? generateHouse(boundingBox) : generateForest(boundingBox);
-            for (let y = 0; y < boundingBox.height; y++) {
-            for (let x = 0; x < boundingBox.width; x++) {
-              const dy = y + boundingBox.topLeft.y;
-              const dx = x + boundingBox.topLeft.x;
-              sketchImage[dy][dx] = struct[y][x];
-              this.structsModel.setTile(dx, dy, [struct[y][x]]);
-            }}
-          }
-        } else {
-          for (const stroke of structure.strokes) {
-            if (structure.info.type === "Fence") console.log("Fence generation not implemented yet");
-            else console.log("Path generation not implemented yet");
-          }
-        }
-      }
-
-    });
-    */
 
     this.generator = {
       House: (region) => generateHouse({width: region.width, height: region.height}),
@@ -71,6 +39,7 @@ export default class Autotiler extends Phaser.Scene {
       const regions = new Regions(this.structures, 16).get();
       const sketchImage = Array.from({ length: TILEMAP.HEIGHT }, () => Array(TILEMAP.WIDTH).fill(0));  // 2D array of all 0s
       
+      this.structsModel.clearSetTiles();
       this.generate(regions, sketchImage);
       
       this.createGroundMap()
