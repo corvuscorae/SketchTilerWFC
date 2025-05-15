@@ -48,6 +48,11 @@ export default class Autotiler extends Phaser.Scene {
 
       console.log("Generation Complete");
     });
+
+    window.addEventListener("clearSketch", (e) => {
+      this.groundModel.clearSetTiles();
+      this.structsModel.clearSetTiles();
+    });
   }
 
   // calls generators
