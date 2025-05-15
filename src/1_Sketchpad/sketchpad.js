@@ -132,38 +132,40 @@ clearButton.onclick = () => {
 	window.dispatchEvent(clearPhaser);
 };
 
-/*
 // undo last stroke
-const undoButton = document.createElement("button");
-undoButton.innerHTML = "Undo";
-buttonContainer.append(undoButton);
+const undoButton = document.getElementById(`undo-button`);
 undoButton.onclick = () => {
-	// TODO: optimize?
-	//    would be better to just remove the stroke in question but this works for now
-	clearStructureSketchHistory();      
 	const toRedo = displayList.pop();
+
 	if (toRedo != undefined) {
 		redoDisplayList.push(toRedo);
+
+		const stroke = toRedo.line;
+		structureSketches[stroke.structure].strokes.pop();
+		structureSketches.lastIndex = displayList.length - 1;
+		//updateStructureSketchHistory();
+
+		sketchCanvas.dispatchEvent(changeDraw);
 	}
-	sketchCanvas.dispatchEvent(changeDraw);
 };
 
 // redo last stroke
-const redoButton = document.createElement("button");
-redoButton.innerHTML = "Redo";
-buttonContainer.append(redoButton);
+const redoButton = document.getElementById(`redo-button`);
 redoButton.onclick = () => {
-	// TODO: optimize?
-	//    would be better to just remove the stroke in question but this works for now
-	clearStructureSketchHistory();
 	const toDisplay = redoDisplayList.pop();
 	if (toDisplay != undefined) {
 		displayList.push(toDisplay);
-	}
 
-	sketchCanvas.dispatchEvent(changeDraw);
+		const stroke = toDisplay.line;
+		structureSketches[stroke.structure].strokes.push(stroke.points);
+		structureSketches.lastIndex = displayList.length - 1;
+		//updateStructureSketchHistory();
+		
+		sketchCanvas.dispatchEvent(changeDraw);
+	}
 };
 
+/*
 // export canvas as png
 const exportButton = document.createElement("button");
 exportButton.innerHTML = "Export Drawing";
