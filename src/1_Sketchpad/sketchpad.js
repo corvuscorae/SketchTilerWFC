@@ -191,6 +191,7 @@ exportButton.onclick = () => {
 // assign structure buttons
 for (const structure of structures) {
 	const button = document.getElementById(`${structure.type.toLowerCase()}-button`);
+	if(!button) continue;
 	button.onclick = () => {
 		mouseObject.mouse.hue = structure.color;
 		button.style.borderColor = structure.color;  // TODO: only highlight active button
