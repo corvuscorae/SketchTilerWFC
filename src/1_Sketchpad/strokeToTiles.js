@@ -4,9 +4,21 @@ export class Regions {
     trace: (strokes) => this.getTrace(strokes),
   };
 
-  constructor(sketch, cellSize) {
+  structureSketches = { lastIndex: -1 }
+
+  constructor(sketch, structures, cellSize) {
     this.cellSize = cellSize;
-    this.sketch = sketch;
+
+    for (const type in structures) {
+      this.structureSketches[type] = {
+        info: structures[type],
+        strokes: []
+      }
+    }
+
+    this.updateStructureSketchHistory(sketch);
+    this.sketch = this.structureSketches;
+
   }
 
   // returns an object 
@@ -36,6 +48,32 @@ export class Regions {
     }
 
     return result;
+  }
+
+  //* STRUCTURES ORGANIZATION *//
+  // organize displayList by structure,
+    updateStructureSketchHistory(displayList){
+      // only add new strokes (added since last generation call)
+      for(let i = this.structureSketches.lastIndex + 1; i < displayList.length; i++){
+        let stroke = displayList[i].line;
+          // ignore invis "strokes" and non-structure strokes
+        if(stroke.points.length > 1 && stroke.structure){ 
+          this.structureSketches[stroke.structure].strokes.push(stroke.points);
+        }
+      }
+
+      this.structureSketches.lastIndex = displayList.length - 1;
+    }
+
+  // clears drawn points from structure history
+  clearStructureSketchHistory(){
+    for(let s in structureSketches){
+      if(structureSketches[s].strokes){ 
+        structureSketches[s].strokes = []; 
+      }
+    }
+    structureSketches.lastIndex = -1;
+
   }
 
   // takes an array of strokes and combines strokes within a threshold 

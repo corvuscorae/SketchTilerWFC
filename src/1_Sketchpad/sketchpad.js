@@ -24,24 +24,16 @@ let redoDisplayList = [];
 // define structures
 // NOTE: regions can be "box" or "trace",
 //    this will be the region that structure generators use to place tiles.
-const structures = [  
-	{type: "House" , color: '#f54242', region: "box"   },
-	{type: "Forest", color: '#009632', region: "box"   },
-	{type: "Fence" , color: '#f5c842', region: "trace" },
-	{type: "Path"  , color: '#8000ff', region: "trace" },
-];
-let structureSketches = { lastIndex: -1 }
-structures.forEach((s) => {
-	structureSketches[s.type] = {
-		info: s,
-		strokes: []
-	}
-});
+const structures = {  
+	"House" : { color: '#f54242', region: "box"   },
+	"Forest": { color: '#009632', region: "box"   },
+	"Fence" : { color: '#f5c842', region: "trace" },
+	"Path"  : { color: '#8000ff', region: "trace" },
+};
+
 //console.log(structureSketches); // DEBUG
 
 //* EVENTS *//
-// sends sketch data to Phaser scene
-const toPhaser = new CustomEvent("generate", { detail: structureSketches });
 
 // updates phaser scene, clearing structures
 const clearPhaser = new CustomEvent("clearSketch");
@@ -77,7 +69,7 @@ sketchCanvas.addEventListener("mousedown", (ev) => {
 		points: [{ x: mouseObject.mouse.x, y: mouseObject.mouse.y }],
 		thickness: lineThickness,
 		hue: mouseObject.mouse.hue,
-		structure: workingLine.structure
+		structure: activeButton
 	};
 	displayList.push(new LineDisplayble(workingLine));
 	sketchCanvas.dispatchEvent(changeDraw);
@@ -115,7 +107,7 @@ sketchCanvas.addEventListener("mouseup", (ev) => {
 	normalizing = document.getElementById("normalize-toggle").checked;
 	if(normalizing) normalizeStrokes();
 
-	updateStructureSketchHistory();
+	//updateStructureSketchHistory();
 	sketchCanvas.dispatchEvent(changeDraw);
 	sketchCanvas.dispatchEvent(movedTool);
 });
@@ -128,7 +120,6 @@ clearButton.onclick = () => {
 	ctx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
 	displayList = [];
 	redoDisplayList = [];
-	clearStructureSketchHistory();
 	window.dispatchEvent(clearPhaser);
 };
 
@@ -139,12 +130,7 @@ undoButton.onclick = () => {
 
 	if (toRedo != undefined) {
 		redoDisplayList.push(toRedo);
-
-		const stroke = toRedo.line;
-		structureSketches[stroke.structure].strokes.pop();
-		structureSketches.lastIndex = displayList.length - 1;
-		//updateStructureSketchHistory();
-
+		window.dispatchEvent(clearPhaser);	// TEMP: need to just remove this stroke // TODO: fix this
 		sketchCanvas.dispatchEvent(changeDraw);
 	}
 };
@@ -155,12 +141,7 @@ redoButton.onclick = () => {
 	const toDisplay = redoDisplayList.pop();
 	if (toDisplay != undefined) {
 		displayList.push(toDisplay);
-
-		const stroke = toDisplay.line;
-		structureSketches[stroke.structure].strokes.push(stroke.points);
-		structureSketches.lastIndex = displayList.length - 1;
-		//updateStructureSketchHistory();
-		
+		window.dispatchEvent(clearPhaser);	// TEMP: need to just remove this stroke // TODO: fix this
 		sketchCanvas.dispatchEvent(changeDraw);
 	}
 };
@@ -191,13 +172,16 @@ exportButton.onclick = () => {
 */
 
 // assign structure buttons
-for (const structure of structures) {
-	const button = document.getElementById(`${structure.type.toLowerCase()}-button`);
+let activeButton;
+for (const type in structures) {
+	const structure = structures[type];
+	const button = document.getElementById(`${type.toLowerCase()}-button`);
 	if(!button) continue;
 	button.onclick = () => {
 		mouseObject.mouse.hue = structure.color;
 		button.style.borderColor = structure.color;  // TODO: only highlight active button
-		workingLine.structure = structure.type;
+		//workingLine.structure = type;
+		activeButton = type;
 	}
 }
 // initial selected marker
@@ -222,6 +206,11 @@ straightenLinesButton.onclick = () => {
 const generateButton = document.getElementById("generate-button");
 generateButton.onclick = () => {
 	showDebugText();
+	
+	// sends sketch data to Phaser scene
+	const toPhaser = new CustomEvent("generate", { 
+		detail: {sketch: displayList, structures: structures} 
+	});
 	window.dispatchEvent(toPhaser);
 }
 
@@ -253,34 +242,11 @@ function normalizeStrokes(){
 	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
 }
 
-//* STRUCTURES ORGANIZATION *//
-// organize displayList by structure,
-function updateStructureSketchHistory(){
-	// only add new strokes (added since last generation call)
-	for(let i = structureSketches.lastIndex + 1; i < displayList.length; i++){
-		let stroke = displayList[i].line;
-			// ignore invis "strokes" and non-structure strokes
-		if(stroke.points.length > 1 && stroke.structure){ 
-			structureSketches[stroke.structure].strokes.push(stroke.points);
-		}
-	}
-
-	structureSketches.lastIndex = displayList.length - 1;
-}
-
-// clears drawn points from structure history
-function clearStructureSketchHistory(){
-	for(let s in structureSketches){
-		if(structureSketches[s].strokes){ 
-			structureSketches[s].strokes = []; 
-		}
-	}
-	structureSketches.lastIndex = -1;
-
-}
-
 // DEBUG: labels strokes' structure types
 function showDebugText(){
+	console.log(displayList)
+	// TODO: reimplement this
+	/*
 	updateStructureSketchHistory();
 	for(let s in structureSketches){
 		if(structureSketches[s].strokes){
@@ -290,7 +256,7 @@ function showDebugText(){
 			})
 		}
 	}
+	*/
 }
-
 
   

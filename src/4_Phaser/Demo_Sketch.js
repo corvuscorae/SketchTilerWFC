@@ -1,4 +1,4 @@
-import Phaser from "../../lib/phaserModule.js";
+import Phaser from "../../lib/PhaserModule.js";
 import { Regions } from "../1_Sketchpad/strokeToTiles.js";
 
 export default class Demo_Sketch extends Phaser.Scene {
@@ -21,21 +21,20 @@ export default class Demo_Sketch extends Phaser.Scene {
     this.fillTiles_gfx = this.add.graphics();
 
     this.drawGridLines();
-    this.structures = {};
-    this.genRegions = {};
+    this.sketch;
+    this.structures;
 
     // receives sketches from sketch tool
     window.addEventListener("generate", (e) => {
-      this.structures = e.detail;
-      // TODO: optimize; this.structures is overwritten everytime when we only
-      //    really need to add new structures
-      const regions = new Regions(this.structures, this.cellSize).get();
+      this.sketch = e.detail.sketch;
+      this.structures = e.detail.structures;
+      const regions = new Regions(this.sketch, this.structures, this.cellSize).get();
       this.generate(regions);
     });
 
     window.addEventListener("clearSketch", (e) => {
+      this.sketch = [];
       this.structures = {};
-      this.genRegions = {};
       this.fillTiles_gfx.clear();
     });
   }
@@ -43,13 +42,12 @@ export default class Demo_Sketch extends Phaser.Scene {
   // calls generators
   generate(regions) {
     for (let structType in regions) {
-      let regionType = this.structures[structType].info.region;
-      let color = this.structures[structType].info.color;
+      let color = this.structures[structType].color;
 
       for (let region of regions[structType]) {
         // DEBUG: color generation regions (placeholder visualization -- this will
         //    eventually call structure generators instead!)
-        this.fillTiles(region, regionType, color);
+        this.fillTiles(region, this.structures[structType]);
 
         // NOTE: this is where we will call generators
         // `structType` is "House" or "Path" or "Forest" or "Fence"
@@ -81,22 +79,20 @@ export default class Demo_Sketch extends Phaser.Scene {
   }
 
   // fill colors
-  fillTiles(data, style, color) {
-    color = color.replace(/\#/g, "0x"); // make hex-formatted color readable for phaser
+  fillTiles(data, config) {
+    const color = config.color.replace(/\#/g, "0x"); // make hex-formatted color readable for phaser
     this.fillTiles_gfx.fillStyle(color);
-    let sz = this.cellSize;
+    const sz = this.cellSize;
 
     // data should have all coords to be filled
-    if (style === "trace") {
+    if (config.region === "trace") {
       for (let i = 0; i < data.length; i++) {
         let { x, y } = data[i];
         this.fillTiles_gfx.fillRect(sz * x, sz * y, sz, sz);
       }
     }
     // data should have {min: {x, y}, max: {x, y}}
-    if (style === "box") {
-      color = color.replace(/\#/g, "0x"); // make hex-formatted color readable for phaser
-      this.fillTiles_gfx.fillStyle(color);
+    if (config.region === "box") {
       this.fillTiles_gfx.fillRect(
         data.topLeft.x * sz, 
         data.topLeft.y * sz, 
