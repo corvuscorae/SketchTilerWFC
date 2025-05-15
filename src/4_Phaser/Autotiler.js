@@ -25,7 +25,7 @@ export default class Autotiler extends Phaser.Scene {
     this.tileset = this.multiLayerMap.addTilesetImage("kenney-tiny-town", "tilemap");
 
     this.groundModel = new WFCModel().learn(IMAGES.GROUND, 2);
-    this.structsModel = new WFCModel().learn([...IMAGES.STRUCTURES], 2);
+    this.structsModel = new WFCModel().learn([...IMAGES.STRUCTURES, ...IMAGES.HOUSES], 2);
     /*
     window.addEventListener("generate", (e) => {
       const sketchImage = Array.from({ length: TILEMAP.HEIGHT }, () => Array(TILEMAP.WIDTH).fill(0));  // 2D array of all 0s
