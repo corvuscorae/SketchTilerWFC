@@ -1,7 +1,7 @@
-import Phaser from "../../lib/PhaserModule.js";
-import WFCModel from "../2_WFC/1_Model/WFCModel.js";
-import IMAGES from "../2_WFC/2_Input/IMAGES.js";
-import TILEMAP from "./TILEMAP.js";
+import Phaser from "../../lib/phaserModule.js";
+import WFCModel from "../2_WFC/1_Model/wfcModel.js";
+import IMAGES from "../2_WFC/2_Input/images.js";
+import TILEMAP from "./tilemap.js";
 import getBoundingBox from "../3_Generators/getBoundingBox.js";
 import generateHouse from "../3_Generators/generateHouse.js";
 import generateForest from "../3_Generators/generateForest.js";
@@ -21,7 +21,8 @@ export default class Autotiler extends Phaser.Scene {
   }
 
   create() {
-    this.multiLayerMap = this.add.tilemap("tinyTownMap", 16, 16, 40, 25);
+    const cellSize = 16;
+    this.multiLayerMap = this.add.tilemap("tinyTownMap", cellSize, cellSize, 40, 25);
     this.tileset = this.multiLayerMap.addTilesetImage("kenney-tiny-town", "tilemap");
 
     this.groundModel = new WFCModel().learn(IMAGES.GROUND, 2);
@@ -35,12 +36,14 @@ export default class Autotiler extends Phaser.Scene {
     };
 
     window.addEventListener("generate", (e) => {
-      this.structures = e.detail;
-      const regions = new Regions(this.structures, 16).get();
+      this.sketch = e.detail.sketch;
+      this.structures = e.detail.structures;
+      this.regions = new Regions(this.sketch, this.structures, cellSize).get();
+
       const sketchImage = Array.from({ length: TILEMAP.HEIGHT }, () => Array(TILEMAP.WIDTH).fill(0));  // 2D array of all 0s
       
       this.structsModel.clearSetTiles();
-      this.generate(regions, sketchImage);
+      this.generate(this.regions, sketchImage);
       
       console.log("Structures generated, attempting to generate map suggestions.");
       this.createGroundMap()
@@ -49,6 +52,14 @@ export default class Autotiler extends Phaser.Scene {
 
       console.log("Generation Complete");
     });
+    /*
+    window.addEventListener("generate", (e) => {
+      this.sketch = e.detail.sketch;
+      this.structures = e.detail.structures;
+      this.regions = new Regions(this.sketch, this.structures, this.cellSize).get();
+      this.generate(this.regions);
+    });
+    */
   }
 
   // calls generators
@@ -58,7 +69,7 @@ export default class Autotiler extends Phaser.Scene {
       for (let region of regions[structType]) {
         const gen = this.generator[structType](region);
 
-        if(this.structures[structType].info.region === "box"){
+        if(this.structures[structType].regionType === "box"){
           console.log("Attempting to generate a structure.");
           for (let y = 0; y < region.height; y++) {
           for (let x = 0; x < region.width; x++) {
@@ -69,7 +80,7 @@ export default class Autotiler extends Phaser.Scene {
           }}
         }
 
-        if(this.structures[structType].info.region === "trace"){
+        if(this.structures[structType].regionType === "trace"){
           // TODO: implement trace region placements
         }
 
