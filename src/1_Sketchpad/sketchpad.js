@@ -252,19 +252,12 @@ function normalizeStrokes(){
 
 // DEBUG: labels strokes' structure types
 function showDebugText(){
-	console.log(displayList)
-	// TODO: reimplement this
-	/*
-	updateStructureSketchHistory();
-	for(let s in structureSketches){
-		if(structureSketches[s].strokes){
-			structureSketches[s].strokes.forEach((ln) => {
-				ctx.fillStyle = "black";      
-				ctx.fillText(s, ln[0].x, ln[0].y)
-			})
-		}
+	//console.log(displayList);
+	ctx.fillStyle = "black";      
+	for(let d of displayList){
+		let line = d.line;
+		ctx.fillText(line.structure, line.points[0].x, line.points[0].y)
 	}
-	*/
 }
 
   
