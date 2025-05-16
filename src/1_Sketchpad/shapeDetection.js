@@ -1,9 +1,8 @@
 import { ramerDouglasPeucker } from "./lineCleanup.js";
 
-/* SHAPE DETECTION */
-export function redrawShape(name, data){
-}
+const sketchCanvas = document.getElementById("sketch-canvas");
 
+/* SHAPE DETECTION */
 export function getShape(pts){
     let name;
     let points;
@@ -96,11 +95,17 @@ function normalizeRect(pts){
         x: Math.min(acc.x, p.x),
         y: Math.min(acc.y, p.y)
     }), { x: Infinity, y: Infinity });
+
+    if(topLeft.x < 0) topLeft.x = 0;
+    if(topLeft.y < 0) topLeft.y = 0;
       
     const bottomRight = pts.reduce((acc, p) => ({
         x: Math.max(acc.x, p.x),
         y: Math.max(acc.y, p.y)
     }), { x: -Infinity, y: -Infinity });
+
+    if(bottomRight.x > sketchCanvas.width) bottomRight.x = sketchCanvas.width;
+    if(bottomRight.y > sketchCanvas.height) bottomRight.y = sketchCanvas.width;
 
     points.push(topLeft);                           // top left
     points.push({x: bottomRight.x, y: topLeft.y});  // top right
@@ -125,10 +130,18 @@ function normalizeCircle(center, radius, numPoints = 60) {
     const points = [];
     for (let i = 0; i < numPoints; i++) {
       const angle = (i / numPoints) * Math.PI * 2;
-      points.push({
+      let point = {
         x: center.x + radius * Math.cos(angle),
         y: center.y + radius * Math.sin(angle)
-      });
+      }
+
+      if(point.x < 0) point.x = 0;
+      else if(point. x > sketchCanvas.width) point.x = sketchCanvas.width;
+      
+      if(point.y < 0) point.y = 0;
+      else if(point. y > sketchCanvas.height) point.x = sketchCanvas.height;
+
+      points.push(point);
     }
     points.push(points[0]); // close circle
     return points;

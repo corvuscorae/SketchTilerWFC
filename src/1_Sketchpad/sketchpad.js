@@ -65,13 +65,15 @@ sketchCanvas.addEventListener("mousedown", (ev) => {
 		hue: mouseObject.mouse.hue,
 		active: true,
 	}, lineThickness);
-	workingLine = {
-		points: [{ x: mouseObject.mouse.x, y: mouseObject.mouse.y }],
-		thickness: lineThickness,
-		hue: mouseObject.mouse.hue,
-		structure: activeButton
-	};
-	displayList.push(new LineDisplayble(workingLine));
+	if(inBounds({ x: mouseObject.mouse.x, y: mouseObject.mouse.y })){ 
+		workingLine = {
+			points: [{ x: mouseObject.mouse.x, y: mouseObject.mouse.y }],
+			thickness: lineThickness,
+			hue: mouseObject.mouse.hue,
+			structure: activeButton
+		};
+		displayList.push(new LineDisplayble(workingLine)); 
+	}
 	sketchCanvas.dispatchEvent(changeDraw);
 	sketchCanvas.dispatchEvent(movedTool);
 });
@@ -85,11 +87,13 @@ sketchCanvas.addEventListener("mousemove", (ev) => {
 		active: mouseObject.mouse.active,
 	}, lineThickness);
 	if (mouseObject?.mouse.active) {
+		if(inBounds({ x: mouseObject.mouse.x, y: mouseObject.mouse.y })){ 
 			workingLine.points.push({
 				x: mouseObject.mouse.x,
 				y: mouseObject.mouse.y,
 			});
 			sketchCanvas.dispatchEvent(changeDraw);
+		}
 	}
 	sketchCanvas.dispatchEvent(movedTool);
 });
@@ -269,3 +273,12 @@ function showDebugText(){
 		else { undo(); }
 	}
   });
+
+function inBounds(point){
+	if(point.x < 0 || point.y < 0 || 
+		point.x > sketchCanvas.width || point.y > sketchCanvas.height)
+	{
+		return false;
+	}
+	return true;
+}
