@@ -52,14 +52,21 @@ export default class Autotiler extends Phaser.Scene {
 
       console.log("Generation Complete");
     });
-    /*
-    window.addEventListener("generate", (e) => {
-      this.sketch = e.detail.sketch;
-      this.structures = e.detail.structures;
-      this.regions = new Regions(this.sketch, this.structures, this.cellSize).get();
-      this.generate(this.regions);
+
+    window.addEventListener("clearSketch", (e) => {
+      const sketchImage = Array.from({ length: TILEMAP.HEIGHT }, () => Array(TILEMAP.WIDTH).fill(0));  // 2D array of all 0s
+      
+      console.log("Clearing sketch data");
+      this.structsModel.clearSetTiles();
     });
-    */
+
+    window.addEventListener("undoSketch", (e) => {
+      console.log("TODO: implement undo functionality");
+    });
+
+    window.addEventListener("redoSketch", (e) => {
+      console.log("TODO: implement redo functionality");
+    });
   }
 
   // calls generators
