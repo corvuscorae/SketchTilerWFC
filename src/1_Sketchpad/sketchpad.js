@@ -125,7 +125,8 @@ clearButton.onclick = () => {
 
 // undo last stroke
 const undoButton = document.getElementById(`undo-button`);
-undoButton.onclick = () => {
+undoButton.onclick = undo;
+function undo(){
 	const toRedo = displayList.pop();
 
 	if (toRedo != undefined) {
@@ -137,12 +138,13 @@ undoButton.onclick = () => {
 
 		sketchCanvas.dispatchEvent(changeDraw);
 	}
-};
+}
 
 // redo last stroke
 const redoButton = document.getElementById(`redo-button`);
-redoButton.onclick = () => {
-	const toDisplay = redoDisplayList.pop();
+redoButton.onclick = redo;
+function redo() {
+ 	const toDisplay = redoDisplayList.pop();
 	if (toDisplay != undefined) {
 		displayList.push(toDisplay);
 		
@@ -152,7 +154,7 @@ redoButton.onclick = () => {
 
 		sketchCanvas.dispatchEvent(changeDraw);
 	}
-};
+}
 
 /*
 // export canvas as png
@@ -260,4 +262,10 @@ function showDebugText(){
 	}
 }
 
-  
+  // KEYBOARD SHORTCUTS
+  document.addEventListener('keydown', (e) => {
+	if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z"){
+		if(e.shiftKey){ redo(); }
+		else { undo(); }
+	}
+  });
