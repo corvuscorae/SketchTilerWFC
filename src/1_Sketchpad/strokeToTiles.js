@@ -33,7 +33,7 @@ export class Regions {
       // only looking through structures (not other attributes) with points drawn
       if (struct.info && struct.strokes && struct.strokes.length > 0) {
         result[structType] = [];
-        let regionType = struct.info.region;
+        let regionType = struct.info.regionType;
 
         // group nearby strokes into a single stroke before defining region
         struct.strokes = this.groupNearby(struct.strokes);

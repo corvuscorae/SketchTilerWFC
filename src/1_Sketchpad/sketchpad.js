@@ -25,10 +25,10 @@ let redoDisplayList = [];
 // NOTE: regions can be "box" or "trace",
 //    this will be the region that structure generators use to place tiles.
 const structures = {  
-	"House" : { color: '#f54242', region: "box"   },
-	"Forest": { color: '#009632', region: "box"   },
-	"Fence" : { color: '#f5c842', region: "trace" },
-	"Path"  : { color: '#8000ff', region: "trace" },
+	"House" : { color: '#f54242', regionType: "box"   },
+	"Forest": { color: '#009632', regionType: "box"   },
+	"Fence" : { color: '#f5c842', regionType: "trace" },
+	"Path"  : { color: '#8000ff', regionType: "trace" },
 };
 
 //console.log(structureSketches); // DEBUG
@@ -130,7 +130,11 @@ undoButton.onclick = () => {
 
 	if (toRedo != undefined) {
 		redoDisplayList.push(toRedo);
-		window.dispatchEvent(clearPhaser);	// TEMP: need to just remove this stroke // TODO: fix this
+		
+		window.dispatchEvent(new CustomEvent("undoSketch", { 
+			detail: displayList.length
+		}));
+
 		sketchCanvas.dispatchEvent(changeDraw);
 	}
 };
@@ -141,7 +145,11 @@ redoButton.onclick = () => {
 	const toDisplay = redoDisplayList.pop();
 	if (toDisplay != undefined) {
 		displayList.push(toDisplay);
-		window.dispatchEvent(clearPhaser);	// TEMP: need to just remove this stroke // TODO: fix this
+		
+		window.dispatchEvent(new CustomEvent("redoSketch", { 
+			detail: displayList.length
+		}));
+
 		sketchCanvas.dispatchEvent(changeDraw);
 	}
 };

@@ -1,4 +1,4 @@
-import Phaser from "../../lib/PhaserModule.js";
+import Phaser from "../../lib/phaserModule.js";
 import { Regions } from "../1_Sketchpad/strokeToTiles.js";
 
 export default class Demo_Sketch extends Phaser.Scene {
@@ -23,16 +23,33 @@ export default class Demo_Sketch extends Phaser.Scene {
     this.drawGridLines();
     this.sketch;
     this.structures;
+    this.regions;
 
     // receives sketches from sketch tool
     window.addEventListener("generate", (e) => {
       this.sketch = e.detail.sketch;
       this.structures = e.detail.structures;
-      const regions = new Regions(this.sketch, this.structures, this.cellSize).get();
-      this.generate(regions);
+      this.regions = new Regions(this.sketch, this.structures, this.cellSize).get();
+      this.generate(this.regions);
     });
 
     window.addEventListener("clearSketch", (e) => {
+      this.sketch = [];
+      this.structures = {};
+      this.fillTiles_gfx.clear();
+    });
+
+    window.addEventListener("undoSketch", (e) => {
+      // NOTE: this will just clear the Phaser canvas. Good enough for the demo, 
+      //    but will need to find a better way in Autotiler scene
+      this.sketch = [];
+      this.structures = {};
+      this.fillTiles_gfx.clear();
+    });
+
+    window.addEventListener("redoSketch", (e) => {
+      // NOTE: this will just clear the Phaser canvas. Good enough for the demo, 
+      //    but will need to find a better way in Autotiler scene
       this.sketch = [];
       this.structures = {};
       this.fillTiles_gfx.clear();
@@ -85,14 +102,14 @@ export default class Demo_Sketch extends Phaser.Scene {
     const sz = this.cellSize;
 
     // data should have all coords to be filled
-    if (config.region === "trace") {
+    if (config.regionType === "trace") {
       for (let i = 0; i < data.length; i++) {
         let { x, y } = data[i];
         this.fillTiles_gfx.fillRect(sz * x, sz * y, sz, sz);
       }
     }
     // data should have {min: {x, y}, max: {x, y}}
-    if (config.region === "box") {
+    if (config.regionType === "box") {
       this.fillTiles_gfx.fillRect(
         data.topLeft.x * sz, 
         data.topLeft.y * sz, 
@@ -101,4 +118,5 @@ export default class Demo_Sketch extends Phaser.Scene {
       );
     }
   }
+
 }
