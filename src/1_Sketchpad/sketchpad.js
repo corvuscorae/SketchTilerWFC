@@ -18,8 +18,18 @@ let mouseObject = new MouseDisplayable({
 	active: false,
 }, lineThickness);
 
+//* STATE TRACKING *//
+// strokes
 let displayList = []; 
 let redoDisplayList = [];
+
+// actions
+const ACTION = {
+	CLEAR: "clear",
+	DRAW: "draw"
+}
+let undoStack = [];
+let redoStack = [];
 
 // define structures
 // NOTE: regions can be "box" or "trace",
@@ -112,6 +122,10 @@ sketchCanvas.addEventListener("mouseup", (ev) => {
 	normalizing = document.getElementById("normalize-toggle").checked;
 	if(normalizing) normalizeStrokes();
 
+	// action tracking
+	undoStack.push({type: ACTION.DRAW});
+	redoStack = [];
+
 	//updateStructureSketchHistory();
 	sketchCanvas.dispatchEvent(changeDraw);
 	sketchCanvas.dispatchEvent(movedTool);
@@ -121,8 +135,16 @@ sketchCanvas.addEventListener("mouseup", (ev) => {
 
 // clear drawing
 const clearButton = document.getElementById(`clear-button`);
-clearButton.onclick = () => {
+clearButton.onclick = clear;
+function clear() {
 	ctx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+	undoStack.push({
+		type: ACTION.CLEAR,
+		state: {
+			displayList: displayList,
+			redoDisplayList: redoDisplayList
+		}
+	});
 	displayList = [];
 	redoDisplayList = [];
 	window.dispatchEvent(clearPhaser);
@@ -132,16 +154,32 @@ clearButton.onclick = () => {
 const undoButton = document.getElementById(`undo-button`);
 undoButton.onclick = undo;
 function undo(){
-	const toRedo = displayList.pop();
+	let lastAction = undoStack.pop();
+	if(!lastAction) return;
 
-	if (toRedo != undefined) {
-		redoDisplayList.push(toRedo);
-		
-		window.dispatchEvent(new CustomEvent("undoSketch", { 
-			detail: displayList.length
-		}));
+	if(lastAction.type === ACTION.DRAW){
+		const toRedo = displayList.pop();
 
+		if(toRedo != undefined) {
+			redoDisplayList.push(toRedo);
+			redoStack.push(lastAction);
+			
+			window.dispatchEvent(new CustomEvent("undoSketch", { 
+				detail: displayList.length
+			}));
+
+			sketchCanvas.dispatchEvent(changeDraw);
+		}
+
+		return;
+	}
+	if(lastAction.type = ACTION.CLEAR){
+		// restoring sketch data from lastAction state snapshot
+		displayList = lastAction.state.displayList;
+		redoDisplayList = lastAction.state.redoDisplayList;
 		sketchCanvas.dispatchEvent(changeDraw);
+
+		return;
 	}
 }
 
@@ -149,15 +187,20 @@ function undo(){
 const redoButton = document.getElementById(`redo-button`);
 redoButton.onclick = redo;
 function redo() {
- 	const toDisplay = redoDisplayList.pop();
-	if (toDisplay != undefined) {
-		displayList.push(toDisplay);
-		
-		window.dispatchEvent(new CustomEvent("redoSketch", { 
-			detail: displayList.length
-		}));
+	let action = redoStack.pop();
+	if(!action) return;
+ 	if(action.type === ACTION.DRAW){
+		const toDisplay = redoDisplayList.pop();
+		if (toDisplay != undefined) {
+			displayList.push(toDisplay);
+			undoStack.push(action);
 
-		sketchCanvas.dispatchEvent(changeDraw);
+			window.dispatchEvent(new CustomEvent("redoSketch", { 
+				detail: displayList.length
+			}));
+
+			sketchCanvas.dispatchEvent(changeDraw);
+		}
 	}
 }
 
