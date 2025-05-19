@@ -75,7 +75,7 @@ sketchCanvas.addEventListener("mousedown", (ev) => {
 		hue: mouseObject.mouse.hue,
 		active: true,
 	}, lineThickness);
-	if(inBounds({ x: mouseObject.mouse.x, y: mouseObject.mouse.y })){ 
+	if(inCanvasBounds({ x: mouseObject.mouse.x, y: mouseObject.mouse.y })){ 
 		workingLine = {
 			points: [{ x: mouseObject.mouse.x, y: mouseObject.mouse.y }],
 			thickness: lineThickness,
@@ -98,7 +98,7 @@ sketchCanvas.addEventListener("mousemove", (ev) => {
 		active: mouseObject.mouse.active,
 	}, lineThickness);
 	if (mouseObject?.mouse.active) {
-		if(inBounds({ x: mouseObject.mouse.x, y: mouseObject.mouse.y })){ 
+		if(inCanvasBounds({ x: mouseObject.mouse.x, y: mouseObject.mouse.y })){ 
 			workingLine.points.push({
 				x: mouseObject.mouse.x,
 				y: mouseObject.mouse.y,
@@ -292,7 +292,7 @@ function normalizeStrokes(){
 					// for unrecognized shapes, de-noise stroke by running rdp, then chaikin
 					const simplified = ramerDouglasPeucker(displayable.line.points, 10); // Adjust tolerance as needed
 					const smoothed = chaikinSmooth(simplified, 4);
-					displayable.line.points = smoothed;
+					displayable.line.points = smoothed.filter(p => inCanvasBounds(p));
 				}
 			}
 		}
@@ -318,11 +318,6 @@ function showDebugText(){
 	}
   });
 
-function inBounds(point){
-	if(point.x < 0 || point.y < 0 || 
-		point.x > sketchCanvas.width || point.y > sketchCanvas.height)
-	{
-		return false;
-	}
-	return true;
+function inCanvasBounds(p) {
+	return p.x >= 0 && p.x <= sketchCanvas.width-1 && p.y >= 0 && p.y <= sketchCanvas.height-1;
 }

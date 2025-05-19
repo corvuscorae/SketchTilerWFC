@@ -1,4 +1,6 @@
 //* STRAIGHTEN LINES *//
+const sketchCanvas = document.getElementById("sketch-canvas");
+
 // Ramer-Douglas-Peucker algorithm to simplify lines
 export function ramerDouglasPeucker(points, tolerance) {
     // Find the point with the maximum perpendicular distance
@@ -51,6 +53,13 @@ export function chaikinSmooth(points, iterations = 2) {
         x: 0.25 * p1.x + 0.75 * p2.x,
         y: 0.25 * p1.y + 0.75 * p2.y
       };
+
+      // snap to canvas bounds
+      if(a.x < 0) a.x = 0;
+      else if(a.x >= sketchCanvas.width) a.x = sketchCanvas.width-1;
+      
+      if(a.y < 0) a.y = 0;
+      else if(a.y >= sketchCanvas.height) a.y = sketchCanvas.height-1;
 
       newPoints.push(a, b);
     }

@@ -96,6 +96,7 @@ function normalizeRect(pts){
         y: Math.min(acc.y, p.y)
     }), { x: Infinity, y: Infinity });
 
+    // snap to canvas bounds
     if(topLeft.x < 0) topLeft.x = 0;
     if(topLeft.y < 0) topLeft.y = 0;
       
@@ -104,8 +105,9 @@ function normalizeRect(pts){
         y: Math.max(acc.y, p.y)
     }), { x: -Infinity, y: -Infinity });
 
-    if(bottomRight.x > sketchCanvas.width) bottomRight.x = sketchCanvas.width;
-    if(bottomRight.y > sketchCanvas.height) bottomRight.y = sketchCanvas.width;
+    // snap to canvas bounds
+    if(bottomRight.x >= sketchCanvas.width-1) bottomRight.x = sketchCanvas.width-1;
+    if(bottomRight.y >= sketchCanvas.height-1) bottomRight.y = sketchCanvas.height-1;
 
     points.push(topLeft);                           // top left
     points.push({x: bottomRight.x, y: topLeft.y});  // top right
@@ -135,11 +137,12 @@ function normalizeCircle(center, radius, numPoints = 60) {
         y: center.y + radius * Math.sin(angle)
       }
 
+      // snap to canvas bounds
       if(point.x < 0) point.x = 0;
-      else if(point. x > sketchCanvas.width) point.x = sketchCanvas.width;
+      else if(point.x >= sketchCanvas.width-1) point.x = sketchCanvas.width-1;
       
       if(point.y < 0) point.y = 0;
-      else if(point. y > sketchCanvas.height) point.x = sketchCanvas.height;
+      else if(point.y >= sketchCanvas.height-1) point.y = sketchCanvas.height-1;
 
       points.push(point);
     }
