@@ -73,6 +73,7 @@ sketchCanvas.addEventListener("mousedown", (ev) => {
 			structure: activeButton
 		};
 		displayList.push(new LineDisplayble(workingLine)); 
+		redoDisplayList = [];
 	}
 	sketchCanvas.dispatchEvent(changeDraw);
 	sketchCanvas.dispatchEvent(movedTool);
