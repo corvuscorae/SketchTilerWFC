@@ -32,7 +32,7 @@ const ACTION = {
 let undoStack = [];
 let redoStack = [];
 
-// define structures
+//* STRUCTURES *//
 // NOTE: regions can be "box" or "trace",
 //    this will be the region that structure generators use to place tiles.
 const structures = {  
@@ -42,12 +42,25 @@ const structures = {
 	"Path"  : { color: '#8000ff', regionType: "trace" },
 };
 
+// STRUCTURE BUTTONS
+let activeButton;
+for (const type in structures) {
+	const structure = structures[type];
+	const button = document.getElementById(`${type.toLowerCase()}-button`);
+	if(!button) continue;
+	button.onclick = () => {
+		mouseObject.mouse.hue = structure.color;
+		button.style.borderColor = structure.color;  
+		activeButton = type;
+	}
+}
+// initial selected marker
+document.getElementById("house-button").click();
+
 //console.log(structureSketches); // DEBUG
 
-//* EVENTS *//
-
-// updates phaser scene, clearing structures
-const clearPhaser = new CustomEvent("clearSketch");
+//* SKETCH EVENTS *//
+const clearPhaser = new CustomEvent("clearSketch");		// phaser event
 
 // When changeDraw is dispatched, the drawing area will be repainted.
 const changeDraw = new Event("drawing-changed"); 
@@ -77,6 +90,7 @@ sketchCanvas.addEventListener("mousedown", (ev) => {
 		active: true,
 	}, lineThickness);
 	if(inCanvasBounds({ x: mouseObject.mouse.x, y: mouseObject.mouse.y })){ 
+		// init workingLine with new points
 		workingLine = {
 			points: [{ x: mouseObject.mouse.x, y: mouseObject.mouse.y }],
 			thickness: lineThickness,
@@ -84,10 +98,13 @@ sketchCanvas.addEventListener("mousedown", (ev) => {
 			structure: activeButton
 		};
 		displayList.push(new LineDisplayble(workingLine)); 
+
+		// clear redo strokes
 		redoDisplayList = [];
+
+		sketchCanvas.dispatchEvent(changeDraw);
+		sketchCanvas.dispatchEvent(movedTool);
 	}
-	sketchCanvas.dispatchEvent(changeDraw);
-	sketchCanvas.dispatchEvent(movedTool);
 });
 
 // mouse move event, draw on canvas
@@ -100,10 +117,12 @@ sketchCanvas.addEventListener("mousemove", (ev) => {
 	}, lineThickness);
 	if (mouseObject?.mouse.active) {
 		if(inCanvasBounds({ x: mouseObject.mouse.x, y: mouseObject.mouse.y })){ 
+			// add new point to working line
 			workingLine.points.push({
 				x: mouseObject.mouse.x,
 				y: mouseObject.mouse.y,
 			});
+
 			sketchCanvas.dispatchEvent(changeDraw);
 		}
 	}
@@ -126,21 +145,21 @@ sketchCanvas.addEventListener("mouseup", (ev) => {
 		normalizing = document.getElementById("normalize-toggle").checked;
 		if(normalizing) normalizeStrokes();
 
-		// action tracking
+		// action tracking: push a draw action now that stroke is complete
 		undoStack.push({type: ACTION.DRAW});
 		redoStack = [];
 
-		//updateStructureSketchHistory();
 		sketchCanvas.dispatchEvent(changeDraw);
 		sketchCanvas.dispatchEvent(movedTool);
 	}
 });
 
-//* BUTTONS *//
-
-// clear drawing
+//*** FUNCTION BUTTONS ***/
+//* CLEAR *//
+// updates phaser scene, clearing structures
 const clearButton = document.getElementById(`clear-button`);
 clearButton.onclick = () => {
+	// push a clear action to undo stack
 	undoStack.push({
 		type: ACTION.CLEAR,
 		state: {
@@ -148,9 +167,15 @@ clearButton.onclick = () => {
 			redoDisplayList: [...redoDisplayList]
 		}
 	});
+
+	// empty redo stack
 	redoStack = [];
+
+	// clear canvas
 	clear();
 };
+
+// handles canvas clearing
 function clear() {
 	ctx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
 	displayList = [];
@@ -159,32 +184,60 @@ function clear() {
 	sketchCanvas.dispatchEvent(changeDraw);
 }
 
+//* GENERATE */
+const generateButton = document.getElementById("generate-button");
+generateButton.onclick = () => {
+	showDebugText();
+	
+	// sends sketch data to Phaser scene
+	const toPhaser = new CustomEvent("generate", { 
+		detail: {sketch: displayList, structures: structures} 
+	});
+	window.dispatchEvent(toPhaser);
+}
 
-// undo last stroke
+//* NORMALIZE STROKES *//
+normalizeToggle.onclick = () => {
+	normalizing = document.getElementById("normalize-toggle").checked;
+	if(normalizing){ normalizeStrokes(); }
+}
+function normalizeStrokes(){
+	// shape-ify each line in displayList
+	for (const displayable of displayList) {
+		if (displayable instanceof LineDisplayble) {
+			if(!displayable.normalized){	// don't re-normalize a stroke that has already been normalized
+				displayable.normalized = true;
+				const shape = getShape(displayable.line.points);
+				//console.log(displayable, shape)
+				if(shape){
+					displayable.line.points = shape.points;
+				} else {
+					// for unrecognized shapes, de-noise stroke by running rdp, then chaikin
+					const simplified = ramerDouglasPeucker(displayable.line.points, 10); // Adjust tolerance as needed
+					const smoothed = chaikinSmooth(simplified, 4);
+					displayable.line.points = smoothed.filter(p => inCanvasBounds(p));
+				}
+			}
+		}
+	}
+	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
+}
+
+//*** HISTORY ***/
+//* UNDO *//
 const undoButton = document.getElementById(`undo-button`);
 undoButton.onclick = undo;
 function undo(){
-	console.log("UNDO STACK", undoStack);
-	console.log("REDO STACK", redoStack);
+	//console.log("UNDO STACK", undoStack);
+	//console.log("REDO STACK", redoStack);
 
-	if(undoStack.length === 0){ 
-		console.log("UNDO FAILED: undo stack empty");
-		return;
-	}
+	if(undoStack.length === 0){ return; }
 
 	let lastAction = undoStack.pop();
 
 	if(lastAction.type === ACTION.DRAW){
-		const toRedo = displayList.pop();
-		if(toRedo != undefined) {
-			redoDisplayList.push(toRedo);
-			redoStack.push(lastAction);
-
-			sketchCanvas.dispatchEvent(changeDraw);
-			console.log("UNDO: draw action");
-		} else {
-			undoStack.push(lastAction); // if no stroke popped, restore action
-		}
+		if(updateDrawHistory(displayList, redoDisplayList)){ redoStack.push(lastAction); }
+		else{ console.error("UNDO FAILED: action popped with no stroke to undo"); }
 		return;
 	}
 
@@ -200,36 +253,22 @@ function undo(){
 		redoDisplayList = [...lastAction.state.redoDisplayList];
 
 		sketchCanvas.dispatchEvent(changeDraw);
-		console.log("UNDO: clear action");
+		//console.log("UNDO: clear action");
 		return;
 	}
 }
 
-
-// redo last stroke
+//* REDO *//
 const redoButton = document.getElementById(`redo-button`);
 redoButton.onclick = redo;
 function redo() {
-	console.log("UNDO STACK", undoStack);
-	console.log("REDO STACK", redoStack);
-
-	if(redoStack.length === 0){ 
-		console.log("REDO FAILED: redo stack empty");
-		return;
-	}
+	if(redoStack.length === 0){ return; }
 
 	let action = redoStack.pop();
 
 	if(action.type === ACTION.DRAW){
-		const toDisplay = redoDisplayList.pop();
-		if (toDisplay != undefined) {
-			displayList.push(toDisplay);
-			undoStack.push(action);
-			sketchCanvas.dispatchEvent(changeDraw);
-			console.log("REDO: draw action");
-		} else {
-			redoStack.push(action); // if no stroke popped, restore action
-		}
+		if(updateDrawHistory(redoDisplayList, displayList)){ undoStack.push(action); }
+		else{ console.error("REDO FAILED: action popped with no stroke to redo"); }
 		return;
 	}
 
@@ -242,12 +281,49 @@ function redo() {
 			}
 		});
 		clear(); // clears and triggers event
-		console.log("REDO: clear action");
+		//console.log("REDO: clear action");
 		return;
 	}
 }
 
+// handle undo/redo for draw actions
+function updateDrawHistory(fromHistory, toHistory){
+	const stroke = fromHistory.pop();
+	if(stroke != undefined) {
+		toHistory.push(stroke);
+		sketchCanvas.dispatchEvent(changeDraw);
+	} 
+	else {
+		return false;	// history handling failure
+	}
 
+	return true;		// history handling success
+}
+
+//*** UTILS ***/
+// KEYBOARD SHORTCUTS
+document.addEventListener('keydown', (e) => {
+	if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z"){
+		if(e.shiftKey){ redo(); }
+		else { undo(); }
+	}
+});
+
+function inCanvasBounds(p) {
+	return p.x >= 0 && p.x <= sketchCanvas.width-1 && p.y >= 0 && p.y <= sketchCanvas.height-1;
+}
+
+// DEBUG: labels strokes' structure types
+function showDebugText(){
+	//console.log(displayList);
+	ctx.fillStyle = "black";      
+	for(let d of displayList){
+		let line = d.line;
+		ctx.fillText(line.structure, line.points[0].x, line.points[0].y)
+	}
+}
+
+//---------- LEGACY CODE ----------//
 /*
 // export canvas as png
 const exportButton = document.createElement("button");
@@ -273,22 +349,6 @@ exportButton.onclick = () => {
 };
 */
 
-// assign structure buttons
-let activeButton;
-for (const type in structures) {
-	const structure = structures[type];
-	const button = document.getElementById(`${type.toLowerCase()}-button`);
-	if(!button) continue;
-	button.onclick = () => {
-		mouseObject.mouse.hue = structure.color;
-		button.style.borderColor = structure.color;  // TODO: only highlight active button
-		//workingLine.structure = type;
-		activeButton = type;
-	}
-}
-// initial selected marker
-document.getElementById("house-button").click();
-
 /*
 // straighten lines
 const straightenLinesButton = document.getElementById("straighten-lines-button");
@@ -303,65 +363,3 @@ straightenLinesButton.onclick = () => {
 	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
 }
 */
-
-// generate button
-const generateButton = document.getElementById("generate-button");
-generateButton.onclick = () => {
-	showDebugText();
-	
-	// sends sketch data to Phaser scene
-	const toPhaser = new CustomEvent("generate", { 
-		detail: {sketch: displayList, structures: structures} 
-	});
-	window.dispatchEvent(toPhaser);
-}
-
-//* NORMALIZE STROKES *//
-normalizeToggle.onclick = () => {
-	normalizing = document.getElementById("normalize-toggle").checked;
-	if(normalizing){ normalizeStrokes(); }
-}
-
-function normalizeStrokes(){
-	// shape-ify each line in displayList
-	for (const displayable of displayList) {
-		if (displayable instanceof LineDisplayble) {
-			if(!displayable.normalized){	// don't re-normalize a stroke that has already been normalized
-				displayable.normalized = true;
-				const shape = getShape(displayable.line.points);
-				//console.log(displayable, shape)
-				if(shape){
-					displayable.line.points = shape.points;
-				} else {
-					// for unrecognized shapes, de-noise stroke by running rdp, then chaikin
-					const simplified = ramerDouglasPeucker(displayable.line.points, 10); // Adjust tolerance as needed
-					const smoothed = chaikinSmooth(simplified, 4);
-					displayable.line.points = smoothed.filter(p => inCanvasBounds(p));
-				}
-			}
-		}
-	}
-	sketchCanvas.dispatchEvent(changeDraw); // Re-render the canvas after simplifying
-}
-
-// DEBUG: labels strokes' structure types
-function showDebugText(){
-	//console.log(displayList);
-	ctx.fillStyle = "black";      
-	for(let d of displayList){
-		let line = d.line;
-		ctx.fillText(line.structure, line.points[0].x, line.points[0].y)
-	}
-}
-
-  // KEYBOARD SHORTCUTS
-  document.addEventListener('keydown', (e) => {
-	if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z"){
-		if(e.shiftKey){ redo(); }
-		else { undo(); }
-	}
-  });
-
-function inCanvasBounds(p) {
-	return p.x >= 0 && p.x <= sketchCanvas.width-1 && p.y >= 0 && p.y <= sketchCanvas.height-1;
-}
