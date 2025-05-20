@@ -148,13 +148,13 @@ clearButton.onclick = () => {
 			redoDisplayList: [...redoDisplayList]
 		}
 	});
+	redoStack = [];
 	clear();
 };
 function clear() {
 	ctx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
 	displayList = [];
 	redoDisplayList = [];
-	redoStack = [];
 	window.dispatchEvent(clearPhaser);
 	sketchCanvas.dispatchEvent(changeDraw);
 }
