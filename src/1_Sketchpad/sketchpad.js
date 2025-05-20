@@ -24,11 +24,7 @@ let mouseObject = new MouseDisplayable({
 let displayList = []; 
 let redoDisplayList = [];
 
-// actions
-const ACTION = {
-	DRAW: "draw",
-	CLEAR: "clear",
-}
+// state snapshots
 let undoStack = [];
 let redoStack = [];
 
@@ -90,6 +86,12 @@ sketchCanvas.addEventListener("mousedown", (ev) => {
 		active: true,
 	}, lineThickness);
 	if(inCanvasBounds({ x: mouseObject.mouse.x, y: mouseObject.mouse.y })){ 
+		// action tracking: save current canvas state before adding a stroke
+		undoStack.push({
+			display: [...displayList],
+			redo: [...redoDisplayList]
+		});
+
 		// init workingLine with new points
 		workingLine = {
 			points: [{ x: mouseObject.mouse.x, y: mouseObject.mouse.y }],
@@ -140,13 +142,12 @@ sketchCanvas.addEventListener("mouseup", (ev) => {
 
 	if(workingLine.points.length <= sizeThreshold){
 		displayList.pop();  // remove accidental tiny stroke
+		undoStack.pop();	// also forget this canvas state
 	} else {
 		// check if "Normalize shapes" is checked
 		normalizing = document.getElementById("normalize-toggle").checked;
 		if(normalizing) normalizeStrokes();
 
-		// action tracking: push a draw action now that stroke is complete
-		undoStack.push({type: ACTION.DRAW});
 		redoStack = [];
 
 		sketchCanvas.dispatchEvent(changeDraw);
@@ -161,15 +162,9 @@ const clearButton = document.getElementById(`clear-button`);
 clearButton.onclick = () => {
 	// push a clear action to undo stack
 	undoStack.push({
-		type: ACTION.CLEAR,
-		state: {
-			displayList: [...displayList],
-			redoDisplayList: [...redoDisplayList]
-		}
+		display: [...displayList],
+		redo: [...redoDisplayList]
 	});
-
-	// empty redo stack
-	redoStack = [];
 
 	// clear canvas
 	clear();
@@ -235,27 +230,15 @@ function undo(){
 
 	let lastAction = undoStack.pop();
 
-	if(lastAction.type === ACTION.DRAW){
-		if(updateDrawHistory(displayList, redoDisplayList)){ redoStack.push(lastAction); }
-		else{ console.error("UNDO FAILED: action popped with no stroke to undo"); }
-		return;
-	}
+	redoStack.push({
+		display: [...displayList],
+		redo: [...redoDisplayList]
+	});
 
-	if(lastAction.type === ACTION.CLEAR){
-		redoStack.push({
-			type: ACTION.CLEAR,
-			state: {
-				displayList: [...displayList], // current cleared state
-				redoDisplayList: [...redoDisplayList]
-			}
-		});
-		displayList = [...lastAction.state.displayList];
-		redoDisplayList = [...lastAction.state.redoDisplayList];
-
-		sketchCanvas.dispatchEvent(changeDraw);
-		//console.log("UNDO: clear action");
-		return;
-	}
+	displayList = [...lastAction.display];
+	redoDisplayList = [...lastAction.redo];
+	sketchCanvas.dispatchEvent(changeDraw);
+	return;
 }
 
 //* REDO *//
@@ -266,24 +249,15 @@ function redo() {
 
 	let action = redoStack.pop();
 
-	if(action.type === ACTION.DRAW){
-		if(updateDrawHistory(redoDisplayList, displayList)){ undoStack.push(action); }
-		else{ console.error("REDO FAILED: action popped with no stroke to redo"); }
-		return;
-	}
+	undoStack.push({
+		display: [...displayList],
+		redo: [...redoDisplayList]
+	})
 
-	if(action.type === ACTION.CLEAR){
-		undoStack.push({
-			type: ACTION.CLEAR,
-			state: {
-				displayList: [...displayList], // this is what we're about to erase
-				redoDisplayList: [...redoDisplayList]
-			}
-		});
-		clear(); // clears and triggers event
-		//console.log("REDO: clear action");
-		return;
-	}
+	displayList = [...action.display];
+	redoDisplayList = [...action.redo];
+	sketchCanvas.dispatchEvent(changeDraw);
+	return;
 }
 
 // handle undo/redo for draw actions
