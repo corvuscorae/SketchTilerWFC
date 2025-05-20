@@ -10,6 +10,7 @@ const normalizeToggle = document.getElementById("normalize-toggle");
 let normalizing = normalizeToggle.checked;
 
 const lineThickness = 5;
+const sizeThreshold = 5;	// number of points that must be drawn for the stroke to be recorded
 let workingLine = { points: [], thickness: lineThickness, hue: 0, structure: null };
 let mouseObject = new MouseDisplayable({
 	x: 0,
@@ -25,8 +26,8 @@ let redoDisplayList = [];
 
 // actions
 const ACTION = {
+	DRAW: "draw",
 	CLEAR: "clear",
-	DRAW: "draw"
 }
 let undoStack = [];
 let redoStack = [];
@@ -118,91 +119,134 @@ sketchCanvas.addEventListener("mouseup", (ev) => {
 		active: false,
 	}, lineThickness);
 
-	// check if "Normalize shapes" is checked
-	normalizing = document.getElementById("normalize-toggle").checked;
-	if(normalizing) normalizeStrokes();
+	if(workingLine.points.length <= sizeThreshold){
+		displayList.pop();  // remove accidental tiny stroke
+	} else {
+		// check if "Normalize shapes" is checked
+		normalizing = document.getElementById("normalize-toggle").checked;
+		if(normalizing) normalizeStrokes();
 
-	// action tracking
-	undoStack.push({type: ACTION.DRAW});
-	redoStack = [];
+		// action tracking
+		undoStack.push({type: ACTION.DRAW});
+		redoStack = [];
 
-	//updateStructureSketchHistory();
-	sketchCanvas.dispatchEvent(changeDraw);
-	sketchCanvas.dispatchEvent(movedTool);
+		//updateStructureSketchHistory();
+		sketchCanvas.dispatchEvent(changeDraw);
+		sketchCanvas.dispatchEvent(movedTool);
+	}
 });
 
 //* BUTTONS *//
 
 // clear drawing
 const clearButton = document.getElementById(`clear-button`);
-clearButton.onclick = clear;
-function clear() {
-	ctx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
+clearButton.onclick = () => {
 	undoStack.push({
 		type: ACTION.CLEAR,
 		state: {
-			displayList: displayList,
-			redoDisplayList: redoDisplayList
+			displayList: [...displayList],
+			redoDisplayList: [...redoDisplayList]
 		}
 	});
+	clear();
+};
+function clear() {
+	ctx.clearRect(0, 0, sketchCanvas.width, sketchCanvas.height);
 	displayList = [];
 	redoDisplayList = [];
+	redoStack = [];
 	window.dispatchEvent(clearPhaser);
-};
+	sketchCanvas.dispatchEvent(changeDraw);
+}
+
 
 // undo last stroke
 const undoButton = document.getElementById(`undo-button`);
 undoButton.onclick = undo;
 function undo(){
+	console.log("UNDO STACK", undoStack);
+	console.log("REDO STACK", redoStack);
+
+	if(undoStack.length === 0){ 
+		console.log("UNDO FAILED: undo stack empty");
+		return;
+	}
+
 	let lastAction = undoStack.pop();
-	if(!lastAction) return;
 
 	if(lastAction.type === ACTION.DRAW){
 		const toRedo = displayList.pop();
-
 		if(toRedo != undefined) {
 			redoDisplayList.push(toRedo);
 			redoStack.push(lastAction);
-			
-			window.dispatchEvent(new CustomEvent("undoSketch", { 
-				detail: displayList.length
-			}));
 
 			sketchCanvas.dispatchEvent(changeDraw);
+			console.log("UNDO: draw action");
+		} else {
+			undoStack.push(lastAction); // if no stroke popped, restore action
 		}
-
 		return;
 	}
-	if(lastAction.type = ACTION.CLEAR){
-		// restoring sketch data from lastAction state snapshot
-		displayList = lastAction.state.displayList;
-		redoDisplayList = lastAction.state.redoDisplayList;
-		sketchCanvas.dispatchEvent(changeDraw);
 
+	if(lastAction.type === ACTION.CLEAR){
+		redoStack.push({
+			type: ACTION.CLEAR,
+			state: {
+				displayList: [...displayList], // current cleared state
+				redoDisplayList: [...redoDisplayList]
+			}
+		});
+		displayList = [...lastAction.state.displayList];
+		redoDisplayList = [...lastAction.state.redoDisplayList];
+
+		sketchCanvas.dispatchEvent(changeDraw);
+		console.log("UNDO: clear action");
 		return;
 	}
 }
+
 
 // redo last stroke
 const redoButton = document.getElementById(`redo-button`);
 redoButton.onclick = redo;
 function redo() {
+	console.log("UNDO STACK", undoStack);
+	console.log("REDO STACK", redoStack);
+
+	if(redoStack.length === 0){ 
+		console.log("REDO FAILED: redo stack empty");
+		return;
+	}
+
 	let action = redoStack.pop();
-	if(!action) return;
- 	if(action.type === ACTION.DRAW){
+
+	if(action.type === ACTION.DRAW){
 		const toDisplay = redoDisplayList.pop();
 		if (toDisplay != undefined) {
 			displayList.push(toDisplay);
 			undoStack.push(action);
-
-			window.dispatchEvent(new CustomEvent("redoSketch", { 
-				detail: displayList.length
-			}));
-
 			sketchCanvas.dispatchEvent(changeDraw);
+			console.log("REDO: draw action");
+		} else {
+			redoStack.push(action); // if no stroke popped, restore action
 		}
+		return;
+	}
+
+	if(action.type === ACTION.CLEAR){
+		undoStack.push({
+			type: ACTION.CLEAR,
+			state: {
+				displayList: [...displayList], // this is what we're about to erase
+				redoDisplayList: [...redoDisplayList]
+			}
+		});
+		clear(); // clears and triggers event
+		console.log("REDO: clear action");
+		return;
 	}
 }
+
 
 /*
 // export canvas as png
