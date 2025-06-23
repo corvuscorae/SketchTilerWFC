@@ -5,7 +5,7 @@ import TILEMAP from "./tilemap.js";
 import getBoundingBox from "../3_Generators/getBoundingBox.js";
 import generateHouse from "../3_Generators/generateHouse.js";
 import generateForest from "../3_Generators/generateForest.js";
-import { Regions } from "../1_Sketchpad/strokeToTiles.js";
+import { Regions } from "../1_Sketchpad/1_Classes/regions.js";
 
 const SUGGESTED_TILE_ALPHA = 0.5;  // must be between 0 and 1
 

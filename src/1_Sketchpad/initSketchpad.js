@@ -1,4 +1,4 @@
-import TILEMAP from "../4_Phaser/TILEMAP.js";
+import TILEMAP from "../4_Phaser/tilemap.js";
 
 const sketchpad = document.getElementById("sketchpad");
 const gridCanvas = document.getElementById("grid-canvas");
