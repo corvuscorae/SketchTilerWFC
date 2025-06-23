@@ -1,14 +1,33 @@
+/**
+ * @class Regions
+ * Processes structured sketches (like houses, fences, etc.) to define regions 
+ * in tile coordinates. Supports two region types: "box" (bounding area) and 
+ * "trace" (exact stroke path).
+ */
 export class Regions {
+  /**
+   * Maps region type keys ("box", "trace") to handler functions.
+   * @type {[key: string]: (strokes: any) => any}
+   */
   regionBlock = {
     box: (strokes) => this.getBoundingBox(strokes),
     trace: (strokes) => this.getTrace(strokes),
   };
 
+  /**
+   * Tracks structure strokes and where the last display list was processed.
+   */
   structureSketches = { lastIndex: -1 }
 
+  /**
+   * @param {any[]} sketch - The full displayList of sketch data.
+   * @param {Record<string, {color: string, regionType: "box"|"trace"}>} structures - All possible structure types and their metadata.
+   * @param {number} cellSize - The size of a tile/grid cell in pixels.
+   */
   constructor(sketch, structures, cellSize) {
     this.cellSize = cellSize;
 
+    // prepare structureSketches for each structure type
     for (const type in structures) {
       this.structureSketches[type] = {
         info: structures[type],
@@ -21,9 +40,12 @@ export class Regions {
 
   }
 
-  // returns an object 
-  //    properties  --> structure types               
-  //    values      --> array of each structure's strokes 
+  /**
+   * Computes the region definitions for each structure type in the sketch.
+   * Groups strokes, defines regions (box/trace), and organizes them by structure type.
+   *
+   * @returns {Record<string, any[]>} A dictionary of structure types to region data.
+   */
   get() {
     let result = {};
 
@@ -50,13 +72,18 @@ export class Regions {
     return result;
   }
 
-  //* STRUCTURES ORGANIZATION *//
-  // organize displayList by structure,
+   /**
+   * Adds new strokes from the displayList to structureSketches.
+   * Skips empty strokes or those without structure type metadata.
+   * 
+   * @param {any[]} displayList
+   */
     updateStructureSketchHistory(displayList){
       // only add new strokes (added since last generation call)
       for(let i = this.structureSketches.lastIndex + 1; i < displayList.length; i++){
         let stroke = displayList[i].line;
-          // ignore invis "strokes" and non-structure strokes
+
+        // ignore invis "strokes" and non-structure strokes
         if(stroke.points.length > 1 && stroke.structure){ 
           this.structureSketches[stroke.structure].strokes.push(stroke.points);
         }
@@ -65,7 +92,10 @@ export class Regions {
       this.structureSketches.lastIndex = displayList.length - 1;
     }
 
-  // clears drawn points from structure history
+
+  /**
+   * Clears all structure stroke history.
+   */
   clearStructureSketchHistory(){
     for(let s in structureSketches){
       if(structureSketches[s].strokes){ 
@@ -73,12 +103,15 @@ export class Regions {
       }
     }
     structureSketches.lastIndex = -1;
-
   }
 
-  // takes an array of strokes and combines strokes within a threshold 
-  //    from each other into a single stroke. Returns a new array with
-  //    grouped strokes.
+ /**
+   * Groups strokes that are spatially close into merged stroke arrays.
+   *
+   * @param {any[][]} strokes - An array of stroke arrays.
+   * @param {number} [threshold=2] - Proximity threshold in tile units.
+   * @returns {any[][]} Array of grouped strokes.
+   */
   groupNearby(strokes, threshold = 2) {
     const visited = new Array(strokes.length).fill(false);  // visit flags
     const result = [];
@@ -112,7 +145,14 @@ export class Regions {
     return result;
   }
 
-  // checkes is strokeA and strokeB are within threshold of one another
+/**
+   * Checks whether two strokes are close enough to be grouped.
+   *
+   * @param {any[]} strokeA
+   * @param {any[]} strokeB
+   * @param {number} threshold
+   * @returns {boolean}
+   */
   strokesNearby(strokeA, strokeB, threshold) {
     const boxA = this.getBoundingBox(strokeA);
     const boxB = this.getBoundingBox(strokeB);
@@ -125,11 +165,15 @@ export class Regions {
     );
   }
 
-  // for "box" region types
-  //    gets min x,y and max x,y of stroke to create a bounding bow region around stroke
+  /**
+   * Draws a bounding box region around a stroke.
+   *
+   * @param {Point[]} stroke
+   * @returns {{topLeft: Point, bottomRight: Point, width: number, height: number}}
+   */
   getBoundingBox(stroke) {
     if (!stroke) return;
-    // console.log("getting bounding box...", stroke)
+
     const outputWidth = window.game.config.width / this.cellSize;
     const outputHeight = window.game.config.height / this.cellSize;
 
@@ -164,11 +208,14 @@ export class Regions {
     };
   }
 
-  // for "trace" region types
-  //    returns an array of the the grid cells that stroke points pass through
+  /**
+   * Returns an array of grid tiles that the stroke path passes through.
+   *
+   * @param {Point[]} stroke
+   * @returns {Point[]}
+   */
   getTrace(stroke) {
     if (!stroke) return;
-    console.log("getting region trace...", stroke);
 
     let result = this.pointsToCells(stroke);
 
@@ -181,19 +228,30 @@ export class Regions {
     return result;
   }
 
-  // uses linear interpolation to fill empty cells in shapes with few points 
-  //    prevents squares, triangles, etc from being represented as just their angle points
+/**
+ * Fills in missing grid cells between widely spaced points using linear interpolation.
+ * Prevents sparse shapes (e.g. triangles, boxes) from being represented as only corners.
+ * 
+ * @param {Point[]} points - The shape’s outline in grid space (typically snapped).
+ * @returns {Point[]} - A new array with filled-in tiles between each pair.
+ */
   completeShape(points) {
+    // if there aren't at least 2 points, no lines can be formed — return as-is.
     if (!points || points.length < 2) return points;
 
     const filled = [];
 
+    // loop over each point and its neighbor (wrapping around to close the shape).
     for (let i = 0; i < points.length; i++) {
       const start = points[i];
       const end = points[(i + 1) % points.length]; // next point (wraps around for closed shape)
 
+      // compute distance in x and y direction...
       const dx = end.x - start.x;
       const dy = end.y - start.y;
+
+      // ... and use the longer direction to determine how many steps to take.
+      // (this ensures consistent spacing regardless of direction)
       const steps = Math.max(Math.abs(dx), Math.abs(dy));
 
       // linear interpolation between start and end
@@ -208,12 +266,18 @@ export class Regions {
     return filled;
   }
 
-  // converts canvas coordinates to grid cells
+
+  /**
+   * Converts stroke point coordinates to grid cells based on cell size.
+   *
+   * @param {Point[]} stroke - Raw point data from canvas (in pixels).
+   * @returns {Point[]} - Unique grid cell coordinates touched by the stroke.
+ 
+   */
   pointsToCells(stroke) {
     let result = [];
 
     for (let point of stroke) {
-      //console.log(getCell(point.x, point.y))
       result.push(this.getCell(point.x, point.y));
     }
 
@@ -221,7 +285,13 @@ export class Regions {
     return result;
   }
 
-  // finds which cell the point is in
+  /**
+   * Converts a pixel coordinate to a grid cell.
+   *
+   * @param {number} x - The x coordinate in pixels.
+   * @param {number} y - The y coordinate in pixels.
+   * @returns {Point} - Cell coordinates in grid space.
+   */
   getCell(x, y) {
     return {
       x: Math.floor(x / this.cellSize),
@@ -229,12 +299,19 @@ export class Regions {
     };
   }
 
-  // removes duplicates for array
+  /**
+   * Removes duplicate objects from an array of coordinate objects.
+   * Uses JSON stringification to treat objects with the same keys/values as equal.
+   *
+   * @param {Point[]} arr - An array of grid cell coordinates.
+   * @returns {Point[]} - Array with unique entries only.
+   */
   removeDuplicates(arr) {
     const uniqueArray = Array.from(
-      new Set(arr.map((obj) => JSON.stringify(obj)))
-    ).map((str) => JSON.parse(str));
+      new Set(arr.map(obj => JSON.stringify(obj)))  // convert each object to a unique string
+    ).map(str => JSON.parse(str));                  // parse strings back into objects
 
     return uniqueArray;
   }
+
 }

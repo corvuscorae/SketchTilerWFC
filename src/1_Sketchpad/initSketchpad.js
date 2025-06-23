@@ -1,9 +1,19 @@
+/**
+ * @fileoverview Initializes and sizes the sketchpad, grid canvas, and sketch canvas
+ * based on the current TILEMAP configuration. Also renders a visual grid overlay.
+ */
 import TILEMAP from "../4_Phaser/tilemap.js";
 
 const sketchpad = document.getElementById("sketchpad");
 const gridCanvas = document.getElementById("grid-canvas");
 const sketchCanvas = document.getElementById("sketch-canvas");
 
+/**
+ * Initializes the sketchpad dimensions and rendering settings.
+ * Sets canvas sizes based on TILEMAP settings and draws a grid overlay.
+ * 
+ * @function initSketchpad
+ */
 export default function initSketchpad() {
   const width = TILEMAP.WIDTH * TILEMAP.TILE_WIDTH;
   const height = TILEMAP.HEIGHT * TILEMAP.TILE_WIDTH;
@@ -20,9 +30,14 @@ export default function initSketchpad() {
   sketchCanvas.getContext("2d").font = "30px serif";
 }
 
-// TODO: make grid toggleable+
+/**
+ * Draws a uniform grid on the gridCanvas.
+ * Each grid cell is a square defined by `cellSize`.
+ * 
+ * @function drawGrid
+ */
 function drawGrid() {
-  const cellSize = 16;
+  const cellSize = TILEMAP.TILE_WIDTH;
   const color = "#DBDBDB";
 
   const width = gridCanvas.width;
