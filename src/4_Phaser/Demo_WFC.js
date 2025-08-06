@@ -1,17 +1,22 @@
-import Phaser from "../../lib/PhaserModule.js";
-import WFCModel from "../2_WFC/1_Model/WFCModel.js";
-import IMAGES from "../2_WFC/2_Input/IMAGES.js";
+import Phaser from "../../lib/phaserModule.js";
+import WFCModel from "../2_WFC/1_Model/wfcModel.js";
+import IMAGES from "../2_WFC/2_Input/images.js";
 import generateHouse from "../3_Generators/generateHouse.js";
+
+// hide sketchpad elements
+document.getElementById("sketchpad").classList.add("hidden");
+document.getElementById("buttons").classList.add("hidden");
+document.getElementById("instructions").classList.add("hidden");
 
 export default class Demo_WFC extends Phaser.Scene {
   displayedMapID = 3;	// check assets folder to see all maps  
 
   N = 2;
-  profileLearning = false;
+  profileLearning = true;
 
   // width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
-  width = 4;
-  height = 15;
+  width = 40;
+  height = 25;
   maxAttempts = 10;
   logProgress = true;
   profileSolving = true;
@@ -83,12 +88,12 @@ export default class Demo_WFC extends Phaser.Scene {
     console.log("Using model for ground");
     const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
     if (!groundImage) return;
-    /*
+
     console.log("Using model for structures");
     const structuresImage = this.structuresModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
     if (!structuresImage) return;
-    */
     
+    /*
     console.log("Using house generator");
     const structuresImage = generateHouse({
       topLeft: { x: 0, y: 0 },
@@ -97,7 +102,7 @@ export default class Demo_WFC extends Phaser.Scene {
       height: this.height
     });
     if (!structuresImage) return;
-    
+    */
 
     this.displayMap(groundImage, structuresImage);
   }

@@ -10,3 +10,8 @@
   position: absolute;
   cursor: none;
 }
+
+/* index.css */
+.hidden {
+  display: none;
+}
