@@ -63,11 +63,26 @@ export default class PerformanceProfiler {
 			message += `\tTotal Duration: ${funcData.totalExecutionTime} ms\n`;
 			message += `\tAverage Duration: ${(funcData.totalExecutionTime / funcData.timesCalled).toFixed(2)} ms\n`
 			message += `\tNum Calls: ${funcData.timesCalled}\n`;
-			if (!funcData.isInnerFunctionCall) combinedTotalExecutionTime += funcData.totalExecutionTime;
+			//if (!funcData.isInnerFunctionCall) combinedTotalExecutionTime += funcData.totalExecutionTime;
+			combinedTotalExecutionTime += funcData.totalExecutionTime;	// adding all function calls to total execution time, including inner functions
 		}
 		message += `\nCombined Total Duration: ${combinedTotalExecutionTime} ms`;
 
 		console.log(message);
+	}
+
+	/** Returns *total durations* of all functions profiled. */
+	returnData() {
+		let obj = {};
+		let combinedTotalExecutionTime = 0;
+
+		for (const [funcName, funcData] of this.data) {
+			obj[`${funcName}`] = funcData.totalExecutionTime;
+			combinedTotalExecutionTime += funcData.totalExecutionTime;	// adding all function calls to total execution time, including inner functions
+		}
+		obj["total"] = combinedTotalExecutionTime;
+
+		return obj;
 	}
 
 	/** Clears all tracked performance data. */

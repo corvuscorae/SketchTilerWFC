@@ -12,7 +12,7 @@ export default class Demo_WFC extends Phaser.Scene {
   displayedMapID = 3;	// check assets folder to see all maps  
 
   N = 2;
-  profileLearning = true;
+  profileLearning = false;
 
   // width & height for entire maps should have an 8:5 ratio (e.g. 24x15, 40x25)
   width = 40;
@@ -20,8 +20,10 @@ export default class Demo_WFC extends Phaser.Scene {
   maxAttempts = 10;
   logProgress = true;
   profileSolving = true;
+  logProfile = false;
 
   numRuns = 100;	// for this.getAverageGenerationDuration()
+  printAveragePerformance = true;
 
   groundModel = new WFCModel().learn(IMAGES.GROUND, this.N, this.profileLearning);
   structuresModel = new WFCModel().learn(IMAGES.STRUCTURES, this.N, this.profileLearning);
@@ -68,7 +70,7 @@ export default class Demo_WFC extends Phaser.Scene {
       if (this.groundMap) this.groundMap.destroy();
       if (this.structuresMap) this.structuresMap.destroy();
     });
-    this.timedRuns_Key.on("down", () => this.getAverageGenerationDuration(this.numRuns));
+    this.timedRuns_Key.on("down", () => this.getAverageGenerationDuration(this.numRuns, this.printAveragePerformance));
 
     const phaser = document.getElementById("phaser");
     const instructions = document.createElement("section");
@@ -84,13 +86,13 @@ export default class Demo_WFC extends Phaser.Scene {
     phaser.append(instructions);
   }
 
-  generateMap(){
+  generateMap(profile = false){
     console.log("Using model for ground");
-    const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
+    const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving, this.logProfile);
     if (!groundImage) return;
 
     console.log("Using model for structures");
-    const structuresImage = this.structuresModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving);
+    const structuresImage = this.structuresModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving, this.logProfile);
     if (!structuresImage) return;
     
     /*
@@ -105,6 +107,14 @@ export default class Demo_WFC extends Phaser.Scene {
     */
 
     this.displayMap(groundImage, structuresImage);
+
+    // return performance profiles for models used
+    if(profile){
+      return {
+        ground: this.groundModel.performanceProfile,
+        structs: this.structuresModel.performanceProfile,
+      }
+    }
   }
 
   displayMap(groundImage, structuresImage) {
@@ -128,15 +138,52 @@ export default class Demo_WFC extends Phaser.Scene {
     for (const layer of this.multiLayerMapLayers) layer.setVisible(false);
   }	
 
-  getAverageGenerationDuration(numRuns) {
-    let totalDuration = 0;
-    for (let i = 1; i <= numRuns; i++) {  // we want i to start at one for console logging
-      const start = performance.now();
-      this.generateMap();
-      let duration = performance.now() - start;
-      totalDuration += duration;
-      console.log(`Generation #${i} took ${duration.toFixed(2)} ms`)
+  getAverageGenerationDuration(numRuns, print) {
+    let profiles = [];
+    for (let i = 0; i < numRuns; i++) {
+      profiles.push(this.generateMap(true));
     }
-    console.log(`Generating ${numRuns} times took ${totalDuration} ms, with an average duration of ${(totalDuration / numRuns).toFixed(2)} ms`)
+
+    let avg = this.sumAllProfiles(profiles);
+
+    for (const [modelName, modelProfile] of Object.entries(avg)) {
+      for (const [funcName, functionPerformance] of Object.entries(modelProfile)) {
+        avg[modelName][funcName] = avg[modelName][funcName] / numRuns;  
+      }
+    }
+
+    if(print) console.log(this.printAverages(avg, numRuns));
+    console.log(avg);
   }
+
+  sumAllProfiles(profiles) {
+    let sum = {};
+    for(let profile of profiles){
+      for (const [modelName, modelProfile] of Object.entries(profile)) {
+        if(!sum[modelName]) sum[modelName] = {};
+        for (const [funcName, functionPerformance] of Object.entries(modelProfile)) {
+          let runningTotal = sum[modelName][funcName] ?? 0;
+          runningTotal += functionPerformance;
+          sum[modelName][funcName] = runningTotal;
+        }
+      }
+    }
+
+    return sum;
+  }
+
+  printAverages(averages, numRuns){
+    let message = `==========================================\n`;
+    message += `Average performance over ${numRuns} runs:\n`;
+    for (const [modelName, modelProfile] of Object.entries(averages)) {
+      message += `\n=== ${modelName.toUpperCase()} MODEL ===\n`;
+      for (const [funcName, functionPerformance] of Object.entries(modelProfile)) {
+        let val = averages[modelName][funcName];  
+        message += `${funcName}: ${val} ms\n`;
+      }
+    }
+    message += `\n==========================================`;
+    return message;
+  }
+
 }

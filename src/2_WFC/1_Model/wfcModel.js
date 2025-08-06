@@ -1,10 +1,11 @@
-import ImageLearner from "./ImageLearner.js";
-import ConstraintSolver from "./ConstraintSolver.js";
+import ImageLearner from "./imageLearner.js";
+import ConstraintSolver from "./constraintSolver.js";
 import Bitmask from "./Bitmask.js";
 
 export default class WFCModel {
   imageLearner = new ImageLearner();
   constraintSolver = new ConstraintSolver();
+  performanceProfile = {}
 
   /**
    * Stores the set tile instructions generated from the user's usage of setTile().
@@ -57,7 +58,14 @@ export default class WFCModel {
    * @returns {TilemapImage | null}
    */
   generate(width, height, maxAttempts = 10, logProgress = true, profile = false) {
-    const success = this.constraintSolver.solve(this.imageLearner.weights, this.imageLearner.adjacencies, this.setTilesInstructions, width, height, maxAttempts, logProgress, profile);
+    const success = this.constraintSolver.solve(
+      this.imageLearner.weights, 
+      this.imageLearner.adjacencies, 
+      this.setTilesInstructions, 
+      width, height, maxAttempts, logProgress, profile
+    );
+
+    if(profile) this.performanceProfile = this.constraintSolver.performanceProfiler.returnData();
     return success ? this.generateImage() : null;
   }
 

@@ -1,6 +1,6 @@
 import DIRECTIONS from "./DIRECTIONS.js";
 import Bitmask from "./Bitmask.js";
-import Queue from "./Queue.js";
+import Queue from "./queue.js";
 import PerformanceProfiler from "../../5_Utility/PerformanceProfiler.js";
 
 export default class ConstraintSolver {
@@ -22,9 +22,10 @@ export default class ConstraintSolver {
    * @param {number} maxAttempts
    * @param {bool} logProgress Whether to log the progress of this function or not.
    * @param {bool} profile Whether to profile the performance of this function or not.
+   * @param {bool} logProfile Whether to log the performance profile of this function or not.
    * @returns {bool} Whether the attempt was successful or not.
    */
-  solve(weights, adjacencies, setTileInstructions, width, height, maxAttempts, logProgress, profile) {
+  solve(weights, adjacencies, setTileInstructions, width, height, maxAttempts, logProgress, profile, logProfile = false) {
     this.performanceProfiler.clearData();
     this.profileFunctions(profile);
 
@@ -36,7 +37,7 @@ export default class ConstraintSolver {
       const [y, x] = this.getLeastEntropyUnsolvedCellPosition(weights);
       if (y === -1 && x === -1) {
         if (logProgress) console.log(`solved in ${numAttempts} attempt(s)`);
-        if (profile) this.performanceProfiler.logData();
+        if (logProfile) this.performanceProfiler.logData();
         return true;
       }
 
@@ -52,7 +53,7 @@ export default class ConstraintSolver {
     }
 
     if (logProgress) console.log("max attempts reached");
-    if (profile) this.performanceProfiler.logData();
+    if (logProfile) this.performanceProfiler.logData();
     return false;
   }
 
@@ -65,7 +66,7 @@ export default class ConstraintSolver {
       this.initializeWaveMatrix = this.performanceProfiler.register(this.initializeWaveMatrix, false);
       this.setTiles = this.performanceProfiler.register(this.setTiles, false);
       this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.register(this.getLeastEntropyUnsolvedCellPosition, false);
-      this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy, false);
+      this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy, true);
       this.observe = this.performanceProfiler.register(this.observe, false);
       this.propagate = this.performanceProfiler.register(this.propagate, false);
     } else {
