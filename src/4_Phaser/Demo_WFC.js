@@ -60,18 +60,7 @@ export default class Demo_WFC extends Phaser.Scene {
   }
 
   setupControls() {
-    this.runWFC_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G);
-    this.clear_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
-    this.timedRuns_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-
-    this.runWFC_Key.on("down", () => this.generateMap());
-    this.clear_Key.on("down", () => {
-      for (const layer of this.multiLayerMapLayers) layer.setVisible(true);
-      if (this.groundMap) this.groundMap.destroy();
-      if (this.structuresMap) this.structuresMap.destroy();
-    });
-    this.timedRuns_Key.on("down", () => this.getAverageGenerationDuration(this.numRuns, this.printAveragePerformance));
-
+    /*
     const phaser = document.getElementById("phaser");
     const instructions = document.createElement("section");
     instructions.innerHTML = `
@@ -84,6 +73,61 @@ export default class Demo_WFC extends Phaser.Scene {
       </p>
     `;
     phaser.append(instructions);
+    */
+    const phaser = document.getElementById("phaser");
+    const instructions = document.createElement("section");
+    instructions.innerHTML = `
+      <h2 class="title is-4">Controls</h2>
+
+      <div class="buttons mt-3">
+        <button id="generateBtn" class="button is-primary">Generate</button>
+        <button id="clearBtn" class="button is-warning">Clear</button>
+      </div>
+      
+      <div class="field">
+        <h3 class="title is-5">Get Average Duration</h3>
+        <label class="label">Number of Runs</label>
+        <div class="control">
+          <input id="numRunsInput" class="input" type="number" min="1" value="${this.numRuns}">
+        </div>
+        <button id="averageBtn" class="button is-info">Generate</button>
+      </div>
+
+      <div id="progressWrapper"></div>
+
+      <div id="thinking-icon" class="spinner" style="display: none;"></div>
+
+      <div id="profileMessage"></div>
+    `;
+    phaser.append(instructions);
+
+    const progressWrapper = document.getElementById("progressWrapper");
+    progressWrapper.style.marginTop = "1rem"; 
+    progressWrapper.style.marginBottom = "1rem"; 
+    progressWrapper.innerHTML = `
+      <progress id="progressBar" class="progress is-info" value="0" max="100">0%</progress>
+    `;
+
+    document.getElementById("numRunsInput").addEventListener("change", (e) => {
+      this.numRuns = parseInt(e.target.value);
+    });
+
+    document.getElementById("generateBtn").addEventListener("click", async () => runWithSpinner(() => this.generateMap()));
+    document.getElementById("clearBtn").addEventListener("click", () => this.clearMap());
+    document.getElementById("averageBtn").addEventListener("click", async () => 
+      runWithSpinner(async () => await this.getAverageGenerationDuration(this.numRuns, this.printAveragePerformance))
+    );
+
+    // legacy keys
+    this.runWFC_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G);
+    this.clear_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
+    this.timedRuns_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+
+    this.runWFC_Key.on("down", () => this.generateMap());
+    this.clear_Key.on("down", () => this.clearMap());
+    this.timedRuns_Key.on("down", async () => 
+      await this.getAverageGenerationDuration(this.numRuns, this.printAveragePerformance)
+    );
   }
 
   generateMap(profile = false){
@@ -107,6 +151,7 @@ export default class Demo_WFC extends Phaser.Scene {
     */
 
     this.displayMap(groundImage, structuresImage);
+    document.getElementById("thinking-icon").style.display = "none";        // hide
 
     // return performance profiles for models used
     if(profile){
@@ -138,22 +183,37 @@ export default class Demo_WFC extends Phaser.Scene {
     for (const layer of this.multiLayerMapLayers) layer.setVisible(false);
   }	
 
-  getAverageGenerationDuration(numRuns, print) {
+  async getAverageGenerationDuration(numRuns, print) {
     let profiles = [];
+    const progressBar = document.getElementById("progressBar");
+
     for (let i = 0; i < numRuns; i++) {
-      profiles.push(this.generateMap(true));
+      let profile = this.generateMap(true);
+      profiles.push(profile);
+
+      // update progress bar
+      progressBar.value = ((i + 1) / numRuns) * 100;
+      await new Promise(resolve => setTimeout(resolve, 10)); // tweak delay as needed
     }
 
     let avg = this.sumAllProfiles(profiles);
 
     for (const [modelName, modelProfile] of Object.entries(avg)) {
       for (const [funcName, functionPerformance] of Object.entries(modelProfile)) {
-        avg[modelName][funcName] = avg[modelName][funcName] / numRuns;  
+        avg[modelName][funcName] = (avg[modelName][funcName] / numRuns).toFixed(2);  
       }
     }
 
-    if(print) console.log(this.printAverages(avg, numRuns));
-    console.log(avg);
+    if(print){ 
+      const outputElement = document.getElementById("profileMessage");
+      const message = this.printAverages(avg, numRuns);
+      
+      outputElement.innerHTML = message.replace(/\n/g, '<br>');
+      console.log(this.printAverages(avg, numRuns));
+    }
+    // console.log(avg);
+
+    progressBar.value = 0;
   }
 
   sumAllProfiles(profiles) {
@@ -186,4 +246,19 @@ export default class Demo_WFC extends Phaser.Scene {
     return message;
   }
 
+  clearMap(){
+    for (const layer of this.multiLayerMapLayers) layer.setVisible(true);
+    if (this.groundMap) this.groundMap.destroy();
+    if (this.structuresMap) this.structuresMap.destroy();
+  }
+}
+
+async function runWithSpinner(task) {
+  const spinner = document.getElementById("thinking-icon");
+  spinner.style.display = "inline-block";
+
+  setTimeout(() => {
+    task();
+    spinner.style.display = "none";
+  }, 1);
 }
