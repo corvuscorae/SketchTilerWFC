@@ -65,7 +65,7 @@ export default class ConstraintSolver {
       this.initializeWaveMatrix = this.performanceProfiler.register(this.initializeWaveMatrix, false);
       this.setTiles = this.performanceProfiler.register(this.setTiles, false);
       this.getLeastEntropyUnsolvedCellPosition = this.performanceProfiler.register(this.getLeastEntropyUnsolvedCellPosition, false);
-      this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy, true);
+      this.getShannonEntropy = this.performanceProfiler.register(this.getShannonEntropy, false);
       this.observe = this.performanceProfiler.register(this.observe, false);
       this.propagate = this.performanceProfiler.register(this.propagate, false);
     } else {
