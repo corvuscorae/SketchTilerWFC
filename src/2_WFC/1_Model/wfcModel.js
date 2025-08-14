@@ -80,7 +80,8 @@ export default class WFCModel {
     // Build the image using the top left tile of each cell's pattern
     for (let y = 0; y < this.constraintSolver.waveMatrix.length; y++) {
     for (let x = 0; x < this.constraintSolver.waveMatrix[0].length; x++) {
-      const possiblePatterns_Array = this.constraintSolver.waveMatrix[y][x].toArray();
+      const cell = this.constraintSolver.waveMatrix[y][x]
+      const possiblePatterns_Array = cell.bitmask.toArray()
       const i = possiblePatterns_Array[0];	// should be guaranteed to only have 1 possible pattern
       const tileID = this.imageLearner.patterns[i][0][0];
       image[y][x] = tileID;

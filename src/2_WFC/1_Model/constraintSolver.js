@@ -2,6 +2,7 @@ import DIRECTIONS from "./DIRECTIONS.js";
 import Bitmask from "./Bitmask.js";
 import Queue from "./queue.js";
 import PerformanceProfiler from "../../5_Utility/PerformanceProfiler.js";
+import PriorityQueue from "./priorityQueue.js";
 
 export default class ConstraintSolver {
   /**
@@ -29,31 +30,51 @@ export default class ConstraintSolver {
     this.performanceProfiler.clearData();
     this.profileFunctions(profile);
 
-    this.initializeWaveMatrix(weights.length, width, height);
+   //const startTime = performance.now(); // start timing
+
+    this.initializeWaveMatrix(weights.length, width, height, weights);
     this.setTiles(setTileInstructions, adjacencies);
+    this.priorityQueue = new PriorityQueue((a, b) => {
+      if (a.entropy === b.entropy) return Math.random() - 0.5;
+      return a.entropy - b.entropy;
+    })
+
+    this.priorityQueue.buildHeap(this.cells);
 
     let numAttempts = 1;
-    while (numAttempts <= maxAttempts) {	// use <= so maxAttempts can be 1
-      const [y, x] = this.getLeastEntropyUnsolvedCellPosition(weights);
-      if (y === -1 && x === -1) {
+    while (numAttempts <= maxAttempts) {
+      const cell = this.priorityQueue.extractMin();
+      
+      if(!cell) {
+        //const totalTime = performance.now() - startTime;
+        //if (logProgress) console.log(`Total solve runtime: ${totalTime.toFixed(2)} ms`);
+
         if (logProgress) console.log(`solved in ${numAttempts} attempt(s)`);
         if (logProfile) this.performanceProfiler.logData();
         return true;
       }
 
-      this.observe(y, x, weights);
+      this.observe(cell, weights);
 
       if (logProgress) console.log("propagating...");
-      const contradictionCreated = this.propagate(y, x, adjacencies);
+      const contradictionCreated = this.propagate(cell, adjacencies, changedCells => {
+        for (const neighbor of changedCells) {
+          this.priorityQueue.update(neighbor);
+        }
+      });
+
       if (contradictionCreated) {
-        this.initializeWaveMatrix(weights.length, width, height);
+        this.initializeWaveMatrix(weights.length, width, height, weights);
         this.setTiles(setTileInstructions, adjacencies);
+        this.priorityQueue.buildHeap(this.cells);
         numAttempts++;
       }
     }
 
     if (logProgress) console.log("max attempts reached");
-    if (logProfile) this.performanceProfiler.logData();
+    if (logProfile){
+      this.performanceProfiler.logData()
+    } 
     return false;
   }
 
@@ -85,17 +106,37 @@ export default class ConstraintSolver {
    * @param {number} width The width to set this.waveMatrix to.
    * @param {number} height The height to set this.waveMatrix to.
    */
-  initializeWaveMatrix(numPatterns, width, height) {
+  initializeWaveMatrix(numPatterns, width, height, weights) {
     this.waveMatrix = [];
-    for (let y = 0; y < height; y++) this.waveMatrix[y] = [];
+    this.cells = [];
 
     const allPatternsPossible = new Bitmask(numPatterns);
     for (let i = 0; i < numPatterns; i++) allPatternsPossible.setBit(i);
 
     for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      this.waveMatrix[y][x] = Bitmask.createCopy(allPatternsPossible);
-    }}
+        this.waveMatrix[y] = [];
+        for (let x = 0; x < width; x++) {
+            const bitmaskCopy = Bitmask.createCopy(allPatternsPossible);
+            const cell = this.createCell(x, y, bitmaskCopy, weights, this.getShannonEntropy);
+            this.waveMatrix[y][x] = cell;
+            this.cells.push(cell);
+        }
+    }
+  }
+
+  /**
+   * Creates cell for priority queue
+   * @param {number} x 
+   */
+  createCell(x, y, bitmask, weights, getEntropy) {
+    return {
+        x,
+        y,
+        bitmask,
+        get entropy() {
+            return getEntropy(bitmask, weights);
+        }
+    };
   }
 
   /**
@@ -175,11 +216,11 @@ export default class ConstraintSolver {
    * @param {number} x The x position/index of the cell.
    * @param {number[]} weights 
    */
-  observe(y, x, weights) {
+  observe(cell, weights) {
     // Uses weighted random
     // https://dev.to/jacktt/understanding-the-weighted-random-algorithm-581p
 
-    const possiblePatterns = this.waveMatrix[y][x].toArray();
+    const possiblePatterns = cell.bitmask.toArray();
 
     const possiblePatternWeights = [];	// is parallel with possiblePatterns
     let totalWeight = 0;
@@ -195,8 +236,8 @@ export default class ConstraintSolver {
     for (let i = 0; i < possiblePatternWeights.length; i++) {
       cursor += possiblePatternWeights[i];
       if (cursor >= random) {
-        this.waveMatrix[y][x].clear();
-        this.waveMatrix[y][x].setBit(possiblePatterns[i]);
+        cell.bitmask.clear();
+        cell.bitmask.setBit(possiblePatterns[i]);
         return;
       }
     }
@@ -211,13 +252,12 @@ export default class ConstraintSolver {
    * @param {AdjacentPatternsMap[]} adjacencies
    * @returns {boolean} Whether a contradiction was created or not.
    */
-  propagate(y, x, adjacencies) {
-    const queue = new Queue();
-    queue.enqueue([y, x]);
+  propagate(startCell, adjacencies) {
+    const queue = [startCell];
 
     while (queue.length > 0) {
-      const [y1, x1] = queue.dequeue();
-      const cell1_PossiblePatterns_Array = this.waveMatrix[y1][x1].toArray();
+      const cell1 = queue.shift();
+      const cell1Patterns = cell1.bitmask.toArray();
 
       for (let k = 0; k < DIRECTIONS.length; k++) {	// using k because k is associated with iterating over DIRECTIONS in the ImageProcessor class
         /*
@@ -235,29 +275,30 @@ export default class ConstraintSolver {
         const dir = DIRECTIONS[k];
         const dy = -dir[0];	// need to reverse direction or else output will be upside down
         const dx = -dir[1];	// need to reverse direction or else output will be upside down
-        const y2 = y1+dy;
-        const x2 = x1+dx;
+        const ny = cell1.y+dy;
+        const nx = cell1.x+dx;
 
         // Don't go out of bounds
-        if (y2 < 0 || y2 > this.waveMatrix.length-1 || x2 < 0 || x2 > this.waveMatrix[0].length-1) continue;
+        if (ny < 0 || ny >= this.waveMatrix.length || nx < 0 || nx >= this.waveMatrix[0].length) continue;
 
-        const cell2_PossiblePatterns_Bitmask = this.waveMatrix[y2][x2];
+        const cell2 = this.waveMatrix[ny][nx];
 
-        const cell1_PossibleAdjacentPatterns_Bitmask = new Bitmask(adjacencies.length);
-        for (const i of cell1_PossiblePatterns_Array) {
-          const i_AdjacentPatterns_Bitmask = adjacencies[i][k];
-          cell1_PossibleAdjacentPatterns_Bitmask.mergeWith(i_AdjacentPatterns_Bitmask);
+        const allowedFromCell1 = new Bitmask(adjacencies.length);
+        for (const pattern of cell1Patterns) {
+          allowedFromCell1.mergeWith(adjacencies[pattern][k]);
         }
 
-        const cell2_NewPossiblePatterns_Bitmask = Bitmask.AND(cell2_PossiblePatterns_Bitmask, cell1_PossibleAdjacentPatterns_Bitmask);
+        const newBitmask = Bitmask.AND(cell2.bitmask, allowedFromCell1);
 
-        const contradictionCreated = cell2_NewPossiblePatterns_Bitmask.isEmpty();
+        const contradictionCreated = newBitmask.isEmpty();
         if (contradictionCreated) return true;
         
-        const cell2Changed = !Bitmask.EQUALS(cell2_PossiblePatterns_Bitmask, cell2_NewPossiblePatterns_Bitmask);
+        const cell2Changed = !Bitmask.EQUALS(cell2.bitmask, newBitmask);
         if (cell2Changed) {
-          this.waveMatrix[y2][x2] = cell2_NewPossiblePatterns_Bitmask;
-          queue.enqueue([y2, x2]);
+          cell2.bitmask = newBitmask
+          queue.push(cell2);
+          
+          if (this.priorityQueue) this.priorityQueue.update(cell2)
         }
       }
     }
