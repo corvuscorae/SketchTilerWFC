@@ -112,9 +112,7 @@ export default class Demo_WFC extends Phaser.Scene {
       this.numRuns = parseInt(e.target.value);
     });
 
-    document.getElementById("generateBtn").addEventListener("click", async () => 
-      runWithSpinner(async () => await this.getAverageGenerationDuration(1, this.printAveragePerformance))
-    );
+    document.getElementById("generateBtn").addEventListener("click", async () => runWithSpinner(() => this.generateMap()));
     document.getElementById("clearBtn").addEventListener("click", () => this.clearMap());
     document.getElementById("averageBtn").addEventListener("click", async () => 
       runWithSpinner(async () => await this.getAverageGenerationDuration(this.numRuns, this.printAveragePerformance))
@@ -125,9 +123,7 @@ export default class Demo_WFC extends Phaser.Scene {
     this.clear_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C);
     this.timedRuns_Key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
-    this.runWFC_Key.on("down", () => 
-      runWithSpinner(async () => await this.getAverageGenerationDuration(1, this.printAveragePerformance))
-    );
+    this.runWFC_Key.on("down", () => this.generateMap());
     this.clear_Key.on("down", () => this.clearMap());
     this.timedRuns_Key.on("down", async () => 
       await this.getAverageGenerationDuration(this.numRuns, this.printAveragePerformance)
@@ -136,11 +132,27 @@ export default class Demo_WFC extends Phaser.Scene {
 
   generateMap(profile = false){
     console.log("Using model for ground");
-    const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving, this.logProfile);
+    //const groundImage = this.groundModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving, this.logProfile);
+    const groundImage = this.groundModel.generate(
+      this.width, 
+      this.height, 
+      this.maxAttempts, 
+      this.logProgress, 
+      this.profileSolving, 
+      [] // Pass an empty array for boundaryConstraints
+    );
     if (!groundImage) return;
 
     console.log("Using model for structures");
-    const structuresImage = this.structuresModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving, this.logProfile);
+    //const structuresImage = this.structuresModel.generate(this.width, this.height, this.maxAttempts, this.logProgress, this.profileSolving, this.logProfile);
+    const structuresImage = this.structuresModel.generate(
+      this.width, 
+      this.height, 
+      this.maxAttempts, 
+      this.logProgress, 
+      this.profileSolving, 
+      [] // Pass an empty array for boundaryConstraints
+    );
     if (!structuresImage) return;
     
     /*
@@ -210,10 +222,10 @@ export default class Demo_WFC extends Phaser.Scene {
 
     if(print){ 
       const outputElement = document.getElementById("profileMessage");
-      const message = this.printProfile(avg, numRuns);
+      const message = this.printAverages(avg, numRuns);
       
       outputElement.innerHTML = message.replace(/\n/g, '<br>');
-      console.log(this.printProfile(avg, numRuns));
+      console.log(this.printAverages(avg, numRuns));
     }
     // console.log(avg);
 
@@ -236,7 +248,7 @@ export default class Demo_WFC extends Phaser.Scene {
     return sum;
   }
 
-  printProfile(averages, numRuns = 1){
+  printAverages(averages, numRuns){
     let message = `==========================================\n`;
     message += `Average performance over ${numRuns} runs:\n`;
     for (const [modelName, modelProfile] of Object.entries(averages)) {
