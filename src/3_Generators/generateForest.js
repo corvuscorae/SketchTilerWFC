@@ -1,4 +1,4 @@
-import WFCModel from "../2_WFC/1_Model/WFCModel.js";
+import WFCModel from "../2_WFC/1_Model/wfcModel.js";
 import IMAGES from "../2_WFC/2_Input/IMAGES.js";
 
 const model = new WFCModel().learn(IMAGES.FORESTS, 2);

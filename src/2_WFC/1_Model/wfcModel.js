@@ -57,6 +57,7 @@ export default class WFCModel {
    * @param {bool} profile (Default false) Whether to profile the performance of this function or not.
    * @returns {TilemapImage | null}
    */
+  /*
   generate(width, height, maxAttempts = 10, logProgress = true, profile = false) {
     const success = this.constraintSolver.solve(
       this.imageLearner.weights, 
@@ -68,7 +69,21 @@ export default class WFCModel {
     if(profile) this.performanceProfile = this.constraintSolver.performanceProfiler.returnData();
     return success ? this.generateImage() : null;
   }
+  */
+  generate(width, height, maxAttempts = 10, logProgress = true, profile = false, boundaryConstraints = []) {
+    // Combine the model's own set tiles with the new boundary constraints
+    const allSetTiles = [...this.setTilesInstructions, ...boundaryConstraints];
+    
+    const success = this.constraintSolver.solve(
+      this.imageLearner.weights, 
+      this.imageLearner.adjacencies, 
+      allSetTiles, // Pass the combined list of constraints to the solver
+      width, height, maxAttempts, logProgress, profile
+    );
 
+    if(profile) this.performanceProfile = this.constraintSolver.performanceProfiler.returnData();
+    return success ? this.generateImage() : null;
+}
   /**
    * Builds and returns an image using the learned patterns and solved wave matrix.
    * @returns {TilemapImage}
