@@ -1,8 +1,9 @@
-import DIRECTIONS from "./DIRECTIONS.js";
-import Bitmask from "./Bitmask.js";
+import DIRECTIONS from "./directions.js";
 import Queue from "./queue.js";
 import PerformanceProfiler from "../../5_Utility/PerformanceProfiler.js";
 import PriorityQueue from "./priorityQueue.js";
+import BigBitmask from "./BigBitmask.js";
+
 
 export default class ConstraintSolver {
   /**
@@ -30,14 +31,9 @@ export default class ConstraintSolver {
     this.performanceProfiler.clearData();
     this.profileFunctions(profile);
 
-   //const startTime = performance.now(); // start timing
-
-    this.initializeWaveMatrix(weights.length, width, height, weights);
+    this.initializeWaveMatrix(weights.length, width, height);
     this.setTiles(setTileInstructions, adjacencies);
-    this.priorityQueue = new PriorityQueue((a, b) => {
-      if (a.entropy === b.entropy) return Math.random() - 0.5;
-      return a.entropy - b.entropy;
-    })
+    this.priorityQueue = new PriorityQueue((a, b) => a.entropy - b.entropy)
 
     this.priorityQueue.buildHeap(this.cells);
 
@@ -46,22 +42,16 @@ export default class ConstraintSolver {
       const cell = this.priorityQueue.extractMin();
       
       if(!cell) {
-        //const totalTime = performance.now() - startTime;
-        //if (logProgress) console.log(`Total solve runtime: ${totalTime.toFixed(2)} ms`);
-
         if (logProgress) console.log(`solved in ${numAttempts} attempt(s)`);
         if (logProfile) this.performanceProfiler.logData();
+        console.log(this.performanceProfiler.returnData())
         return true;
       }
 
       this.observe(cell, weights);
 
       if (logProgress) console.log("propagating...");
-      const contradictionCreated = this.propagate(cell, adjacencies, changedCells => {
-        for (const neighbor of changedCells) {
-          this.priorityQueue.update(neighbor);
-        }
-      });
+      const contradictionCreated = this.propagate(cell, adjacencies, weights)
 
       if (contradictionCreated) {
         this.initializeWaveMatrix(weights.length, width, height, weights);
@@ -106,18 +96,19 @@ export default class ConstraintSolver {
    * @param {number} width The width to set this.waveMatrix to.
    * @param {number} height The height to set this.waveMatrix to.
    */
-  initializeWaveMatrix(numPatterns, width, height, weights) {
+  initializeWaveMatrix(numPatterns, width, height) {
     this.waveMatrix = [];
     this.cells = [];
 
-    const allPatternsPossible = new Bitmask(numPatterns);
+    const allPatternsPossible = new BigBitmask(numPatterns);
     for (let i = 0; i < numPatterns; i++) allPatternsPossible.setBit(i);
+
+    //const initialEntropy = this.getShannonEntropy(allPatternsPossible, weights)
 
     for (let y = 0; y < height; y++) {
         this.waveMatrix[y] = [];
         for (let x = 0; x < width; x++) {
-            const bitmaskCopy = Bitmask.createCopy(allPatternsPossible);
-            const cell = this.createCell(x, y, bitmaskCopy, weights, this.getShannonEntropy);
+            const cell = this.createCell(x, y, BigBitmask.createDeepCopy(allPatternsPossible));
             this.waveMatrix[y][x] = cell;
             this.cells.push(cell);
         }
@@ -128,14 +119,11 @@ export default class ConstraintSolver {
    * Creates cell for priority queue
    * @param {number} x 
    */
-  createCell(x, y, bitmask, weights, getEntropy) {
+  createCell(x, y, bitmask) {
     return {
         x,
         y,
-        bitmask,
-        get entropy() {
-            return getEntropy(bitmask, weights);
-        }
+        bitmask
     };
   }
 
@@ -259,6 +247,7 @@ export default class ConstraintSolver {
       const cell1 = queue.shift();
       const cell1Patterns = cell1.bitmask.toArray();
 
+
       for (let k = 0; k < DIRECTIONS.length; k++) {	// using k because k is associated with iterating over DIRECTIONS in the ImageProcessor class
         /*
           Given two adjacent cells: cell1 at (y1, x1) and cell2 at (y2, x2)
@@ -283,17 +272,22 @@ export default class ConstraintSolver {
 
         const cell2 = this.waveMatrix[ny][nx];
 
-        const allowedFromCell1 = new Bitmask(adjacencies.length);
+        const allowedFromCell1 = new BigBitmask(adjacencies.length);
         for (const pattern of cell1Patterns) {
+          const neighborMask = adjacencies[pattern][k];
+          if (!neighborMask) {
+            console.error("Undefined adjacency:", { pattern, direction: k, row: adjacencies[pattern] });
+            continue;
+}
           allowedFromCell1.mergeWith(adjacencies[pattern][k]);
         }
 
-        const newBitmask = Bitmask.AND(cell2.bitmask, allowedFromCell1);
+        const newBitmask = BigBitmask.AND(cell2.bitmask, allowedFromCell1);
 
         const contradictionCreated = newBitmask.isEmpty();
         if (contradictionCreated) return true;
         
-        const cell2Changed = !Bitmask.EQUALS(cell2.bitmask, newBitmask);
+        const cell2Changed = !BigBitmask.EQUALS(cell2.bitmask, newBitmask);
         if (cell2Changed) {
           cell2.bitmask = newBitmask
           queue.push(cell2);

@@ -1,6 +1,5 @@
 import ImageLearner from "./imageLearner.js";
 import ConstraintSolver from "./constraintSolver.js";
-import Bitmask from "./Bitmask.js";
 
 export default class WFCModel {
   imageLearner = new ImageLearner();
