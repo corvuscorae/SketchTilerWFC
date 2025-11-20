@@ -14,7 +14,7 @@ import {
 import Queue from "./Queue_List.js";          // uncomment the one you wish to use
 //import Queue from "./Queue_LinkedList.js";  // uncomment the one you wish to use
 
-import DIRECTIONS from "./DIRECTIONS.js";
+import DIRECTIONS from "./directions.js";
 
 
 /** A component of the WFCModel that's solely responsible for solving the wave matrix. */

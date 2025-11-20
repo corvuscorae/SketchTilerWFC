@@ -1,6 +1,6 @@
 import PerformanceProfiler from "../../5_Utility/PerformanceProfiler.js";
 import BigBitmask from "./BigBitmask.js";
-import DIRECTIONS from "./DIRECTIONS.js";
+import DIRECTIONS from "./directions.js";
 
 /** A component of the WFCModel that's responsible for gathering all data
  *  necessary for solving a wave matrix and generating an image from it. */
