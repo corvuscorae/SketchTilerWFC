@@ -1,5 +1,5 @@
 import ImageLearner from "./ImageLearner.js";
-import ConstraintSolver from "./constraintSolver.js";
+import ConstraintSolver from "./ConstraintSolver.js";
 import BigBitmask from "./BigBitmask.js";
 
 export default class WFCModel {
