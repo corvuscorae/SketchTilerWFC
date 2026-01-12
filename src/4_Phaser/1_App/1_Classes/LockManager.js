@@ -100,6 +100,9 @@ export default class LockManager {
     
     // draw rect
     this.display.drawLockRect(lockRegion, index)
+
+    // draw at full-opacity
+    this.display.displayMap('locked', this.state.lockedTiles, 'tilemap', 1, 1)
     
     // dispatch event to draw region on sketch canvas
     // (prevent user overlaps)
