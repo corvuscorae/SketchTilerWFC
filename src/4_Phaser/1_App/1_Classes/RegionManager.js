@@ -33,6 +33,14 @@ export default class RegionManager {
   }
   
   regenerateRegion(region){
+    // unlock region
+    const locked = this.lockManager.findExistingLock(region.type, region.boundingBox);
+    if(locked != null){
+      this.lockManager.dispatchSketchEvent('checkSketch', region.type, region.boundingBox);
+      const drawn = this.lockManager.sketchCheck;
+      this.lockManager.unlockStructure(region.type, locked, region.boundingBox, drawn);
+    }
+
     // clear region in display maps
     this.clearRegion(region.boundingBox, this.state.wfcResult)
     this.clearRegion(region.boundingBox, this.state.userTiles)
