@@ -56,10 +56,6 @@ export default class RegionManager {
     
     // put generated tiles in final tilemap 
     this.copyRegionTiles(region.boundingBox, gen, this.state.wfcResult)
-    // TODO: should this be copied to locked tiles or user tiles??
-    // maybe also remove sketched region when we regen, then redraw if locked?
-    // or, IF this was a locked region, auto-lock?
-    // likewise: IF this region was drawn, add back to user tiles
 
     this.display.displayMap('structs', this.state.wfcResult, 'tilemap')
     this.display.displayMap('sketch', this.state.userTiles, 'tilemap', 1, 1)

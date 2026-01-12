@@ -1,16 +1,3 @@
-// TODO
-//  - better comments (JSDoc) 
-//  - ***structure regen?? right-click structures in phaser canvas to regenerate just that one structure
-//    - lean in to the hierarchical appraoch more!
-// BUGS
-//  - fix undo/redo bugs after unlocking a locked region
-//      - puts empty tiles atm :( should probably replace removes tiles which means more state tracking in phaser yayyyy
-//      - only sometimes puts empty?? why  
-//      - click to unlock -> undo -> empty
-//  - clicking on user drawn regions in phaser canvas draws a rect around the sketched region. 
-//      - maybe skip canvas dispatch when we click user regions
-//  - do more testing to catch anything else i fear im missing something 
-
 import Phaser from "../../../lib/phaserModule.js";
 import TILEMAP from "../3_Utils/tilemap.js";
 import WFCModel from "../../2_WFC/1_Model/wfcModel.js";
@@ -117,7 +104,7 @@ export default class Autotiler extends Phaser.Scene {
     const overlayToggle = document.getElementById('overlay-toggle')
     if (overlayToggle) {
       overlayToggle.onclick = () => {
-        this.displayManager.setLayoutVisibility(overlayToggle.checked)
+        this.displayManager.setLayoutVisibility(overlayToggle.checked === "true")
       }
     }
     
@@ -175,7 +162,7 @@ export default class Autotiler extends Phaser.Scene {
       if (this.state.layout) {
         this.displayManager.displayMap('layout', this.state.layout.layoutMap, 'colorTiles', 0.25)
         const overlayToggle = document.getElementById('overlay-toggle')
-        this.displayManager.setLayoutVisibility(overlayToggle.checked || false)
+        this.displayManager.setLayoutVisibility(overlayToggle.checked === "true" || false)
       }
 
       // enable map export
@@ -240,13 +227,12 @@ export default class Autotiler extends Phaser.Scene {
     this.displayManager.displayMap('layout', this.state.layout.layoutMap, 'colorTiles')
     
     const overlayToggle = document.getElementById('overlay-toggle')
-    this.displayManager.setLayoutVisibility(overlayToggle.checked || false)
+    this.displayManager.setLayoutVisibility(overlayToggle.checked === "true" || false)
 
     this.displayManager.showLockRects()
   }
   
   // redo button clicked
-  // TODO: re-draw ??
   handleRedoSketch(e) {
     this.state.userRegions = new Regions(e.detail.sketch, e.detail.structures, this.tileSize).get()
   }
