@@ -71,6 +71,29 @@
   background-color: #CCDEDD;
 }
 
-#generate-button {
+body.embed-mode {
+	margin: 0;
+	overflow: auto;
+	background: #CCDEDD;
+}
 
+body.embed-mode #page {
+	display: block;
+}
+
+body.embed-mode #app {
+	padding: 1rem 7rem 1rem 1rem;
+}
+
+body.embed-mode #wfc-demo,
+body.embed-mode #data,
+body.embed-mode #pattern-panel {
+	display: none;
+}
+
+body.embed-mode #drawing-buttons {
+	position: fixed;
+	top: 1rem;
+	right: 1rem;
+	z-index: 10;
 }
