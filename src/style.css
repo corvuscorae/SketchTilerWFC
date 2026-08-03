@@ -73,16 +73,26 @@
 
 body.embed-mode {
 	margin: 0;
-	overflow: auto;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
 	background: #CCDEDD;
 }
 
 body.embed-mode #page {
-	display: block;
+	display: grid;
+	place-items: center;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
 }
 
 body.embed-mode #app {
-	padding: 1rem 7rem 1rem 1rem;
+	position: relative;
+	width: 750px;
+	height: 800px;
+	padding: 0;
+	zoom: var(--embed-scale, 1);
 }
 
 body.embed-mode #wfc-demo,
@@ -92,8 +102,11 @@ body.embed-mode #pattern-panel {
 }
 
 body.embed-mode #drawing-buttons {
-	position: fixed;
-	top: 1rem;
-	right: 1rem;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 100px;
+	padding: 10px 8px;
+	gap: 7px;
 	z-index: 10;
 }
